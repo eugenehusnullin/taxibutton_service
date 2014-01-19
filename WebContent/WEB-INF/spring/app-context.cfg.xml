@@ -28,7 +28,7 @@
 	</bean>
 	<tx:annotation-driven />
 
-	<bean id="runner" class="org.monitoring.server.Run" init-method="start"
+	<bean id="runner" class="tb2014.Run" init-method="start"
 		destroy-method="stop">
 	</bean>
 
