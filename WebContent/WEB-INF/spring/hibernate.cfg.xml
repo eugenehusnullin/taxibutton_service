@@ -16,5 +16,6 @@
 
 
 		<mapping resource="tb2014/domain/hibernate/Broker.hbm.xml" />
+		<mapping resource="tb2014/domain/hibernate/SimpleTariff.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

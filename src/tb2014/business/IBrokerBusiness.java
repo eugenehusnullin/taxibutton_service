@@ -6,6 +6,8 @@ import tb2014.domain.Broker;
 
 public interface IBrokerBusiness {
 	Broker getById(Long id);
+
 	List<Broker> getAll();
+
 	void add(Broker broker);
 }
