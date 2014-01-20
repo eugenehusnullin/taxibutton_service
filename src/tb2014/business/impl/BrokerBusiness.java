@@ -35,7 +35,7 @@ public class BrokerBusiness implements IBrokerBusiness {
 	@Transactional
 	@Override
 	public void add(Broker broker) {
-		brokerDao.add(broker);
+		brokerDao.save(broker);
 	}
 
 }

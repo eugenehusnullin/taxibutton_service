@@ -31,7 +31,7 @@ public class BrokerDao implements IBrokerDao {
 	}
 
 	@Override
-	public void add(Broker broker) {
+	public void save(Broker broker) {
 		sessionFactory.getCurrentSession().save(broker);
 	}
 
