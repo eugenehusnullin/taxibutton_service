@@ -5,9 +5,11 @@
 
 <hibernate-mapping package="tb2014.domain.tariff">
 	<class name="SimpleTariff" table="tariffs">
-		<id name="brokerId">
+		<id name="id">
 			<generator class="identity" />
 		</id>
+		<one-to-one name="broker" class="tb2014.domain.Broker"
+			constrained="true"></one-to-one>
 		<property name="tariffs" type="java.sql.Clob" />
 	</class>
 </hibernate-mapping>

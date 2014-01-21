@@ -1,16 +1,19 @@
 package tb2014.domain.tariff;
 
+import tb2014.domain.Broker;
+
 public class SimpleTariff {
 
-	private Long brokerId;
+	private int id;
+	private Broker broker;
 	private String tariffs;
 	
-	public Long getBrokerId() {
-		return brokerId;
+	public Broker getBroker() {
+		return broker;
 	}
 	
-	public void setBrokerId(Long brokerId) {
-		this.brokerId = brokerId;
+	public void setBroker(Broker broker) {
+		this.broker = broker;
 	}
 	
 	public String getTariffs() {
@@ -19,5 +22,13 @@ public class SimpleTariff {
 	
 	public void setTariffs(String tariffs) {
 		this.tariffs = tariffs;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

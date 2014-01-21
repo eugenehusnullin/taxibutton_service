@@ -10,7 +10,7 @@
 </head>
 <body>
 	<c:forEach items="${brokers}" var="broker">
-		<p>${broker.id} --- ${broker.name} --- ${broker.apiurl}</p>
+		<p>${broker.id} --- <a href="../tariff/tariff?id=${broker.id}">Tariff</a> --- ${broker.name} --- ${broker.apiurl}</p>
 	</c:forEach>
 	<br/>
 	<a href="create">Create</a>
