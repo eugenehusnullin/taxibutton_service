@@ -8,8 +8,7 @@
 		<id name="id">
 			<generator class="identity" />
 		</id>
-		<one-to-one name="broker" class="tb2014.domain.Broker"
-			constrained="true"></one-to-one>
-		<property name="tariffs" type="java.sql.Clob" />
+		<many-to-one name="broker" column="brokerid" unique-key="tariffs_uk1" />
+		<property name="tariffs" length="10000"/>
 	</class>
 </hibernate-mapping>
