@@ -11,7 +11,7 @@
 <body>
 	<form method="post">
 		<br />Tariff<input type="hidden" name="brokerId" value="${brokerId}">
-		<br /><textarea name="tariff"></textarea>
+		<br /><textarea name="tariff">${tariff.tariffs}</textarea>
 		<br /><input type="submit" value="save" />
 	</form>
 </body>

@@ -49,6 +49,6 @@ public class SimpleTariffController {
 
 		simpleTariffBusiness.save(simpleTariff);
 
-		return "redirect:broker/list";
+		return "redirect:../broker/list";
 	}
 }

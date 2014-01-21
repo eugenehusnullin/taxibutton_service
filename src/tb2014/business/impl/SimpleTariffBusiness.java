@@ -33,6 +33,7 @@ public class SimpleTariffBusiness implements ISimpleTariffBusiness {
 		return simpleTariffDao.getAll();
 	}
 
+	@Transactional
 	@Override
 	public void save(SimpleTariff tariff) {
 		simpleTariffDao.save(tariff);
