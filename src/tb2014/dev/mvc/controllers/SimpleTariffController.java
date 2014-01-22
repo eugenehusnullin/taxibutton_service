@@ -42,12 +42,17 @@ public class SimpleTariffController {
 	public String tariff(@RequestParam("tariff") String tariff,
 			@RequestParam("brokerId") Long brokerId, Model model) {
 		Broker broker = brokerBusiness.getById(brokerId);
-		SimpleTariff simpleTariff = new SimpleTariff();
+		SimpleTariff simpleTariff = simpleTariffBusiness.get(broker);
+
+		if (simpleTariff == null) {
+
+			simpleTariff = new SimpleTariff();
+		}
 
 		simpleTariff.setBroker(broker);
 		simpleTariff.setTariffs(tariff);
 
-		simpleTariffBusiness.save(simpleTariff);
+		simpleTariffBusiness.saveOrUpdate(simpleTariff);
 
 		return "redirect:../broker/list";
 	}

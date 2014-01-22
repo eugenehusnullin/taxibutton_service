@@ -3,43 +3,60 @@ package tb2014.service.tariff;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 
+import tb2014.Run;
+import tb2014.business.IBrokerBusiness;
+import tb2014.business.ISimpleTariffBusiness;
+import tb2014.utils.ConverterUtil;
 import tb2014.domain.Broker;
+import tb2014.domain.tariff.SimpleTariff;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TariffsProcessing {
 
-	public static void GetBrokerTariffs() {
+	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
-		ArrayList<Broker> brokers = new ArrayList<Broker>();
+	private IBrokerBusiness brokerBusiness;
+	private ISimpleTariffBusiness simpleTariffBusiness;
 
-		Broker broker1 = new Broker();
-		Broker broker2 = new Broker();
+	@Autowired
+	public TariffsProcessing(IBrokerBusiness brokerBusiness,
+			ISimpleTariffBusiness simpleTariffBusiness) {
 
-		brokers.add(broker1);
-		brokers.add(broker2);
+		this.brokerBusiness = brokerBusiness;
+		this.simpleTariffBusiness = simpleTariffBusiness;
+	}
+
+	public void GetBrokersTariffs() {
+
+		List<Broker> brokers = brokerBusiness.getAll();
 
 		for (Broker currentBroker : brokers) {
 
 			try {
 
-				Document currentXMLresponce = GetTariffsHTTP(currentBroker);
+				Document currentXMLResponce = GetTariffsHTTP(currentBroker);
+				String currentStringResponce = ConverterUtil
+						.XmlToString(currentXMLResponce);
 
-				currentXMLresponce.getDocumentElement().normalize();
-				UpdateBrokerTariffs(currentBroker, currentXMLresponce);
-			} catch (Exception e) {
-
+				UpdateBrokerTariffs(currentBroker, currentStringResponce);
+			} catch (Exception ex) {
+				log.info("Get XML tariffs error: " + ex.toString());
 			}
 
 		}
 	}
 
-	private static Document GetTariffsHTTP(Broker broker) {
+	private Document GetTariffsHTTP(Broker broker) {
 
 		Document doc = null;
 		URL url = null;
@@ -58,38 +75,26 @@ public class TariffsProcessing {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			doc = db.parse(xml);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.info("Get XML tariffs HTTP error: " + ex.toString());
 		}
 
 		return doc;
 	}
 
-	private static void UpdateBrokerTariffs(Broker broker, Document document) {
-//
-//		String tariffId;
-//		String tariffName;
-//		NodeList tariffNodes = document.getElementsByTagName("Tariff");
-//
-//		// looping all tariffs
-//		for (int i = 0; i < tariffNodes.getLength(); i++) {
-//
-//			Node currentTariff = tariffNodes.item(i);
-//
-//			if (currentTariff.getNodeType() == Node.ELEMENT_NODE) {
-//
-//				Element currentTariffElement = (Element) currentTariff;
-//
-//				tariffId = currentTariffElement.getElementsByTagName("Id")
-//						.item(0).getNodeValue();
-//				tariffName = currentTariffElement.getElementsByTagName("Name")
-//						.item(0).getNodeValue();
-//
-//				Node tariffDescription = currentTariffElement
-//						.getElementsByTagName("Description").item(0);
-//			}
-//
-//		}
+	private void UpdateBrokerTariffs(Broker broker, String tariff) {
 
+		SimpleTariff simpleTariff = simpleTariffBusiness.get(broker);
+		
+		if(simpleTariff == null) {
+			
+			simpleTariff = new SimpleTariff();
+			
+			simpleTariff.setBroker(broker);
+		}
+		
+		simpleTariff.setTariffs(tariff);
+		
+		simpleTariffBusiness.saveOrUpdate(simpleTariff);
 	}
 }

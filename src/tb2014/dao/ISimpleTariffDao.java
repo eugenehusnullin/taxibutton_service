@@ -14,4 +14,6 @@ public interface ISimpleTariffDao {
 	List<SimpleTariff> getAll();
 
 	void save(SimpleTariff tariff);
+	
+	void saveOrUpdate(SimpleTariff tariff);
 }

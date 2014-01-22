@@ -14,4 +14,6 @@ public interface ISimpleTariffBusiness {
 	List<SimpleTariff> getAll();
 
 	void save(SimpleTariff tariff);
+	
+	void saveOrUpdate(SimpleTariff tariff);
 }

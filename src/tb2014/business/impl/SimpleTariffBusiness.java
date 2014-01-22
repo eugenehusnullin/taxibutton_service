@@ -42,7 +42,12 @@ public class SimpleTariffBusiness implements ISimpleTariffBusiness {
 	@Transactional(readOnly=true)
 	@Override
 	public SimpleTariff get(Broker broker) {
-		// TODO Auto-generated method stub
 		return simpleTariffDao.get(broker);
+	}
+
+	@Transactional
+	@Override
+	public void saveOrUpdate(SimpleTariff tariff) {
+		simpleTariffDao.saveOrUpdate(tariff);
 	}
 }

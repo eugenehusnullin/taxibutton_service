@@ -45,4 +45,9 @@ public class SimpleTariffDao implements ISimpleTariffDao {
 				.createCriteria(SimpleTariff.class)
 				.add(Restrictions.eq("broker", broker)).uniqueResult();
 	}
+
+	@Override
+	public void saveOrUpdate(SimpleTariff tariff) {
+		sessionFactory.getCurrentSession().saveOrUpdate(tariff);	
+	}
 }
