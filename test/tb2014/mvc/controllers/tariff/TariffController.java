@@ -1,4 +1,4 @@
-package tb2014.mvc.controllers;
+package tb2014.mvc.controllers.tariff;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

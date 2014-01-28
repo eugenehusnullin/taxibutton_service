@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb2014.domain.order">
+	<class name="Order" table="orders">
+		<id name="id" column="orderId">
+			<generator class="identity" />
+		</id>
+		<many-to-one name="broker" column="brokerid" unique-key="tariffs_uk1" />
+		<property name="type" length="20" type="java.lang.String" />
+		<property name="phone" length="20" type="java.lang.String" />
+		<property name="supplyDate" type="java.util.Date" />
+		<property name="supplyMin" type="int" />
+		<property name="supplyHour" type="int" />
+		<set name="requirements" cascade="save-update" table="requirement">
+			<key>
+				<column name="orderId" not-null="true"/>
+			</key>
+			<one-to-many class="tb2014.domain.order.Requirement" />
+		</set>
+		<list name="destinations" cascade="save-update" table="orderAddressPoints">
+			<key>
+				<column name="orderId" not-null="true"/>
+			</key>
+			<index column="id"/>
+			<one-to-many class="tb2014.domain.order.AddressPoint" />
+		</list>
+	</class>
+</hibernate-mapping>

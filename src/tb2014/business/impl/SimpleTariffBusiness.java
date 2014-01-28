@@ -21,13 +21,13 @@ public class SimpleTariffBusiness implements ISimpleTariffBusiness {
 		this.simpleTariffDao = simpleTariffDao;
 	}
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Override
 	public SimpleTariff get(Long id) {
 		return simpleTariffDao.get(id);
 	}
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Override
 	public List<SimpleTariff> getAll() {
 		return simpleTariffDao.getAll();
@@ -39,7 +39,7 @@ public class SimpleTariffBusiness implements ISimpleTariffBusiness {
 		simpleTariffDao.save(tariff);
 	}
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Override
 	public SimpleTariff get(Broker broker) {
 		return simpleTariffDao.get(broker);

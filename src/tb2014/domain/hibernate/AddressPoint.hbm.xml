@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb2014.domain.order">
+	<class name="AddressPoint" table="orderAddressPoints">
+		<id name="id" column="pointId">
+			<generator class="identity"/>
+		</id>
+		<many-to-one name="order" class="tb2014.domain.order.Order">
+			<column name="orderId" not-null="true" />
+		</many-to-one>
+		<property name="type" type="byte" />
+		<property name="lon" type="double" />
+		<property name="lat" type="double" />
+		<property name="fullAddress" type="java.lang.String" />
+		<property name="shortAddress" type="java.lang.String" />
+		<property name="closesStation" type="java.lang.String" />
+		<property name="county" type="java.lang.String" />
+		<property name="locality" type="java.lang.String" />
+		<property name="street" type="java.lang.String" />
+		<property name="housing" type="java.lang.String" />
+	</class>
+</hibernate-mapping>
