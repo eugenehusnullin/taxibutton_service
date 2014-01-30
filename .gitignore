@@ -4,5 +4,4 @@ target/*
 .project
 /build
 /target
-
-WebContent/WEB-INF/settings/jdbc.settings
+jdbc.settings
