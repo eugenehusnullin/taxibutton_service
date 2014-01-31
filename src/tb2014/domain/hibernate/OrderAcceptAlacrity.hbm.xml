@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb2014.domain.order">
+	<class name="OrderAcceptAlacrity" table="orderacceptalacrity">
+		<id name="id" column="alacrityId">
+			<generator class="identity" />
+		</id>
+		<many-to-one name="broker" column="brokerId" unique-key="alacrity_uk1" />
+		<many-to-one name="order" column="orderId" unique-key="alacrity_uk2" />
+		<property name="date" type="date"/>
+	</class>
+</hibernate-mapping>

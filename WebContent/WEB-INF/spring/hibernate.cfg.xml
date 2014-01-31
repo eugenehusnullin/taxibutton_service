@@ -12,12 +12,14 @@
 		<property name="show_sql">true</property>
 		<property name="temp.use_jdbc_metadata_defaults">false</property>
 
-		<property name="hbm2ddl.auto">create-drop</property>
+		<property name="hbm2ddl.auto">update</property>
 
 		<mapping resource="tb2014/domain/hibernate/Broker.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/SimpleTariff.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/AddressPoint.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/Requirement.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/Order.hbm.xml" />
+		<mapping resource="tb2014/domain/hibernate/OrderAcceptAlacrity.hbm.xml" />
+		<mapping resource="tb2014/domain/hibernate/OrderStatus.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

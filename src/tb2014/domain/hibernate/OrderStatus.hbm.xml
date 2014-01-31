@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb2014.domain.order">
+	<class name="OrderStatus" table="orderstatus">
+		<id name="id" column="id">
+			<generator class="identity" />
+		</id>
+		<many-to-one name="order" class="tb2014.domain.order.Order">
+			<column name="orderId" not-null="true" />
+		</many-to-one>
+		<property name="longitude" type="double" />
+		<property name="latitude" type="double" />
+		<property name="status">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">tb2014.domain.order.OrderStatusType</param>
+			</type>
+		</property>
+		<property name="speed" type="int" />
+		<property name="direction" type="int" />
+		<property name="date" type="java.util.Date" />
+		<property name="category" type="java.lang.String" />
+	</class>
+</hibernate-mapping>

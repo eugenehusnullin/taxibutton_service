@@ -3,6 +3,7 @@ package tb2014.dao.impl;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -21,18 +22,27 @@ public class BrokerDao implements IBrokerDao {
 
 	@Override
 	public Broker get(Long id) {
-		return (Broker)sessionFactory.getCurrentSession().get(Broker.class, id);
+		return (Broker) sessionFactory.getCurrentSession()
+				.get(Broker.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Broker> getAll() {
-		return sessionFactory.getCurrentSession().createCriteria(Broker.class).list();
+		return sessionFactory.getCurrentSession().createCriteria(Broker.class)
+				.list();
 	}
 
 	@Override
 	public void save(Broker broker) {
 		sessionFactory.getCurrentSession().save(broker);
+	}
+
+	@Override
+	public Broker getByApiId(String id) {
+		return (Broker) sessionFactory.getCurrentSession()
+				.createCriteria(Broker.class).add(Restrictions.eq("apiId", id))
+				.uniqueResult();
 	}
 
 }

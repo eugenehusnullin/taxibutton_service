@@ -38,4 +38,10 @@ public class BrokerBusiness implements IBrokerBusiness {
 		brokerDao.save(broker);
 	}
 
+	@Transactional(readOnly=true)
+	@Override
+	public Broker getByApiId(String id) {
+		return brokerDao.getByApiId(id);
+	}
+
 }

@@ -14,7 +14,11 @@
 		<input type="text" name="name" />
 		<br/>Apiurl
 		<input type="text" name="apiurl" />
-		<br/>
+		<br/>Api id
+		<input type="text" name="apiId" />
+		<br/>Api key
+		<input type="text" name="apiKey" />
+		<br />
 		<input type="submit" value="save" />
 	</form>
 </body>

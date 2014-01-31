@@ -1,0 +1,19 @@
+package tb2014.business;
+
+import java.util.List;
+
+import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderStatus;
+
+public interface IOrderStatusBusiness {
+
+	OrderStatus get(Long id);
+
+	OrderStatus get(Order order);
+
+	List<OrderStatus> getAll();
+
+	void save(OrderStatus orderStatus);
+
+	void saveOrUpdate(OrderStatus orderStatus);
+}

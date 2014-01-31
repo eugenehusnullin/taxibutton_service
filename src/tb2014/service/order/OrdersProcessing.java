@@ -60,7 +60,7 @@ public class OrdersProcessing {
 		List<Broker> brokers = brokerBusiness.getAll();
 		Order order = orderBusiness.getWithChilds(orderId);
 		Document orderXml = OrderSerializer.OrderToXml(order);
-		
+
 		for (Broker currentBroker : brokers) {
 			try {
 				OfferOrderHTTP(currentBroker, orderXml);
@@ -76,7 +76,7 @@ public class OrdersProcessing {
 		try {
 
 			String url = broker.getApiurl() + "/offer";
-			//String url = "http://localhost:8080/tb2014/test/offer";
+			// String url = "http://localhost:8080/tb2014/test/offer";
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj
 					.openConnection();
@@ -100,11 +100,42 @@ public class OrdersProcessing {
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
-				log.info("Error offering order to broker (code: " + responceCode + "): "
-						+ broker.getId().toString());
+				log.info("Error offering order to broker (code: "
+						+ responceCode + "): " + broker.getId().toString());
 			}
 		} catch (Exception ex) {
 			log.info("Offering order for broker " + broker.getId() + " error: "
+					+ ex.toString());
+		}
+	}
+
+	public void GiveOrder(Long orderId, Broker broker) {
+
+		try {
+
+			String url = "http://localhost:8080/tb2014/test/give";
+			// String url = broker.getApiurl() + "/give";
+			url += "?orderId=" + orderId.toString();
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
+
+			connection.setRequestMethod("GET");
+
+			int responceCode = connection.getResponseCode();
+
+			if (responceCode != 200) {
+				log.info("Error giving order to broker (code: " + responceCode
+						+ "): " + broker.getId().toString());
+			} else {
+
+				Order order = orderBusiness.get(orderId);
+
+				order.setBroker(broker);
+				orderBusiness.saveOrUpdate(order);
+			}
+		} catch (Exception ex) {
+			log.info("Giving order for broker " + broker.getId() + " error: "
 					+ ex.toString());
 		}
 	}

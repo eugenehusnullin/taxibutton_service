@@ -26,8 +26,7 @@ public class BrokerController {
 		model.addAttribute("brokers", brokerBusiness.getAll());
 		return "broker/list";
 	}
-	
-	
+
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public String create() {
 		return "broker/create";
@@ -35,11 +34,15 @@ public class BrokerController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String create(@RequestParam("name") String name,
-			@RequestParam("apiurl") String apiurl, Model model) {
+			@RequestParam("apiurl") String apiurl,
+			@RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey, Model model) {
 
 		Broker broker = new Broker();
 		broker.setName(name);
 		broker.setApiurl(apiurl);
+		broker.setApiId(apiId);
+		broker.setApiKey(apiKey);
 		brokerBusiness.add(broker);
 
 		return "redirect:list";

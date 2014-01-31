@@ -10,10 +10,10 @@
 </head>
 <body>
 	<c:forEach items="${brokers}" var="broker">
-		<p>${broker.id}
-			--- <a href="../tariff/tariff?id=${broker.id}">Tariff</a> --- <a
-				href="../phone/blackList?id=${broker.id}">Black list</a> ---
-			${broker.name} --- ${broker.apiurl}
+		<p>${broker.getId()}
+			--- <a href="../tariff/tariff?id=${broker.getId()}">Tariff</a> --- <a
+				href="../phone/blackList?id=${broker.getId()}">Black list</a> ---
+			${broker.getName()} --- ${broker.getApiurl()}
 		</p>
 	</c:forEach>
 	<br />

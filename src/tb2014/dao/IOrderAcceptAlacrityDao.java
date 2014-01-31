@@ -1,0 +1,22 @@
+package tb2014.dao;
+
+import java.util.List;
+
+import tb2014.domain.Broker;
+import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderAcceptAlacrity;
+
+public interface IOrderAcceptAlacrityDao {
+	
+	OrderAcceptAlacrity get(Long id);
+	
+	List<OrderAcceptAlacrity> getOrderAll(Long id);
+	
+	List<OrderAcceptAlacrity> getAll();
+	
+	void save(OrderAcceptAlacrity alacrity);
+	
+	void saveOrUpdate(OrderAcceptAlacrity alacrity);
+	
+	Broker getWinner(Order order);
+}

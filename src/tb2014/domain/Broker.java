@@ -2,6 +2,8 @@ package tb2014.domain;
 
 public class Broker {
 	private Long id;
+	private String apiId;
+	private String apiKey;
 	private String name;
 	private String apiurl;
 
@@ -27,5 +29,21 @@ public class Broker {
 
 	public void setApiurl(String apiurl) {
 		this.apiurl = apiurl;
+	}
+
+	public String getApiId() {
+		return apiId;
+	}
+
+	public void setApiId(String apiId) {
+		this.apiId = apiId;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 }

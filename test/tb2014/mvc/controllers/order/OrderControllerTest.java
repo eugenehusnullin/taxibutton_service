@@ -14,6 +14,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/test")
 @Controller
@@ -40,5 +41,13 @@ public class OrderControllerTest {
 		response.setHeader("Pragma", "No-cache");
 		response.setDateHeader("Expires", 0);
 		response.setHeader("Cache-Control", "no-cache");
+	}
+	
+	@RequestMapping(value = "/give", method = RequestMethod.GET)
+	public void give(@RequestParam("orderId") Long orderId, HttpServletResponse response) {
+		
+		Long result = orderId;
+		
+		response.setStatus(200);
 	}
 }

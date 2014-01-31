@@ -6,13 +6,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Orders list</title>
+<title>Give order to broker</title>
 </head>
 <body>
-	<c:forEach items="${orders}" var="order">
-		<p>${order.getId()}---${order.getType()}---<a href="send?id=${order.getId()}">Send</a>---<a href="give?id=${order.getId()}">Give</a>---<a href="sendStatus?id=${order.getId()}">Send status</a></p>
-	</c:forEach>
-	<br />
-	<a href="create">Create</a>
+	<form action="give" method="POST">
+		<input type="hidden" name="orderId" value="${orderId}" /> Broker api
+		id <br /> <input type="text" name="apiId" /><br /><input type="submit"
+			value="Give" />
+	</form>
 </body>
 </html>
