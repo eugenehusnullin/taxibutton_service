@@ -9,7 +9,7 @@ public interface IOrderStatusBusiness {
 
 	OrderStatus get(Long id);
 
-	OrderStatus get(Order order);
+	List<OrderStatus> get(Order order);
 
 	List<OrderStatus> getAll();
 

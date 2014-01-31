@@ -9,7 +9,7 @@ public interface IOrderStatusDao {
 
 	OrderStatus get(Long id);
 
-	OrderStatus get(Order order);
+	List<OrderStatus> get(Order order);
 
 	List<OrderStatus> getAll();
 

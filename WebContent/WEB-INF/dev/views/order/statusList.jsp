@@ -9,15 +9,8 @@
 <title>Orders list</title>
 </head>
 <body>
-	<c:forEach items="${orders}" var="order">
-		<p>${order.getId()}---${order.getType()}---<a
-				href="send?id=${order.getId()}">Send</a>---<a
-				href="give?id=${order.getId()}">Give</a>---<a
-				href="sendStatus?id=${order.getId()}">Send status</a>---<a
-				href="showStatus?id=${order.getId()}">Show status</a>
-		</p>
+	<c:forEach items="${statusList}" var="status">
+		<p>${status.getId()}---${status.getLatitude()}---${status.getLongitude()}---${status.getDate()}</p>
 	</c:forEach>
-	<br />
-	<a href="create">Create</a>
 </body>
 </html>

@@ -38,6 +38,7 @@ public class OrderControllerApi {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.alacrityBuiness = alacrityBuiness;
+		this.orderStatusBusiness = orderStatusBusiness;
 	}
 
 	@RequestMapping(value = "/alacrity", method = RequestMethod.GET)

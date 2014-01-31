@@ -75,8 +75,8 @@ public class OrdersProcessing {
 
 		try {
 
-			String url = broker.getApiurl() + "/offer";
-			// String url = "http://localhost:8080/tb2014/test/offer";
+			//String url = broker.getApiurl() + "/offer";
+			String url = "http://localhost:8080/tb2014/test/offer";
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj
 					.openConnection();

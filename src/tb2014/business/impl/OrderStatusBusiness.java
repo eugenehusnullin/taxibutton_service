@@ -29,7 +29,7 @@ public class OrderStatusBusiness implements IOrderStatusBusiness {
 
 	@Transactional(readOnly = true)
 	@Override
-	public OrderStatus get(Order order) {
+	public List<OrderStatus> get(Order order) {
 		return orderStatusDao.get(order);
 	}
 

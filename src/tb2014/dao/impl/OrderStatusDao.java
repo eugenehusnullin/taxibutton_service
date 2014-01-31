@@ -27,11 +27,12 @@ public class OrderStatusDao implements IOrderStatusDao {
 				OrderStatus.class, id);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public OrderStatus get(Order order) {
-		return (OrderStatus) sessionFactory.getCurrentSession()
+	public List<OrderStatus> get(Order order) {
+		return sessionFactory.getCurrentSession()
 				.createCriteria(OrderStatus.class)
-				.add(Restrictions.eqOrIsNull("order", order)).uniqueResult();
+				.add(Restrictions.eqOrIsNull("order", order)).list();
 	}
 
 	@SuppressWarnings("unchecked")

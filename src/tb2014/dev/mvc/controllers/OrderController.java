@@ -3,10 +3,8 @@ package tb2014.dev.mvc.controllers;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +20,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.omg.DynamicAny.NameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,10 +29,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOrderBusiness;
+import tb2014.business.IOrderStatusBusiness;
 import tb2014.service.order.OrdersProcessing;
 import tb2014.domain.Broker;
 import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.Requirement;
 
 @RequestMapping("/order")
@@ -44,12 +43,15 @@ public class OrderController {
 
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
+	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
 	public OrderController(IOrderBusiness orderBusiness,
-			IBrokerBusiness brokerBusiness) {
+			IBrokerBusiness brokerBusiness,
+			IOrderStatusBusiness orderStatusBusiness) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
+		this.orderStatusBusiness = orderStatusBusiness;
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -116,9 +118,20 @@ public class OrderController {
 		outputStream.flush();
 		outputStream.close();
 
-		int responseCode = connection.getResponseCode();
+		//int responseCode = connection.getResponseCode();
 
 		return "redirect:list";
+	}
+
+	@RequestMapping(value = "/showStatus", method = RequestMethod.GET)
+	public String showStatus(@RequestParam("id") Long orderId, Model model) {
+
+		Order order = orderBusiness.get(orderId);
+		List<OrderStatus> statusList = orderStatusBusiness.get(order);
+		
+		model.addAttribute("statusList", statusList);
+		
+		return "order/statusList";
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -249,18 +262,19 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/give", method = RequestMethod.POST)
-	public String give(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId) {
-		
+	public String give(@RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId) {
+
 		OrdersProcessing orderProcessing = new OrdersProcessing(orderBusiness,
 				brokerBusiness);
 
 		Broker broker = brokerBusiness.getByApiId(apiId);
 
 		orderProcessing.GiveOrder(orderId, broker);
-		
+
 		return "redirect:list";
 	}
-	
+
 	@RequestMapping(value = "/offer", method = RequestMethod.POST)
 	public void offer(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
