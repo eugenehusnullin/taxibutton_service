@@ -33,6 +33,7 @@ public class OrderDao implements IOrderDao {
 				.add(Restrictions.eq("id", id))
 				.setFetchMode("destinations", FetchMode.JOIN)
 				.setFetchMode("requirements", FetchMode.JOIN)
+				.setFetchMode("broker", FetchMode.JOIN)
 				.uniqueResult();
 	}
 

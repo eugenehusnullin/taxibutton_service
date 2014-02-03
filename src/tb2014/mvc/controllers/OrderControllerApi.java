@@ -49,6 +49,11 @@ public class OrderControllerApi {
 		Broker broker = brokerBusiness.getByApiId(apiId);
 		Order order = orderBusiness.get(orderId);
 
+		if(broker == null) {
+			response.setStatus(403);
+			return;
+		}
+		
 		if (broker.getApiKey().trim().equals(apiKey.trim()) == false) {
 			response.setStatus(403);
 			return;

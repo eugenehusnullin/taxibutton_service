@@ -21,5 +21,6 @@
 		<mapping resource="tb2014/domain/hibernate/Order.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/OrderAcceptAlacrity.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/OrderStatus.hbm.xml" />
+		<mapping resource="tb2014/domain/hibernate/OrderCancel.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

@@ -46,6 +46,16 @@ public class OrderControllerTest {
 	@RequestMapping(value = "/give", method = RequestMethod.GET)
 	public void give(@RequestParam("orderId") Long orderId, HttpServletResponse response) {
 		
+		@SuppressWarnings("unused")
+		Long result = orderId;
+		
+		response.setStatus(200);
+	}
+	
+	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
+	public void cancel(@RequestParam("orderId") Long orderId, @RequestParam("reason") String reason, HttpServletResponse response) {
+		
+		@SuppressWarnings("unused")
 		Long result = orderId;
 		
 		response.setStatus(200);

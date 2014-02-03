@@ -41,6 +41,7 @@ import tb2014.domain.order.Requirement;
 @Controller
 public class OrderController {
 
+	private OrdersProcessing orderProcessing;
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
 	private IOrderStatusBusiness orderStatusBusiness;
@@ -48,10 +49,12 @@ public class OrderController {
 	@Autowired
 	public OrderController(IOrderBusiness orderBusiness,
 			IBrokerBusiness brokerBusiness,
-			IOrderStatusBusiness orderStatusBusiness) {
+			IOrderStatusBusiness orderStatusBusiness,
+			OrdersProcessing orderProcessing) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
+		this.orderProcessing = orderProcessing;
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -132,6 +135,17 @@ public class OrderController {
 		model.addAttribute("statusList", statusList);
 		
 		return "order/statusList";
+	}
+	
+	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
+	public String cancel(@RequestParam("id") Long orderId) {
+		
+		String reason = "temp reason of cancelling";
+		Order order = orderBusiness.getWithChilds(orderId);
+		
+		orderProcessing.cancelOrder(order, reason);
+		
+		return "redirect:list";
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -246,10 +260,7 @@ public class OrderController {
 	@RequestMapping(value = "/send", method = RequestMethod.GET)
 	public String send(@RequestParam("id") Long orderId, Model model) {
 
-		OrdersProcessing orderProcessing = new OrdersProcessing(orderBusiness,
-				brokerBusiness);
-
-		orderProcessing.OfferOrder(orderId);
+		orderProcessing.offerOrder(orderId);
 
 		return "redirect:list";
 	}
@@ -264,13 +275,10 @@ public class OrderController {
 	@RequestMapping(value = "/give", method = RequestMethod.POST)
 	public String give(@RequestParam("orderId") Long orderId,
 			@RequestParam("apiId") String apiId) {
-
-		OrdersProcessing orderProcessing = new OrdersProcessing(orderBusiness,
-				brokerBusiness);
-
+		
 		Broker broker = brokerBusiness.getByApiId(apiId);
 
-		orderProcessing.GiveOrder(orderId, broker);
+		orderProcessing.giveOrder(orderId, broker);
 
 		return "redirect:list";
 	}

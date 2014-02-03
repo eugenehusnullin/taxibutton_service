@@ -14,7 +14,8 @@
 				href="send?id=${order.getId()}">Send</a>---<a
 				href="give?id=${order.getId()}">Give</a>---<a
 				href="sendStatus?id=${order.getId()}">Send status</a>---<a
-				href="showStatus?id=${order.getId()}">Show status</a>
+				href="showStatus?id=${order.getId()}">Show status</a>---<a
+				href="cancel?id=${order.getId()}">Cancel</a>
 		</p>
 	</c:forEach>
 	<br />

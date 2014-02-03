@@ -2,7 +2,10 @@ package tb2014.service.order;
 
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.transform.Result;
@@ -14,31 +17,44 @@ import javax.xml.transform.dom.DOMSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOrderBusiness;
+import tb2014.business.IOrderCancelBusiness;
+import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderCancel;
+import tb2014.domain.order.OrderStatus;
+import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
 
+@Service("OrdersProcessing")
 public class OrdersProcessing {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
+	private IOrderCancelBusiness orderCancelBusiness;
+	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
 	public OrdersProcessing(IOrderBusiness orderBusiness,
-			IBrokerBusiness brokerBusiness) {
+			IBrokerBusiness brokerBusiness,
+			IOrderCancelBusiness orderCancelBusiness,
+			IOrderStatusBusiness orderStatusBusiness) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
+		this.orderCancelBusiness = orderCancelBusiness;
+		this.orderStatusBusiness = orderStatusBusiness;
 	}
 
 	// create client order object in database (returns a new order id)
-	public Long CreateOrder(Order order) {
+	public Long createOrder(Order order) {
 
 		try {
 
@@ -55,7 +71,7 @@ public class OrdersProcessing {
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
-	public void OfferOrder(Long orderId) {
+	public void offerOrder(Long orderId) {
 
 		List<Broker> brokers = brokerBusiness.getAll();
 		Order order = orderBusiness.getWithChilds(orderId);
@@ -63,7 +79,7 @@ public class OrdersProcessing {
 
 		for (Broker currentBroker : brokers) {
 			try {
-				OfferOrderHTTP(currentBroker, orderXml);
+				offerOrderHTTP(currentBroker, orderXml);
 			} catch (Exception ex) {
 				log.info("Offer order to broker " + currentBroker.getId()
 						+ " error: " + ex.toString());
@@ -71,11 +87,12 @@ public class OrdersProcessing {
 		}
 	}
 
-	private void OfferOrderHTTP(Broker broker, Document document) {
+	// offer order via HTTP protocol
+	private void offerOrderHTTP(Broker broker, Document document) {
 
 		try {
 
-			//String url = broker.getApiurl() + "/offer";
+			// String url = broker.getApiurl() + "/offer";
 			String url = "http://localhost:8080/tb2014/test/offer";
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj
@@ -109,7 +126,8 @@ public class OrdersProcessing {
 		}
 	}
 
-	public void GiveOrder(Long orderId, Broker broker) {
+	// assign order executer
+	public void giveOrder(Long orderId, Broker broker) {
 
 		try {
 
@@ -138,5 +156,61 @@ public class OrdersProcessing {
 			log.info("Giving order for broker " + broker.getId() + " error: "
 					+ ex.toString());
 		}
+	}
+
+	// cancelling order
+	public void cancelOrder(Order order, String reason) {
+
+		@SuppressWarnings("unused")
+		Broker broker = order.getBroker();
+
+		// String url = broker.getApiurl() + "/cancel";
+		String url = "/tb2014/test/cancel";
+		String params = "orderId=" + order.getId() + "&reason=" + reason;
+
+		int resultCode = sendHttpGet(url, params);
+
+		if (resultCode == 200) {// if broker has accepted cancelling order,
+								// adding cancel row into the table & saving a
+								// status of order as Cancelled
+			OrderCancel orderCancel = new OrderCancel();
+			orderCancel.setOrder(order);
+			orderCancel.setReason(reason);
+
+			orderCancelBusiness.save(orderCancel);
+
+			OrderStatus orderStatus = new OrderStatus();
+
+			orderStatus.setOrder(order);
+			orderStatus.setStatus(OrderStatusType.valueOf("Cancelled"));
+			orderStatus.setDate(new Date());
+
+			orderStatusBusiness.save(orderStatus);
+		}
+	}
+
+	// sending HTTP GET request
+	private int sendHttpGet(String url, String params) {
+
+		int responseCode = 0;
+
+		try {
+			URI uriObject = new URI("http", "localhost:8080", url, params, null);
+			
+			URL obj = uriObject.toURL();
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
+
+			connection.setRequestMethod("GET");
+
+			responseCode = connection.getResponseCode();
+		} catch (Exception ex) {
+
+			System.out.println("Sending HTTP GET to: " + url
+					+ " FAILED, error: " + ex.toString());
+			responseCode = -1;
+		}
+
+		return responseCode;
 	}
 }
