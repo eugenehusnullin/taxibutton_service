@@ -39,6 +39,7 @@ public class OrderSerializer {
 
 			recipient.setAttribute("blacklisted", "no");
 			recipient.setAttribute("loyal", "yes");
+			recipient.appendChild(doc.createTextNode(order.getPhone()));
 			offer.appendChild(recipient);
 
 			Element source = doc.createElement("Source");

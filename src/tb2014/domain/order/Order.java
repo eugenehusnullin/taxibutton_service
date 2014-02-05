@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.Set;
 
 import tb2014.domain.Broker;
+import tb2014.domain.Device;
 import tb2014.domain.order.AddressPoint;
 
 public class Order {
 
 	private Long id;
+	private String uuid;
+	private Device device;
 	private String type;
 	private String phone;
 	private Date supplyDate;
@@ -111,5 +114,21 @@ public class Order {
 
 	public void setRequirements(Set<Requirement> requirements) {
 		this.requirements = requirements;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String guid) {
+		this.uuid = guid;
+	}
+
+	public Device getDevice() {
+		return device;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
 	}
 }

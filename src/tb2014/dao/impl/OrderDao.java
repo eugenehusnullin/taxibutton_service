@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import tb2014.dao.IOrderDao;
+import tb2014.domain.Device;
 import tb2014.domain.order.Order;
 
 @Repository("OrderDao")
@@ -52,6 +53,17 @@ public class OrderDao implements IOrderDao {
 	@Override
 	public void saveOrUpdate(Order order) {
 		sessionFactory.getCurrentSession().saveOrUpdate(order);
+	}
+
+	@Override
+	public void delete(Order order) {
+		sessionFactory.getCurrentSession().delete(order);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Order> getAll(Device device) {
+		return sessionFactory.getCurrentSession().createCriteria(Order.class).add(Restrictions.eq("device", device)).list();
 	}
 
 }

@@ -1,16 +1,13 @@
 package tb2014.dev.mvc.controllers;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +17,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,10 +32,8 @@ import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderStatusBusiness;
 import tb2014.service.order.OrdersProcessing;
 import tb2014.domain.Broker;
-import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
-import tb2014.domain.order.Requirement;
 
 @RequestMapping("/order")
 @Controller
@@ -60,20 +58,8 @@ public class OrderController {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
 
-		List<Order> orders = orderBusiness.getAll();
-
-		for (Order currentOrder : orders) {
-			System.out.println("Current order: " + currentOrder.getId() + "---"
-					+ currentOrder.getType());
-		}
-
 		model.addAttribute("orders", orderBusiness.getAll());
 		return "order/list";
-	}
-
-	@RequestMapping(value = "/create", method = RequestMethod.GET)
-	public String create() {
-		return "order/create";
 	}
 
 	@RequestMapping(value = "/sendStatus", method = RequestMethod.GET)
@@ -96,7 +82,7 @@ public class OrderController {
 			@RequestParam("speed") int speed,
 			@RequestParam("category") String category) throws IOException {
 
-		String url = "http://localhost:8080/tb2014/apiOrder/setStatus";
+		String url = "http://localhost:8080/tb2014/apibroker/order/setStatus";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -121,7 +107,7 @@ public class OrderController {
 		outputStream.flush();
 		outputStream.close();
 
-		//int responseCode = connection.getResponseCode();
+		// int responseCode = connection.getResponseCode();
 
 		return "redirect:list";
 	}
@@ -131,128 +117,158 @@ public class OrderController {
 
 		Order order = orderBusiness.get(orderId);
 		List<OrderStatus> statusList = orderStatusBusiness.get(order);
-		
+
 		model.addAttribute("statusList", statusList);
-		
+
 		return "order/statusList";
 	}
-	
+
 	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
 	public String cancel(@RequestParam("id") Long orderId) {
-		
+
 		String reason = "temp reason of cancelling";
 		Order order = orderBusiness.getWithChilds(orderId);
-		
+
 		orderProcessing.cancelOrder(order, reason);
-		
+
 		return "redirect:list";
+	}
+
+	@RequestMapping(value = "/create", method = RequestMethod.GET)
+	public String create() {
+		return "order/create";
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String create(HttpServletRequest request) {
 
-		Order order = new Order();
+		JSONObject createOrderJson = new JSONObject();
 
-		order.setType(request.getParameter("orderType"));
-		order.setPhone(request.getParameter("phone"));
+		createOrderJson.put("apiId", request.getParameter("apiId"));
+		createOrderJson.put("apiKey", request.getParameter("apiKey"));
 
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+		JSONObject orderJson = new JSONObject();
 
-		if (request.getParameter("bookingDate").isEmpty() == false) {
-			String orderDate = request.getParameter("bookingDate");
-			Date resultDate = null;
+		orderJson.put("recipientBlackListed", "no");
+		orderJson.put("recipientLoyal", "yes");
+		orderJson.put("recipientPhone", request.getParameter("phone"));
 
-			try {
-				resultDate = dateFormatter.parse(orderDate);
-				order.setSupplyDate(resultDate);
-			} catch (Exception ex) {
-				System.out.println("");
-			}
-		}
+		JSONObject sourceJson = new JSONObject();
 
-		if (request.getParameter("bookingHour").isEmpty() == false) {
-			order.setSupplyHour(Integer.parseInt(request
-					.getParameter("bookingHour")));
-		}
+		sourceJson.put("lon", request.getParameter("sourceLon"));
+		sourceJson.put("lat", request.getParameter("sourceLat"));
+		sourceJson.put("fullAddress", request.getParameter("sFullAddress"));
+		sourceJson.put("shortAddress", request.getParameter("sShortAddress"));
+		sourceJson.put("closestStation",
+				request.getParameter("sClosestStation"));
+		sourceJson.put("country", request.getParameter("sCountry"));
+		sourceJson.put("locality", request.getParameter("sLocality"));
+		sourceJson.put("street", request.getParameter("sStreet"));
+		sourceJson.put("housing", request.getParameter("sHousing"));
 
-		if (request.getParameter("bookingMin").isEmpty() == false) {
-			order.setSupplyMin(Integer.parseInt(request
-					.getParameter("bookingMin")));
-		}
+		orderJson.put("source", sourceJson);
 
-		List<AddressPoint> addressPoints = new ArrayList<AddressPoint>();
+		JSONArray destinationsJson = new JSONArray();
+		JSONObject destinationJson = new JSONObject();
 
-		// source point
-		AddressPoint source = new AddressPoint();
+		destinationJson.put("index", "1");
+		destinationJson.put("lon", request.getParameter("destinationLon"));
+		destinationJson.put("lat", request.getParameter("destinationLat"));
+		destinationJson
+				.put("fullAddress", request.getParameter("dFullAddress"));
+		destinationJson.put("shortAddress",
+				request.getParameter("dShortAddress"));
+		destinationJson.put("closestStation",
+				request.getParameter("dClosestStation"));
+		destinationJson.put("country", request.getParameter("dCountry"));
+		destinationJson.put("locality", request.getParameter("dLocality"));
+		destinationJson.put("street", request.getParameter("dStreet"));
+		destinationJson.put("housing", request.getParameter("dHousing"));
 
-		source.setType(Byte.parseByte("0"));
+		destinationsJson.put(destinationJson);
 
-		if (request.getParameter("sourceLon").isEmpty() == false) {
-			source.setLon(Double.parseDouble(request.getParameter("sourceLon")));
-		}
+		orderJson.put("destinations", destinationsJson);
+		orderJson.put("bookingType", request.getParameter("orderType"));
+		orderJson.put("bookingDate", request.getParameter("bookingDate"));
+		orderJson.put("bookingHour", request.getParameter("bookingHour"));
+		orderJson.put("bookingMin", request.getParameter("bookingMin"));
 
-		if (request.getParameter("sourceLat").isEmpty() == false) {
-			source.setLat(Double.parseDouble(request.getParameter("sourceLat")));
-		}
-
-		source.setFullAddress(request.getParameter("sFullAddress"));
-		source.setShortAddress(request.getParameter("sShortAddress"));
-		source.setClosesStation(request.getParameter("sClosestStation"));
-		source.setCounty(request.getParameter("sCountry"));
-		source.setLocality(request.getParameter("sLocality"));
-		source.setStreet(request.getParameter("sStreet"));
-		source.setHousing(request.getParameter("sHousing"));
-		source.setOrder(order);
-
-		addressPoints.add(source);
-
-		AddressPoint destination = new AddressPoint();
-
-		destination.setType(Byte.parseByte("1"));
-
-		if (request.getParameter("destinationLon").isEmpty() == false) {
-			destination.setLon(Double.parseDouble(request
-					.getParameter("destinationLon")));
-		}
-
-		if (request.getParameter("destinationLat").isEmpty() == false) {
-			destination.setLat(Double.parseDouble(request
-					.getParameter("destinationLat")));
-		}
-
-		destination.setFullAddress(request.getParameter("dFullAddress"));
-		destination.setShortAddress(request.getParameter("dShortAddress"));
-		destination.setClosesStation(request.getParameter("dClosestStation"));
-		destination.setCounty(request.getParameter("dCountry"));
-		destination.setLocality(request.getParameter("dLocality"));
-		destination.setStreet(request.getParameter("dStreet"));
-		destination.setHousing(request.getParameter("dHousing"));
-		destination.setOrder(order);
-
-		addressPoints.add(destination);
-
-		order.setDestinations(addressPoints);
-
-		Set<Requirement> requirements = new HashSet<Requirement>();
-
-		Requirement currentRequirement = new Requirement();
+		JSONArray requirementsJson = new JSONArray();
 
 		String[] formRequirements = request.getParameterValues("requirements");
 
 		for (String currentRequirementName : formRequirements) {
-			currentRequirement = new Requirement();
-			currentRequirement.setType(currentRequirementName);
+
+			JSONObject currentRequirementJson = new JSONObject();
+
+			currentRequirementJson.put("name", currentRequirementName);
 
 			if (currentRequirementName.trim().equals("isChildChair")) {
-				currentRequirement.setOptions(request.getParameter("childAge"));
+				currentRequirementJson.put("value",
+						request.getParameter("childAge"));
+			} else {
+				currentRequirementJson.put("value", "yes");
 			}
 
-			currentRequirement.setOrder(order);
-			requirements.add(currentRequirement);
+			requirementsJson.put(currentRequirementJson);
 		}
 
-		order.setRequirements(requirements);
-		orderBusiness.save(order);
+		orderJson.put("requirements", requirementsJson);
+
+		createOrderJson.put("order", orderJson);
+
+		String jsonResult = createOrderJson.toString();
+
+		try {
+
+			String url = "http://localhost:8080/tb2014/apidevice/order/create";
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			connection.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(
+					connection.getOutputStream());
+
+			wr.writeBytes(jsonResult);
+			wr.flush();
+			wr.close();
+
+			int responceCode = connection.getResponseCode();
+
+			if (responceCode != 200) {
+				System.out.println("Error sending order to server");
+			}
+
+			// need to get an response with order id
+			StringBuffer stringBuffer = new StringBuffer();
+			String line = null;
+
+			try {
+
+				BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(connection.getInputStream()));
+
+				while ((line = bufferedReader.readLine()) != null) {
+					stringBuffer.append(line);
+				}
+			} catch (Exception ex) {
+				System.out.println("Error receiving server respone: "
+						+ ex.toString());
+			}
+
+			JSONObject responseJson = (JSONObject) new JSONTokener(
+					stringBuffer.toString()).nextValue();
+
+			System.out.println("Server JSON response: "
+					+ responseJson.toString());
+		} catch (Exception ex) {
+			System.out.println("Error creating new order: " + ex.toString());
+		}
 
 		return "redirect:list";
 	}
@@ -261,6 +277,14 @@ public class OrderController {
 	public String send(@RequestParam("id") Long orderId, Model model) {
 
 		orderProcessing.offerOrder(orderId);
+
+		return "redirect:list";
+	}
+
+	@RequestMapping(value = "/delete", method = RequestMethod.GET)
+	public String delete(@RequestParam("id") Long orderId) {
+
+		orderProcessing.deleteOrder(orderId);
 
 		return "redirect:list";
 	}
@@ -275,7 +299,7 @@ public class OrderController {
 	@RequestMapping(value = "/give", method = RequestMethod.POST)
 	public String give(@RequestParam("orderId") Long orderId,
 			@RequestParam("apiId") String apiId) {
-		
+
 		Broker broker = brokerBusiness.getByApiId(apiId);
 
 		orderProcessing.giveOrder(orderId, broker);

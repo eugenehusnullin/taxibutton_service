@@ -4,7 +4,6 @@ import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
@@ -67,6 +66,14 @@ public class OrdersProcessing {
 
 			return null;
 		}
+	}
+
+	// saving an order into database, return his new db id
+	public Long saveOrder(Order order) {
+
+		orderBusiness.save(order);
+
+		return order.getId();
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
@@ -196,7 +203,7 @@ public class OrdersProcessing {
 
 		try {
 			URI uriObject = new URI("http", "localhost:8080", url, params, null);
-			
+
 			URL obj = uriObject.toURL();
 			HttpURLConnection connection = (HttpURLConnection) obj
 					.openConnection();
@@ -212,5 +219,13 @@ public class OrdersProcessing {
 		}
 
 		return responseCode;
+	}
+
+	// deleting order with all childs
+	public void deleteOrder(Long orderId) {
+		
+		Order order = orderBusiness.get(orderId);
+		
+		orderBusiness.delete(order);
 	}
 }

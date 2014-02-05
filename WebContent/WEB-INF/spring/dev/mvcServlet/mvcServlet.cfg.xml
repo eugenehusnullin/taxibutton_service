@@ -15,7 +15,7 @@
 	<!-- Scans within the base package of the application for @Components to 
 		configure as beans -->
 	<!-- @Controller, @Service, @Configuration, etc. -->
-	<context:component-scan base-package="tb2014.dev,tb2014.mvc.controllers" />
+	<context:component-scan base-package="tb2014.dev,tb2014.apidevice,tb2014.apibroker" />
 
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<mvc:annotation-driven />

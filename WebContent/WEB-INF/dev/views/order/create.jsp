@@ -10,6 +10,12 @@
 </head>
 <body>
 	<form method="POST">
+		<h3>Device</h3>
+		Api id<br />
+		<input type="text" name="apiId">
+		<br />
+		Api key<br />
+		<input type="text" name="apiKey">
 		<h3>Order</h3>
 		Type:<br />
 		<input type="radio" name="orderType" value="urgent" checked /> urgent order

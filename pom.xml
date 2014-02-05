@@ -81,5 +81,10 @@
   		<artifactId>spring-webmvc</artifactId>
   		<version>3.2.5.RELEASE</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.json</groupId>
+  		<artifactId>json</artifactId>
+  		<version>20131018</version>
+  	</dependency>
   </dependencies>
 </project>

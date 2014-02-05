@@ -8,19 +8,21 @@
 		<id name="id" column="orderId">
 			<generator class="identity" />
 		</id>
+		<many-to-one name="device" column="deviceId" unique-key="order_uk3" />
 		<many-to-one name="broker" column="brokerid" unique-key="order_uk1" />
+		<property name="uuid" type="java.lang.String" unique-key="order_uk2" />
 		<property name="type" length="20" type="java.lang.String" />
 		<property name="phone" length="20" type="java.lang.String" />
 		<property name="supplyDate" type="java.util.Date" />
 		<property name="supplyMin" type="int" />
 		<property name="supplyHour" type="int" />
-		<set name="requirements" cascade="save-update" table="requirement">
+		<set name="requirements" cascade="save-update, delete">
 			<key>
-				<column name="orderId" not-null="true"/>
+				<column name="orderId" />
 			</key>
 			<one-to-many class="tb2014.domain.order.Requirement" />
 		</set>
-		<list name="destinations" cascade="save-update" table="orderaddresspoints">
+		<list name="destinations" cascade="save-update, delete" table="orderaddresspoints">
 			<key>
 				<column name="orderId" not-null="true"/>
 			</key>

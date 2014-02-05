@@ -1,4 +1,4 @@
-package tb2014.mvc.controllers;
+package tb2014.apibroker;
 
 import java.util.Date;
 
@@ -21,9 +21,9 @@ import tb2014.domain.order.OrderAcceptAlacrity;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 
-@RequestMapping("/apiOrder")
-@Controller
-public class OrderControllerApi {
+@RequestMapping("/apibroker/order")
+@Controller("apiBrokerOrderController")
+public class OrderController {
 
 	private IBrokerBusiness brokerBusiness;
 	private IOrderBusiness orderBusiness;
@@ -31,7 +31,7 @@ public class OrderControllerApi {
 	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
-	public OrderControllerApi(IOrderBusiness orderBusiness,
+	public OrderController(IOrderBusiness orderBusiness,
 			IBrokerBusiness brokerBusiness,
 			IOrderAcceptAlacrityBusiness alacrityBuiness,
 			IOrderStatusBusiness orderStatusBusiness) {
@@ -49,11 +49,11 @@ public class OrderControllerApi {
 		Broker broker = brokerBusiness.getByApiId(apiId);
 		Order order = orderBusiness.get(orderId);
 
-		if(broker == null) {
+		if (broker == null) {
 			response.setStatus(403);
 			return;
 		}
-		
+
 		if (broker.getApiKey().trim().equals(apiKey.trim()) == false) {
 			response.setStatus(403);
 			return;
@@ -101,7 +101,8 @@ public class OrderControllerApi {
 			return;
 		}
 
-		if (order.getBroker() == null || order.getBroker().getId() != broker.getId()) {
+		if (order.getBroker() == null
+				|| order.getBroker().getId() != broker.getId()) {
 			response.setStatus(403);
 			return;
 		}
