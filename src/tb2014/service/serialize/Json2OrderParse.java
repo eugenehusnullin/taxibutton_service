@@ -50,7 +50,7 @@ public class Json2OrderParse {
 
 		List<AddressPoint> addressPoints = new ArrayList<AddressPoint>();
 		AddressPoint source = new AddressPoint();
-		source.setType(Byte.parseByte("0"));
+		source.setIndexNumber(0);
 
 		JSONObject sourceJson = jsonObject.getJSONObject("source");
 
@@ -78,9 +78,7 @@ public class Json2OrderParse {
 		for (int i = 0; i < destinationsJson.length(); i++) {
 
 			JSONObject destinationJson = destinationsJson.getJSONObject(i);
-			AddressPoint destination = new AddressPoint();
-
-			destination.setType(Byte.parseByte("1"));
+			AddressPoint destination = new AddressPoint();			
 
 			if (destinationJson.getString("lon").isEmpty() == false) {
 				destination.setLon(Double.parseDouble(destinationJson

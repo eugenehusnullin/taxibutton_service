@@ -87,25 +87,12 @@ public class Order {
 	}
 
 	public AddressPoint getSource() {
-
 		for (AddressPoint currentPoint : destinations) {
-
-			if (currentPoint.getType() == 0) {
+			if (currentPoint.getIndexNumber() == 0) {
 				return currentPoint;
 			}
 		}
-
 		return null;
-	}
-
-	public void setSource(AddressPoint source) {
-
-		for (AddressPoint currentPoint : destinations) {
-
-			if (currentPoint.getIndexNumber() == 1) {
-				currentPoint = source;
-			}
-		}
 	}
 
 	public Set<Requirement> getRequirements() {

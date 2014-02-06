@@ -30,16 +30,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderStatusBusiness;
-import tb2014.service.order.OrdersProcessing;
+import tb2014.service.order.OrderProcessing;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
 
 @RequestMapping("/order")
-@Controller
+@Controller("devTestOrderController")
 public class OrderController {
 
-	private OrdersProcessing orderProcessing;
+	private OrderProcessing orderProcessing;
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
 	private IOrderStatusBusiness orderStatusBusiness;
@@ -48,7 +48,7 @@ public class OrderController {
 	public OrderController(IOrderBusiness orderBusiness,
 			IBrokerBusiness brokerBusiness,
 			IOrderStatusBusiness orderStatusBusiness,
-			OrdersProcessing orderProcessing) {
+			OrderProcessing orderProcessing) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;

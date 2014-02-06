@@ -68,7 +68,7 @@ public class OrderController {
 
 				deviceUtil.assignDevice(apiId, order);
 				order.setUuid(UUID.randomUUID().toString());
-				;
+
 				orderBusiness.save(order);
 
 				// write order.getId(); or order.getUUID() to response stream
