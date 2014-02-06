@@ -4,7 +4,6 @@ public class AddressPoint {
 	
 	private Long id;
 	private Order order;
-	private Byte type;
 	private double lon;
 	private double lat;
 	private int indexNumber;
@@ -30,14 +29,6 @@ public class AddressPoint {
 	
 	public void setOrder(Order order) {
 		this.order = order;
-	}
-
-	public Byte getType() {
-		return type;
-	}
-
-	public void setType(Byte type) {
-		this.type = type;
 	}
 
 	public String getFullAddress() {

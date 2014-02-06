@@ -32,7 +32,7 @@ import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
 
 @Service("OrdersProcessing")
-public class OrdersProcessing {
+public class OrderProcessing {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
@@ -42,7 +42,7 @@ public class OrdersProcessing {
 	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
-	public OrdersProcessing(IOrderBusiness orderBusiness,
+	public OrderProcessing(IOrderBusiness orderBusiness,
 			IBrokerBusiness brokerBusiness,
 			IOrderCancelBusiness orderCancelBusiness,
 			IOrderStatusBusiness orderStatusBusiness) {
@@ -50,30 +50,6 @@ public class OrdersProcessing {
 		this.brokerBusiness = brokerBusiness;
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
-	}
-
-	// create client order object in database (returns a new order id)
-	public Long createOrder(Order order) {
-
-		try {
-
-			orderBusiness.save(order);
-
-			return order.getId();
-		} catch (Exception ex) {
-
-			log.info("Creating new order error: " + ex.toString());
-
-			return null;
-		}
-	}
-
-	// saving an order into database, return his new db id
-	public Long saveOrder(Order order) {
-
-		orderBusiness.save(order);
-
-		return order.getId();
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
@@ -88,7 +64,7 @@ public class OrdersProcessing {
 			try {
 				offerOrderHTTP(currentBroker, orderXml);
 			} catch (Exception ex) {
-				log.info("Offer order to broker " + currentBroker.getId()
+				log.error("Offer order to broker " + currentBroker.getId()
 						+ " error: " + ex.toString());
 			}
 		}

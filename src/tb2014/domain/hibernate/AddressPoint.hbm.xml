@@ -11,15 +11,15 @@
 		<many-to-one name="order" class="tb2014.domain.order.Order">
 			<column name="orderId" not-null="true" />
 		</many-to-one>
-		<property name="type" type="byte" />
-		<property name="lon" type="double" />
-		<property name="lat" type="double" />
-		<property name="fullAddress" type="java.lang.String" />
-		<property name="shortAddress" type="java.lang.String" />
-		<property name="closesStation" type="java.lang.String" />
-		<property name="county" type="java.lang.String" />
-		<property name="locality" type="java.lang.String" />
-		<property name="street" type="java.lang.String" />
-		<property name="housing" type="java.lang.String" />
+		<property name="lon" />
+		<property name="lat" />
+		<property name="fullAddress" />
+		<property name="shortAddress" />
+		<property name="closesStation" />
+		<property name="county" />
+		<property name="locality" />
+		<property name="street" />
+		<property name="housing" />
+		<property name="indexNumber" />
 	</class>
 </hibernate-mapping>

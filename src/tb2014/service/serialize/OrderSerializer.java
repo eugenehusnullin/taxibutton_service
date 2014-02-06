@@ -102,7 +102,7 @@ public class OrderSerializer {
 
 			for (AddressPoint currentDestination : order.getDestinations()) {
 
-				if (currentDestination.getType() == 0) {
+				if (currentDestination.getIndexNumber() == 0) {
 					continue;
 				}
 
