@@ -9,8 +9,8 @@
 <title>Orders list</title>
 </head>
 <body>
-	<c:forEach items="${statusList}" var="status">
-		<p>${status.getId()}---${status.getDate()}</p>
+	<c:forEach items="${geoList}" var="geo">
+		<p>${geo.getId()}---${geo.getDate()}---${geo.getLat()}---${geo.getLon()}</p>
 	</c:forEach>
 </body>
 </html>

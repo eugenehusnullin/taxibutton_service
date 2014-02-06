@@ -9,6 +9,8 @@ public interface IOrderBusiness {
 
 	Order get(Long id);
 
+	Order get(String uuid);
+
 	Order getWithChilds(Long id);
 
 	List<Order> getAll();

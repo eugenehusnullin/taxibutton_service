@@ -11,9 +11,11 @@ public interface IOrderStatusDao {
 
 	List<OrderStatus> get(Order order);
 
+	OrderStatus getLast(Order order);
+
 	List<OrderStatus> getAll();
 
 	void save(OrderStatus orderStatus);
-	
+
 	void saveOrUpdate(OrderStatus orderStatus);
 }

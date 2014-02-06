@@ -11,6 +11,8 @@ public interface IOrderStatusBusiness {
 
 	List<OrderStatus> get(Order order);
 
+	OrderStatus getLast(Order order);
+	
 	List<OrderStatus> getAll();
 
 	void save(OrderStatus orderStatus);

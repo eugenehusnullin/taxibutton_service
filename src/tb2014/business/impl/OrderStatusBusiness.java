@@ -50,4 +50,10 @@ public class OrderStatusBusiness implements IOrderStatusBusiness {
 	public void saveOrUpdate(OrderStatus orderStatus) {
 		orderStatusDao.saveOrUpdate(orderStatus);
 	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public OrderStatus getLast(Order order) {
+		return orderStatusDao.getLast(order);
+	}
 }

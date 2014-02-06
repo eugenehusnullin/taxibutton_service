@@ -31,8 +31,12 @@ import tb2014.business.IBrokerBusiness;
 import tb2014.business.IGeoDataBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderStatusBusiness;
+<<<<<<< HEAD
 import tb2014.business.IOrderAcceptAlacrityBusiness;
+import tb2014.service.order.OrdersProcessing;
+=======
 import tb2014.service.order.OrderProcessing;
+>>>>>>> faad3f0d535bea8d97f24b81c20c4d095ce6246a
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
@@ -52,9 +56,13 @@ public class OrderController {
 	public OrderController(IOrderBusiness orderBusiness,
 			IBrokerBusiness brokerBusiness,
 			IOrderStatusBusiness orderStatusBusiness,
+<<<<<<< HEAD
 			IOrderAcceptAlacrityBusiness orderAlacrityBusiness,
 			IGeoDataBusiness geoDataBusiness,
+			OrdersProcessing orderProcessing) {
+=======
 			OrderProcessing orderProcessing) {
+>>>>>>> faad3f0d535bea8d97f24b81c20c4d095ce6246a
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;

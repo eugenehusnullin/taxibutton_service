@@ -6,11 +6,18 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Orders list</title>
+<title>Get status</title>
 </head>
 <body>
-	<c:forEach items="${statusList}" var="status">
-		<p>${status.getId()}---${status.getDate()}</p>
-	</c:forEach>
+	<form method="POST">
+		<input type="hidden" name="orderId" value="${orderId}" />
+		Api id:<br />
+		<input type="text" name="apiId" />
+		<br />
+		Api key:<br />
+		<input type="text" name="apiKey" />
+		<br />
+		<input type="submit" value="Get" />
+	</form>
 </body>
 </html>
