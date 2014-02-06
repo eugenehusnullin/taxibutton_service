@@ -47,10 +47,10 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<OrderAcceptAlacrity> getOrderAll(Long id) {
+	public List<OrderAcceptAlacrity> getAll(Order order) {
 		return sessionFactory.getCurrentSession()
 				.createCriteria(OrderAcceptAlacrity.class)
-				.add(Restrictions.eq("orderId", id)).list();
+				.add(Restrictions.eq("order", order)).list();
 	}
 
 	@SuppressWarnings("unchecked")

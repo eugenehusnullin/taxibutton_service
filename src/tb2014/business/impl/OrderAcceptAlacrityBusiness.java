@@ -49,8 +49,8 @@ public class OrderAcceptAlacrityBusiness implements
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrderAcceptAlacrity> getOrderAll(Long id) {
-		return alacrityDao.getOrderAll(id);
+	public List<OrderAcceptAlacrity> getAll(Order order) {
+		return alacrityDao.getAll(order);
 	}
 
 	@Transactional(readOnly = true)

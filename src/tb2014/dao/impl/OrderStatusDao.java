@@ -32,7 +32,7 @@ public class OrderStatusDao implements IOrderStatusDao {
 	public List<OrderStatus> get(Order order) {
 		return sessionFactory.getCurrentSession()
 				.createCriteria(OrderStatus.class)
-				.add(Restrictions.eqOrIsNull("order", order)).list();
+				.add(Restrictions.eq("order", order)).list();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -50,5 +50,13 @@ public class OrderStatusDao implements IOrderStatusDao {
 	@Override
 	public void saveOrUpdate(OrderStatus orderStatus) {
 		sessionFactory.getCurrentSession().saveOrUpdate(orderStatus);
+	}
+
+	@Override
+	public OrderStatus getLast(Order order) {
+		return (OrderStatus) sessionFactory.getCurrentSession()
+				.createCriteria(OrderStatus.class)
+				.addOrder(org.hibernate.criterion.Order.desc("date")).list()
+				.get(0);
 	}
 }

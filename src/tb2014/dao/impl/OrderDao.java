@@ -30,12 +30,10 @@ public class OrderDao implements IOrderDao {
 	@Override
 	public Order getWithChilds(Long id) {
 		return (Order) sessionFactory.getCurrentSession()
-				.createCriteria(Order.class)
-				.add(Restrictions.eq("id", id))
+				.createCriteria(Order.class).add(Restrictions.eq("id", id))
 				.setFetchMode("destinations", FetchMode.JOIN)
 				.setFetchMode("requirements", FetchMode.JOIN)
-				.setFetchMode("broker", FetchMode.JOIN)
-				.uniqueResult();
+				.setFetchMode("broker", FetchMode.JOIN).uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -63,7 +61,15 @@ public class OrderDao implements IOrderDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Order> getAll(Device device) {
-		return sessionFactory.getCurrentSession().createCriteria(Order.class).add(Restrictions.eq("device", device)).list();
+		return sessionFactory.getCurrentSession().createCriteria(Order.class)
+				.add(Restrictions.eq("device", device)).list();
+	}
+
+	@Override
+	public Order get(String uuid) {
+		return (Order) sessionFactory.getCurrentSession()
+				.createCriteria(Order.class).add(Restrictions.eq("uuid", uuid))
+				.uniqueResult();
 	}
 
 }

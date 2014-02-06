@@ -4,18 +4,18 @@
 		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="tb2014.domain.order">
-	<class name="OrderStatus" table="orderstatus">
+	<class name="GeoData" table="geodata">
 		<id name="id" column="id">
 			<generator class="identity" />
 		</id>
 		<many-to-one name="order" class="tb2014.domain.order.Order">
 			<column name="orderId" not-null="true" />
 		</many-to-one>
-		<property name="status">
-			<type name="org.hibernate.type.EnumType">
-				<param name="enumClass">tb2014.domain.order.OrderStatusType</param>
-			</type>
-		</property>
+		<property name="lat" type="double" />
+		<property name="lon" type="double" />
+		<property name="direction" type="integer" />
+		<property name="speed" type="double" />
+		<property name="category" type="java.lang.String" />
 		<property name="date" type="java.util.Date" />
 	</class>
 </hibernate-mapping>

@@ -12,7 +12,7 @@ public interface IOrderAcceptAlacrityBusiness {
 
 	List<OrderAcceptAlacrity> getAll();
 	
-	List<OrderAcceptAlacrity> getOrderAll(Long id);
+	List<OrderAcceptAlacrity> getAll(Order order);
 
 	void save(OrderAcceptAlacrity alacrity);
 

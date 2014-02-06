@@ -14,7 +14,7 @@ import tb2014.domain.order.Order;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Json2OrderParse {
+public class OrderJsonParser {
 
 	public static Order Json2Order(JSONObject jsonObject) {
 

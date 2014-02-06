@@ -10,6 +10,20 @@
 		</id>
 		<many-to-one name="broker" column="brokerId" unique-key="alacrity_uk1" />
 		<many-to-one name="order" column="orderId" unique-key="alacrity_uk2" />
-		<property name="date" type="date"/>
+		<property name="date" type="date" />
+		<component name="driver" class="tb2014.domain.order.Driver"
+			insert="true" update="true" access="field">
+			<property name="name" type="java.lang.String" />
+			<property name="secondName" type="java.lang.String" />
+			<property name="thirdName" type="java.lang.String" />
+			<property name="phone" type="java.lang.String" />
+		</component>
+		<component name="car" class="tb2014.domain.order.Car"
+			insert="true" update="true" access="field">
+			<property name="number" type="java.lang.String" />
+			<property name="color" type="java.lang.String" />
+			<property name="mark" type="java.lang.String" />
+			<property name="model" type="java.lang.String" />
+		</component>
 	</class>
 </hibernate-mapping>

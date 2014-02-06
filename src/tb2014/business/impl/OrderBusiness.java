@@ -26,7 +26,7 @@ public class OrderBusiness implements IOrderBusiness {
 	public Order get(Long id) {
 		return orderDao.get(id);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public Order getWithChilds(Long id) {
@@ -61,5 +61,11 @@ public class OrderBusiness implements IOrderBusiness {
 	@Override
 	public List<Order> getAll(Device device) {
 		return orderDao.getAll(device);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public Order get(String uuid) {
+		return orderDao.get(uuid);
 	}
 }

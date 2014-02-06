@@ -28,8 +28,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb2014.business.IBrokerBusiness;
+import tb2014.business.IGeoDataBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderStatusBusiness;
+import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.service.order.OrdersProcessing;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
@@ -43,16 +45,22 @@ public class OrderController {
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
 	private IOrderStatusBusiness orderStatusBusiness;
+	private IOrderAcceptAlacrityBusiness orderAlacrityBusiness;
+	private IGeoDataBusiness geoDataBusiness;
 
 	@Autowired
 	public OrderController(IOrderBusiness orderBusiness,
 			IBrokerBusiness brokerBusiness,
 			IOrderStatusBusiness orderStatusBusiness,
+			IOrderAcceptAlacrityBusiness orderAlacrityBusiness,
+			IGeoDataBusiness geoDataBusiness,
 			OrdersProcessing orderProcessing) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.orderProcessing = orderProcessing;
+		this.orderAlacrityBusiness = orderAlacrityBusiness;
+		this.geoDataBusiness = geoDataBusiness;
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -62,34 +70,35 @@ public class OrderController {
 		return "order/list";
 	}
 
-	@RequestMapping(value = "/sendStatus", method = RequestMethod.GET)
-	public String sendStatus(@RequestParam("id") Long orderId, Model model) {
+	@RequestMapping(value = "/alacrity", method = RequestMethod.GET)
+	public String alacrity(@RequestParam("id") Long orderId, Model model) {
 
 		Order order = orderBusiness.get(orderId);
 
-		model.addAttribute("orderId", order.getId());
-		return "order/sendStatus";
+		model.addAttribute("alacrities", orderAlacrityBusiness.getAll(order));
+		model.addAttribute("orderId", orderId);
+
+		return "order/alacrity";
 	}
 
-	@RequestMapping(value = "/sendStatus", method = RequestMethod.POST)
-	public String sendStatus(@RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey,
-			@RequestParam("status") String status,
-			@RequestParam("latitude") double latitude,
-			@RequestParam("longitude") double longitude,
-			@RequestParam("direction") int direction,
-			@RequestParam("speed") int speed,
-			@RequestParam("category") String category) throws IOException {
+	@RequestMapping(value = "/alacrity", method = RequestMethod.POST)
+	public String alacrity(HttpServletRequest request) throws IOException {
 
-		String url = "http://localhost:8080/tb2014/apibroker/order/setStatus";
+		String url = "http://localhost:8080/tb2014/apibroker/order/alacrity";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + orderId.toString() + "&apiId=" + apiId
-				+ "&apiKey=" + apiKey + "&status=" + status + "&latitude="
-				+ latitude + "&longitude=" + longitude + "&direction="
-				+ direction + "&speed=" + speed + "&category=" + category;
+		String params = "orderId=" + request.getParameter("orderId")
+				+ "&apiId=" + request.getParameter("apiId") + "&apiKey="
+				+ request.getParameter("apiKey") + "&driverName="
+				+ request.getParameter("driverName") + "&driverSecondName="
+				+ request.getParameter("driverSecondName")
+				+ "&driverThirdName=" + request.getParameter("driverThirdName")
+				+ "&driverPhone=" + request.getParameter("driverPhone")
+				+ "&carNumber=" + request.getParameter("carNumber")
+				+ "&carColor=" + request.getParameter("carColor") + "&carMark="
+				+ request.getParameter("carMark") + "&carModel="
+				+ request.getParameter("carModel");
 
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type",
@@ -107,7 +116,126 @@ public class OrderController {
 		outputStream.flush();
 		outputStream.close();
 
-		// int responseCode = connection.getResponseCode();
+		@SuppressWarnings("unused")
+		int responseCode = connection.getResponseCode();
+
+		return "redirect:list";
+	}
+
+	@RequestMapping(value = "/setStatus", method = RequestMethod.GET)
+	public String sendStatus(@RequestParam("id") Long orderId, Model model) {
+
+		Order order = orderBusiness.get(orderId);
+
+		model.addAttribute("orderId", order.getId());
+		return "order/setStatus";
+	}
+
+	@RequestMapping(value = "/setStatus", method = RequestMethod.POST)
+	public String sendStatus(@RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey,
+			@RequestParam("status") String status) throws IOException {
+
+		String url = "http://localhost:8080/tb2014/apibroker/order/setStatus";
+		URL obj = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+		String params = "orderId=" + orderId.toString() + "&apiId=" + apiId
+				+ "&apiKey=" + apiKey + "&status=" + status;
+
+		connection.setRequestMethod("POST");
+		connection.setRequestProperty("Content-Type",
+				"application/x-www-form-urlencoded");
+		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		connection.setRequestProperty("Content-Length",
+				"" + Integer.toString(params.getBytes().length));
+
+		connection.setDoOutput(true);
+
+		DataOutputStream outputStream = new DataOutputStream(
+				connection.getOutputStream());
+
+		outputStream.writeBytes(params);
+		outputStream.flush();
+		outputStream.close();
+
+		@SuppressWarnings("unused")
+		int responseCode = connection.getResponseCode();
+
+		return "redirect:list";
+	}
+
+	@RequestMapping(value = "/setGeoData", method = RequestMethod.GET)
+	public String setGeoData(@RequestParam("id") Long orderId, Model model) {
+
+		model.addAttribute("orderId", orderId);
+		return "order/setGeoData";
+	}
+
+	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
+	public String setGeoData(@RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey,
+			@RequestParam("lon") Double lon, @RequestParam("lat") Double lat,
+			@RequestParam("direction") int direction,
+			@RequestParam("speed") Double speed,
+			@RequestParam("category") String category) throws IOException {
+
+		String url = "http://localhost:8080/tb2014/apibroker/order/setGeoData";
+		URL obj = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+		String params = "orderId=" + orderId.toString() + "&apiId=" + apiId
+				+ "&apiKey=" + apiKey + "&lon=" + lon + "&lat=" + lat
+				+ "&direction=" + direction + "&speed=" + speed + "&category="
+				+ category;
+
+		connection.setRequestMethod("POST");
+		connection.setRequestProperty("Content-Type",
+				"application/x-www-form-urlencoded");
+		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		connection.setRequestProperty("Content-Length",
+				"" + Integer.toString(params.getBytes().length));
+
+		connection.setDoOutput(true);
+
+		DataOutputStream outputStream = new DataOutputStream(
+				connection.getOutputStream());
+
+		outputStream.writeBytes(params);
+		outputStream.flush();
+		outputStream.close();
+
+		@SuppressWarnings("unused")
+		int responseCode = connection.getResponseCode();
+
+		return "redirect:list";
+	}
+
+	@RequestMapping(value = "/getStatus", method = RequestMethod.GET)
+	public String getStatus(@RequestParam("id") Long orderId, Model model) {
+
+		model.addAttribute("orderId", orderId);
+		return "order/getStatus";
+	}
+
+	@RequestMapping(value = "/getStatus", method = RequestMethod.POST)
+	public String getStatus(@RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey) {
+
+		JSONObject getStatusJson = new JSONObject();
+
+		getStatusJson.put("apiId", apiId);
+		getStatusJson.put("apiKey", apiKey);
+		getStatusJson.put("orderId", orderId);
+
+		try {
+
+		} catch (Exception ex) {
+			System.out.println("Error getting order status: " + ex.toString());
+		}
 
 		return "redirect:list";
 	}
@@ -121,6 +249,13 @@ public class OrderController {
 		model.addAttribute("statusList", statusList);
 
 		return "order/statusList";
+	}
+
+	@RequestMapping(value = "/showGeoData", method = RequestMethod.GET)
+	public String showGeoData(@RequestParam("id") Long orderId, Model model) {
+
+		model.addAttribute("geoList", geoDataBusiness.getAll(orderBusiness.get(orderId)));
+		return "order/geoList";
 	}
 
 	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
