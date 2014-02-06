@@ -108,7 +108,7 @@ public class OrderController {
 	// get status of order
 	@RequestMapping(value = "/status", method = RequestMethod.POST)
 	public void gtatus(HttpServletRequest request, HttpServletResponse response) {
-/*
+
 		StringBuffer stringBuffer = new StringBuffer();
 		String line = null;
 
@@ -147,24 +147,21 @@ public class OrderController {
 
 				statusJson.put("orderId", status.getOrder().getId().toString());
 
-				if (order.getBroker() == null) {
+				if (order.getBroker() == null) {// isn't executing by any broker
 
-					if (orderAcceptAlacrityBusiness.getOrderAll(order.getId()) == null) {// no
-																							// alacrities
-						statusJson.put("status", "NoAlacrities");
+					// no alacrities
+					if (orderAcceptAlacrityBusiness.getAll(order) == null) {
+						statusJson.put("status", "NoAlacrity");
 					} else {// there are any alacrities
-						statusJson.put("status", "AnyAlacrities");
+						statusJson.put("status", "IsAlacrity");
 					}
-					
+
 					statusJson.put("date", new Date());
-				} else {
+				} else {// is executing by broker
 
 					statusJson.put("status", status.getStatus().toString());
-					statusJson.put("executor", status.getOrder().getBroker().getName());
-					statusJson.put("lon", status.getLongitude());
-					statusJson.put("lat", status.getLatitude());
-					statusJson.put("speed", status.getSpeed());
-					statusJson.put("direction", status.getDirection());
+					statusJson.put("executor", status.getOrder().getBroker()
+							.getName());
 					statusJson.put("date", status.getDate());
 				}
 
@@ -180,6 +177,6 @@ public class OrderController {
 		} catch (Exception ex) {
 			System.out
 					.println("Error parsing JSON to object: " + ex.toString());
-		}*/
+		}
 	}
 }
