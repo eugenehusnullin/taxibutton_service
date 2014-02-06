@@ -1,5 +1,6 @@
 package tb2014.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -57,6 +58,13 @@ public class GeoDataDao implements IGeoDataDao {
 	@Override
 	public void saveOrUpdate(GeoData geoData) {
 		sessionFactory.getCurrentSession().saveOrUpdate(geoData);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<GeoData> getAll(Order order, Date date) {
+		return sessionFactory.getCurrentSession().createCriteria(GeoData.class)
+				.add(Restrictions.gt("date", date)).list();
 	}
 
 }

@@ -1,5 +1,6 @@
 package tb2014.business;
 
+import java.util.Date;
 import java.util.List;
 
 import tb2014.domain.order.GeoData;
@@ -13,6 +14,8 @@ public interface IGeoDataBusiness {
 
 	List<GeoData> getAll(Order order);
 
+	List<GeoData> getAll(Order order, Date date);
+	
 	GeoData getLast(Order order);
 
 	void save(GeoData geoData);

@@ -1,5 +1,6 @@
 package tb2014.business.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,5 +56,11 @@ public class GeoDataBusiness implements IGeoDataBusiness {
 	@Override
 	public void saveOrUpdate(GeoData geoData) {
 		geoDataDao.saveOrUpdate(geoData);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<GeoData> getAll(Order order, Date date) {
+		return geoDataDao.getAll(order, date);
 	}
 }
