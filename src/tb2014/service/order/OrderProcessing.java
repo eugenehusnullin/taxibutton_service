@@ -1,6 +1,7 @@
 package tb2014.service.order;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -9,9 +10,12 @@ import java.util.List;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +25,12 @@ import org.w3c.dom.Document;
 
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
+import tb2014.business.IOfferedOrderBrokerBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
+import tb2014.domain.order.OfferedOrderBroker;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderCancel;
 import tb2014.domain.order.OrderStatus;
@@ -40,72 +46,74 @@ public class OrderProcessing {
 	private IBrokerBusiness brokerBusiness;
 	private IOrderCancelBusiness orderCancelBusiness;
 	private IOrderStatusBusiness orderStatusBusiness;
+	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 
 	@Autowired
-	public OrderProcessing(IOrderBusiness orderBusiness,
-			IBrokerBusiness brokerBusiness,
-			IOrderCancelBusiness orderCancelBusiness,
-			IOrderStatusBusiness orderStatusBusiness) {
+	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
+			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
+			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
+		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
 	public void offerOrder(Long orderId) {
-
 		List<Broker> brokers = brokerBusiness.getAll();
 		Order order = orderBusiness.getWithChilds(orderId);
 		Document orderXml = OrderSerializer.OrderToXml(order);
 
+		boolean offered = false;
 		for (Broker currentBroker : brokers) {
 			try {
 				offerOrderHTTP(currentBroker, orderXml);
+
+				offered = true;
+
+				OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
+				offeredOrderBroker.setOrder(order);
+				offeredOrderBroker.setBroker(currentBroker);
+				offeredOrderBroker.setTimestamp(new Date());
+				offeredOrderBrokerBusiness.save(offeredOrderBroker);
 			} catch (Exception ex) {
-				log.error("Offer order to broker " + currentBroker.getId()
-						+ " error: " + ex.toString());
+				log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
 			}
+		}
+
+		if (offered) {
+			// TODO: remove this order from need offer queue
 		}
 	}
 
 	// offer order via HTTP protocol
-	private void offerOrderHTTP(Broker broker, Document document) {
+	private void offerOrderHTTP(Broker broker, Document document) throws IOException,
+			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+		// String url = broker.getApiurl() + "/offer";
+		String url = "http://localhost:8080/tb2014/test/offer";
+		URL obj = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		try {
+		connection.setRequestMethod("POST");
+		connection.setRequestProperty("Content-Type", "application/xml");
+		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-			// String url = broker.getApiurl() + "/offer";
-			String url = "http://localhost:8080/tb2014/test/offer";
-			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+		connection.setDoOutput(true);
+		DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/xml");
-			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		Source source = new DOMSource(document);
+		Result result = new StreamResult(wr);
 
-			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(
-					connection.getOutputStream());
+		TransformerFactory.newInstance().newTransformer().transform(source, result);
+		wr.flush();
+		wr.close();
 
-			Source source = new DOMSource(document);
-			Result result = new StreamResult(wr);
+		int responceCode = connection.getResponseCode();
 
-			TransformerFactory.newInstance().newTransformer()
-					.transform(source, result);
-			wr.flush();
-			wr.close();
-
-			int responceCode = connection.getResponseCode();
-
-			if (responceCode != 200) {
-				log.info("Error offering order to broker (code: "
-						+ responceCode + "): " + broker.getId().toString());
-			}
-		} catch (Exception ex) {
-			log.info("Offering order for broker " + broker.getId() + " error: "
-					+ ex.toString());
+		if (responceCode != 200) {
+			log.info("Error offering order to broker (code: " + responceCode + "): " + broker.getId().toString());
 		}
 	}
 
@@ -118,16 +126,14 @@ public class OrderProcessing {
 			// String url = broker.getApiurl() + "/give";
 			url += "?orderId=" + orderId.toString();
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("GET");
 
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
-				log.info("Error giving order to broker (code: " + responceCode
-						+ "): " + broker.getId().toString());
+				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
 
 				Order order = orderBusiness.get(orderId);
@@ -136,8 +142,7 @@ public class OrderProcessing {
 				orderBusiness.saveOrUpdate(order);
 			}
 		} catch (Exception ex) {
-			log.info("Giving order for broker " + broker.getId() + " error: "
-					+ ex.toString());
+			log.info("Giving order for broker " + broker.getId() + " error: " + ex.toString());
 		}
 	}
 
@@ -181,16 +186,14 @@ public class OrderProcessing {
 			URI uriObject = new URI("http", "localhost:8080", url, params, null);
 
 			URL obj = uriObject.toURL();
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("GET");
 
 			responseCode = connection.getResponseCode();
 		} catch (Exception ex) {
 
-			System.out.println("Sending HTTP GET to: " + url
-					+ " FAILED, error: " + ex.toString());
+			System.out.println("Sending HTTP GET to: " + url + " FAILED, error: " + ex.toString());
 			responseCode = -1;
 		}
 
@@ -199,9 +202,9 @@ public class OrderProcessing {
 
 	// deleting order with all childs
 	public void deleteOrder(Long orderId) {
-		
+
 		Order order = orderBusiness.get(orderId);
-		
+
 		orderBusiness.delete(order);
 	}
 }
