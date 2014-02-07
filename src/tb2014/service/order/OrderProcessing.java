@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -48,6 +50,9 @@ public class OrderProcessing {
 	private IOrderStatusBusiness orderStatusBusiness;
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 
+	private Queue<Order> sendOrderQueue;
+	private Queue<Order> chooseWinnerOrderQueue;
+
 	@Autowired
 	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
 			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
@@ -57,13 +62,17 @@ public class OrderProcessing {
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
+
+		this.chooseWinnerOrderQueue = new ArrayDeque<Order>();
+		this.sendOrderQueue = new ArrayDeque<Order>();
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
 	public void offerOrder(Long orderId) {
-		List<Broker> brokers = brokerBusiness.getAll();
 		Order order = orderBusiness.getWithChilds(orderId);
+		List<Broker> brokers = brokerBusiness.getAll();
+		
 		Document orderXml = OrderSerializer.OrderToXml(order);
 
 		boolean offered = false;
@@ -84,7 +93,15 @@ public class OrderProcessing {
 		}
 
 		if (offered) {
-			// TODO: remove this order from need offer queue
+			synchronized (sendOrderQueue) {
+				sendOrderQueue.remove(order);
+				sendOrderQueue.notifyAll();
+			}
+
+			synchronized (chooseWinnerOrderQueue) {
+				chooseWinnerOrderQueue.add(order);
+				chooseWinnerOrderQueue.notifyAll();
+			}
 		}
 	}
 

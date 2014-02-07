@@ -2,6 +2,7 @@ package tb2014.business.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ public class OfferedOrderBrokerBusiness implements IOfferedOrderBrokerBusiness {
 	
 	private IOfferedOrderBrokerDao offeredOrderBrokerDao;
 	
+	@Autowired
 	public OfferedOrderBrokerBusiness(IOfferedOrderBrokerDao offeredOrderBrokerDao) {
 		this.offeredOrderBrokerDao = offeredOrderBrokerDao;
 	}

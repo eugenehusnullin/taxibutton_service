@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import tb2014.dao.IOfferedOrderBrokerDao;
@@ -15,6 +16,7 @@ public class OfferedOrderBrokerDao implements IOfferedOrderBrokerDao {
 	
 	private SessionFactory sessionFactory;
 	
+	@Autowired
 	public OfferedOrderBrokerDao(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
