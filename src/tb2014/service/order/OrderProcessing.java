@@ -39,7 +39,7 @@ import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
 
-@Service("OrdersProcessing")
+@Service("ordersProcessing")
 public class OrderProcessing {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
