@@ -11,13 +11,13 @@
 <body>
 	<form method="post">
 		<br/>Name
-		<input type="text" name="name" />
+		<input type="text" name="name" value="Желтое такси" />
 		<br/>Apiurl
-		<input type="text" name="apiurl" />
+		<input type="text" name="apiurl" value="http://localhost:8080/tb2014/test" />
 		<br/>Api id
-		<input type="text" name="apiId" />
+		<input type="text" name="apiId" value="1"/>
 		<br/>Api key
-		<input type="text" name="apiKey" />
+		<input type="text" name="apiKey" value="1"/>
 		<br />
 		<input type="submit" value="save" />
 	</form>

@@ -5,9 +5,12 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import tb2014.business.IOrderAcceptAlacrityBusiness;
+import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
 
 public class ChooseWinnerProcessing {
+
 	class RecieverOrderRunnable implements Runnable {
 		@Override
 		public void run() {
@@ -23,26 +26,41 @@ public class ChooseWinnerProcessing {
 						}
 					}
 				}
-				
+
 				if (order != null) {
-					ProcessOrderRunnable processOrderRunnable = new ProcessOrderRunnable(order);
-					executor.execute(processOrderRunnable);
+					ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(order);
+					executor.execute(chooseWinnerRunnable);
 				}
 			}
 		}
 	}
-	
-	class ProcessOrderRunnable implements Runnable {
+
+	class ChooseWinnerRunnable implements Runnable {
 		private Order order;
-		
-		public ProcessOrderRunnable(Order order) {
+
+		public ChooseWinnerRunnable(Order order) {
 			this.order = order;
 		}
-		
+
 		@Override
 		public void run() {
-			// TODO: выявить победителя, отправить ему сообщение об этом
-			// если победителя нет, вернуть order в очередь обрабатываемых, после 5 сек. паузы
+			boolean success = false;
+			Broker winner = alacrityBuiness.getWinner(order);
+
+			if (winner != null) {
+				success = orderProcessing.giveOrder(order.getId(), winner);
+			}
+			
+			if (!success) {
+				try {
+					Thread.sleep(5000);
+					synchronized (queue) {
+						queue.add(order);
+						queue.notifyAll();
+					}
+				} catch (InterruptedException e) {
+				}
+			}
 		}
 	}
 
@@ -50,9 +68,12 @@ public class ChooseWinnerProcessing {
 	private Thread mainThread;
 	private boolean processing = true;
 	private ExecutorService executor;
-	
+	private IOrderAcceptAlacrityBusiness alacrityBuiness;
+	private OrderProcessing orderProcessing;
 
-	public ChooseWinnerProcessing() {
+	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing) {
+		this.alacrityBuiness = alacrityBuiness;
+		this.orderProcessing = orderProcessing;
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
 	}
@@ -66,5 +87,13 @@ public class ChooseWinnerProcessing {
 	public void stopProcessing() {
 		processing = false;
 		mainThread.interrupt();
+		executor.shutdown();
+	}
+	
+	public void addOrder(Order order) {
+		synchronized (queue) {
+			queue.add(order);
+			queue.notifyAll();
+		}
 	}
 }

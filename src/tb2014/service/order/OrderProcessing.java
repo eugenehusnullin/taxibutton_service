@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.List;
-import java.util.Queue;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -28,6 +26,7 @@ import org.w3c.dom.Document;
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOfferedOrderBrokerBusiness;
+import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
@@ -50,21 +49,19 @@ public class OrderProcessing {
 	private IOrderStatusBusiness orderStatusBusiness;
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 
-	private Queue<Order> sendOrderQueue;
-	private Queue<Order> chooseWinnerOrderQueue;
+	private ChooseWinnerProcessing chooseWinnerProcessing;
 
 	@Autowired
 	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
 			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
-			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness) {
+			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness, IOrderAcceptAlacrityBusiness alacrityBuiness) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
 
-		this.chooseWinnerOrderQueue = new ArrayDeque<Order>();
-		this.sendOrderQueue = new ArrayDeque<Order>();
+		chooseWinnerProcessing = new ChooseWinnerProcessing(alacrityBuiness, this);
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
@@ -72,7 +69,7 @@ public class OrderProcessing {
 	public void offerOrder(Long orderId) {
 		Order order = orderBusiness.getWithChilds(orderId);
 		List<Broker> brokers = brokerBusiness.getAll();
-		
+
 		Document orderXml = OrderSerializer.OrderToXml(order);
 
 		boolean offered = false;
@@ -93,15 +90,7 @@ public class OrderProcessing {
 		}
 
 		if (offered) {
-			synchronized (sendOrderQueue) {
-				sendOrderQueue.remove(order);
-				sendOrderQueue.notifyAll();
-			}
-
-			synchronized (chooseWinnerOrderQueue) {
-				chooseWinnerOrderQueue.add(order);
-				chooseWinnerOrderQueue.notifyAll();
-			}
+			chooseWinnerProcessing.addOrder(order);
 		}
 	}
 
@@ -135,8 +124,9 @@ public class OrderProcessing {
 	}
 
 	// assign order executer
-	public void giveOrder(Long orderId, Broker broker) {
+	public boolean giveOrder(Long orderId, Broker broker) {
 
+		boolean result = true;
 		try {
 
 			String url = "http://localhost:8080/tb2014/test/give";
@@ -150,6 +140,7 @@ public class OrderProcessing {
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
+				result = false;
 				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
 
@@ -159,8 +150,11 @@ public class OrderProcessing {
 				orderBusiness.saveOrUpdate(order);
 			}
 		} catch (Exception ex) {
+			result = false;
 			log.info("Giving order for broker " + broker.getId() + " error: " + ex.toString());
 		}
+
+		return result;
 	}
 
 	// cancelling order
