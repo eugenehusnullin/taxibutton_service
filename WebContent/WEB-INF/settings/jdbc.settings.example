@@ -2,3 +2,6 @@ jdbc.driverClassName=org.hsqldb.jdbcDriver
 jdbc.url=jdbc:hsqldb:mem:tb2014
 jdbc.username=sa
 jdbc.password=
+hibernate.dialect=org.hibernate.dialect.HSQLDialect
+hibernate.show_sql=true
+hibernate.hbm2ddl.auto=create-drop

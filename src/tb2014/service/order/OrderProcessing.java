@@ -26,6 +26,7 @@ import org.w3c.dom.Document;
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOfferedOrderBrokerBusiness;
+import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
@@ -37,7 +38,7 @@ import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
 
-@Service("OrdersProcessing")
+@Service("ordersProcessing")
 public class OrderProcessing {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
@@ -48,22 +49,27 @@ public class OrderProcessing {
 	private IOrderStatusBusiness orderStatusBusiness;
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 
+	private ChooseWinnerProcessing chooseWinnerProcessing;
+
 	@Autowired
 	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
 			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
-			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness) {
+			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness, IOrderAcceptAlacrityBusiness alacrityBuiness) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
+
+		chooseWinnerProcessing = new ChooseWinnerProcessing(alacrityBuiness, this);
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
 	public void offerOrder(Long orderId) {
-		List<Broker> brokers = brokerBusiness.getAll();
 		Order order = orderBusiness.getWithChilds(orderId);
+		List<Broker> brokers = brokerBusiness.getAll();
+
 		Document orderXml = OrderSerializer.OrderToXml(order);
 
 		boolean offered = false;
@@ -84,7 +90,7 @@ public class OrderProcessing {
 		}
 
 		if (offered) {
-			// TODO: remove this order from need offer queue
+			chooseWinnerProcessing.addOrder(order);
 		}
 	}
 
@@ -118,8 +124,9 @@ public class OrderProcessing {
 	}
 
 	// assign order executer
-	public void giveOrder(Long orderId, Broker broker) {
+	public boolean giveOrder(Long orderId, Broker broker) {
 
+		boolean result = true;
 		try {
 
 			String url = "http://localhost:8080/tb2014/test/give";
@@ -133,6 +140,7 @@ public class OrderProcessing {
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
+				result = false;
 				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
 
@@ -142,8 +150,11 @@ public class OrderProcessing {
 				orderBusiness.saveOrUpdate(order);
 			}
 		} catch (Exception ex) {
+			result = false;
 			log.info("Giving order for broker " + broker.getId() + " error: " + ex.toString());
 		}
+
+		return result;
 	}
 
 	// cancelling order
