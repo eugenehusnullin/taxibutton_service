@@ -2,6 +2,7 @@ package tb2014.dao.impl;
 
 import java.util.List;
 
+import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +53,34 @@ public class OrderStatusDao implements IOrderStatusDao {
 		sessionFactory.getCurrentSession().saveOrUpdate(orderStatus);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public OrderStatus getLast(Order order) {
-		return (OrderStatus) sessionFactory.getCurrentSession()
+
+		List<OrderStatus> statusList = sessionFactory.getCurrentSession()
 				.createCriteria(OrderStatus.class)
-				.addOrder(org.hibernate.criterion.Order.desc("date")).list()
-				.get(0);
+				.addOrder(org.hibernate.criterion.Order.desc("date")).list();
+
+		if (statusList.size() != 0) {
+			return statusList.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public OrderStatus getLastWithChilds(Order order) {
+
+		List<OrderStatus> statusList = sessionFactory.getCurrentSession()
+				.createCriteria(OrderStatus.class)
+				.addOrder(org.hibernate.criterion.Order.desc("date"))
+				.setFetchMode("order", FetchMode.JOIN).list();
+
+		if (statusList.size() != 0) {
+			return statusList.get(0);
+		} else {
+			return null;
+		}
 	}
 }

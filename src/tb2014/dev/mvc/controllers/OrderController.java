@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -53,8 +54,7 @@ public class OrderController {
 			IBrokerBusiness brokerBusiness,
 			IOrderStatusBusiness orderStatusBusiness,
 			IOrderAcceptAlacrityBusiness orderAlacrityBusiness,
-			IGeoDataBusiness geoDataBusiness,
-			OrderProcessing orderProcessing) {
+			IGeoDataBusiness geoDataBusiness, OrderProcessing orderProcessing) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
@@ -223,21 +223,104 @@ public class OrderController {
 	@RequestMapping(value = "/getStatus", method = RequestMethod.POST)
 	public String getStatus(@RequestParam("orderId") Long orderId,
 			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey) {
+			@RequestParam("apiKey") String apiKey, Model model) {
 
+		Order order = orderBusiness.get(orderId);
 		JSONObject getStatusJson = new JSONObject();
 
 		getStatusJson.put("apiId", apiId);
 		getStatusJson.put("apiKey", apiKey);
-		getStatusJson.put("orderId", orderId);
+		getStatusJson.put("orderId", order.getUuid());
 
 		try {
+
+			String url = "http://localhost:8080/tb2014/apidevice/order/status";
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			connection.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(
+					connection.getOutputStream());
+
+			wr.writeBytes(getStatusJson.toString());
+			wr.flush();
+			wr.close();
+
+			int responceCode = connection.getResponseCode();
+
+			if (responceCode != 200) {
+				System.out.println("Error sending order to server");
+			}
+
+			model.addAttribute("result",
+					getStringFromInputStream(connection.getInputStream()));
 
 		} catch (Exception ex) {
 			System.out.println("Error getting order status: " + ex.toString());
 		}
 
-		return "redirect:list";
+		return "order/result";
+	}
+
+	@RequestMapping(value = "/getGeoData", method = RequestMethod.GET)
+	public String getGeoData(@RequestParam("id") Long orderId, Model model) {
+
+		model.addAttribute("orderId", orderId);
+		return "order/getGeoData";
+	}
+
+	@RequestMapping(value = "/getGeoData", method = RequestMethod.POST)
+	public String getGeoData(@RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey,
+			@RequestParam("lastDate") String lastDate, Model model) {
+
+		Order order = orderBusiness.get(orderId);
+		JSONObject getGeoDataJson = new JSONObject();
+		
+		getGeoDataJson.put("apiId", apiId);
+		getGeoDataJson.put("apiKey", apiKey);
+		getGeoDataJson.put("orderId", order.getUuid());
+		getGeoDataJson.put("lastDate", lastDate);
+		
+		try {
+
+			String url = "http://localhost:8080/tb2014/apidevice/order/geodata";
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			connection.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(
+					connection.getOutputStream());
+
+			wr.writeBytes(getGeoDataJson.toString());
+			wr.flush();
+			wr.close();
+
+			int responceCode = connection.getResponseCode();
+
+			if (responceCode != 200) {
+				System.out.println("Error sending order to server");
+			}
+
+			model.addAttribute("result",
+					getStringFromInputStream(connection.getInputStream()));
+
+		} catch (Exception ex) {
+			System.out.println("Error getting order status: " + ex.toString());
+		}
+
+		return "order/result";
 	}
 
 	@RequestMapping(value = "/showStatus", method = RequestMethod.GET)
@@ -254,7 +337,8 @@ public class OrderController {
 	@RequestMapping(value = "/showGeoData", method = RequestMethod.GET)
 	public String showGeoData(@RequestParam("id") Long orderId, Model model) {
 
-		model.addAttribute("geoList", geoDataBusiness.getAll(orderBusiness.get(orderId)));
+		model.addAttribute("geoList",
+				geoDataBusiness.getAll(orderBusiness.get(orderId)));
 		return "order/geoList";
 	}
 
@@ -464,5 +548,26 @@ public class OrderController {
 		response.setHeader("Pragma", "No-cache");
 		response.setDateHeader("Expires", 0);
 		response.setHeader("Cache-Control", "no-cache");
+	}
+
+	private String getStringFromInputStream(InputStream stream) {
+
+		StringBuffer stringBuffer = new StringBuffer();
+		String line = null;
+
+		try {
+
+			BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(stream));
+
+			while ((line = bufferedReader.readLine()) != null) {
+				stringBuffer.append(line);
+			}
+		} catch (Exception ex) {
+			System.out.println("Error greating string from input stream: "
+					+ ex.toString());
+		}
+
+		return stringBuffer.toString();
 	}
 }

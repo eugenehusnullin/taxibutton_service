@@ -72,4 +72,12 @@ public class OrderDao implements IOrderDao {
 				.uniqueResult();
 	}
 
+	@Override
+	public Order getWithChilds(String uuid) {
+
+		return (Order) sessionFactory.getCurrentSession()
+				.createCriteria(Order.class).add(Restrictions.eq("uuid", uuid))
+				.setFetchMode("broker", FetchMode.JOIN).uniqueResult();
+	}
+
 }

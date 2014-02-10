@@ -12,6 +12,8 @@ public interface IOrderStatusDao {
 	List<OrderStatus> get(Order order);
 
 	OrderStatus getLast(Order order);
+	
+	OrderStatus getLastWithChilds(Order order);
 
 	List<OrderStatus> getAll();
 

@@ -68,4 +68,10 @@ public class OrderBusiness implements IOrderBusiness {
 	public Order get(String uuid) {
 		return orderDao.get(uuid);
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public Order getWithChilds(String uuid) {
+		return orderDao.getWithChilds(uuid);
+	}
 }

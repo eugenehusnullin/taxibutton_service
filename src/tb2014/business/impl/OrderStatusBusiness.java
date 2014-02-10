@@ -56,4 +56,10 @@ public class OrderStatusBusiness implements IOrderStatusBusiness {
 	public OrderStatus getLast(Order order) {
 		return orderStatusDao.getLast(order);
 	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public OrderStatus getLastWithChilds(Order order) {
+		return orderStatusDao.getLastWithChilds(order);
+	}
 }

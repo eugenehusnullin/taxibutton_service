@@ -15,8 +15,10 @@
 				href="give?id=${order.getId()}">Give</a>---<a
 				href="setStatus?id=${order.getId()}">Send status</a>---<a
 				href="showStatus?id=${order.getId()}">Show status</a>---<a
+				href="getStatus?id=${order.getId()}">Get status</a>---<a
 				href="setGeoData?id=${order.getId()}">Send geo</a>---<a
 				href="showGeoData?id=${order.getId()}">Show geo</a>---<a
+				href="getGeoData?id=${order.getId()}">Get geo data</a>---<a
 				href="cancel?id=${order.getId()}">Cancel</a>---<a
 				href="delete?id=${order.getId()}">Delete</a>---<a
 				href="getStatus?id=${order.getId()}">Get status</a> ---<a

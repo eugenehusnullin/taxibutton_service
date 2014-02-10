@@ -13,6 +13,8 @@ public interface IOrderBusiness {
 
 	Order getWithChilds(Long id);
 
+	Order getWithChilds(String uuid);
+	
 	List<Order> getAll();
 
 	List<Order> getAll(Device device);

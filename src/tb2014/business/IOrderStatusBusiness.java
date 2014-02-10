@@ -13,6 +13,8 @@ public interface IOrderStatusBusiness {
 
 	OrderStatus getLast(Order order);
 	
+	OrderStatus getLastWithChilds(Order order);
+	
 	List<OrderStatus> getAll();
 
 	void save(OrderStatus orderStatus);
