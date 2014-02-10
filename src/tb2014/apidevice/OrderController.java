@@ -59,22 +59,11 @@ public class OrderController {
 	public void createOrder(HttpServletRequest request,
 			HttpServletResponse response) {
 
-		StringBuffer stringBuffer = new StringBuffer();
-		String line = null;
-
 		try {
 
-			BufferedReader reader = request.getReader();
+			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
 
-			while ((line = reader.readLine()) != null) {
-				stringBuffer.append(line);
-			}
-		} catch (Exception ex) {
-			System.out.println("Error reading input JSON string: "
-					+ ex.toString());
-		}
-
-		try {
+			System.out.println(stringBuffer.toString());
 
 			JSONObject createOrderObject = (JSONObject) new JSONTokener(
 					stringBuffer.toString()).nextValue();
@@ -246,7 +235,7 @@ public class OrderController {
 				JSONObject geoDataJson = new JSONObject();
 				JSONArray geoPointsArrayJson = new JSONArray();
 
-				geoDataJson.put("orderId", order.getId());
+				geoDataJson.put("orderId", order.getUuid());
 
 				for (GeoData currentPoint : geoDataList) {
 

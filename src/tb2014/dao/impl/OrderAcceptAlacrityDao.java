@@ -53,7 +53,6 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 				.add(Restrictions.eq("order", order)).list();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Broker getWinner(Order order) {
 
