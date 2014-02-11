@@ -1,13 +1,17 @@
 package tb2014.service.order;
 
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import tb2014.business.IOrderAcceptAlacrityBusiness;
+import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderStatus;
+import tb2014.domain.order.OrderStatusType;
 
 public class ChooseWinnerProcessing {
 
@@ -50,8 +54,14 @@ public class ChooseWinnerProcessing {
 			if (winner != null) {
 				success = orderProcessing.giveOrder(order.getId(), winner);
 			}
-			
-			if (!success) {
+
+			if (success) {
+				OrderStatus orderStatus = new OrderStatus();
+				orderStatus.setDate(new Date());
+				orderStatus.setOrder(order);
+				orderStatus.setStatus(OrderStatusType.Taked);
+				orderStatusBusiness.save(orderStatus);
+			} else {
 				try {
 					Thread.sleep(5000);
 					synchronized (queue) {
@@ -70,10 +80,13 @@ public class ChooseWinnerProcessing {
 	private ExecutorService executor;
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;
+	private IOrderStatusBusiness orderStatusBusiness;
 
-	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing) {
+	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing,
+			IOrderStatusBusiness orderStatusBusiness) {
 		this.alacrityBuiness = alacrityBuiness;
 		this.orderProcessing = orderProcessing;
+		this.orderStatusBusiness = orderStatusBusiness;
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
 	}
@@ -89,7 +102,7 @@ public class ChooseWinnerProcessing {
 		mainThread.interrupt();
 		executor.shutdown();
 	}
-	
+
 	public void addOrder(Order order) {
 		synchronized (queue) {
 			queue.add(order);
