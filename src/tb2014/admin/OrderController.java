@@ -1,4 +1,4 @@
-package tb2014.dev.mvc.controllers;
+package tb2014.admin;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

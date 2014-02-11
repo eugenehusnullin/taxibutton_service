@@ -86,5 +86,10 @@
   		<artifactId>json</artifactId>
   		<version>20131018</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.springframework.security</groupId>
+  		<artifactId>spring-security-web</artifactId>
+  		<version>3.2.0.RELEASE</version>
+  	</dependency>
   </dependencies>
 </project>

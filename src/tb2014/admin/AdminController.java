@@ -1,4 +1,4 @@
-package tb2014.dev.mvc.controllers;
+package tb2014.admin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
