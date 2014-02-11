@@ -1,0 +1,15 @@
+@CHARSET "UTF-8";
+
+div.mainDiv {
+	padding: 5px;
+	display: inline-block;;
+	width: auto;
+	background-color: #EEEEEE;
+	border-style: dashed;
+	border-color: silver;
+	border-width: 1px;
+}
+
+div.mainDiv a {
+	line-height: 30px;
+}

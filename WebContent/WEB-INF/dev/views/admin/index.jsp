@@ -8,12 +8,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Administrator</title>
 </head>
-<link media="screen" href="./css/main.css" type="text/css"
-	rel="stylesheet" />
+<link media="screen" href="<c:url value="/resources/css/main.css"/>"
+	type="text/css" rel="stylesheet" />
 <body>
 	<div class="mainDiv">
-		<a href="orders">Заказы</a><br /> <a href="brokers">Диспетчерские</a><br />
-		<a href="devices">Устройства</a>
+		<a href="order/list">Заказы</a><br /> <a href="broker/list">Диспетчерские</a><br />
+		<a href="device/list">Устройства</a>
 	</div>
 </body>
 </html>
