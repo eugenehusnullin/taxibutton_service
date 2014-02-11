@@ -32,7 +32,7 @@ import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderJsonParser;
 import tb2014.utils.DeviceUtil;
 
-@RequestMapping("/apidevice/order")
+@RequestMapping("/order")
 @Controller("apiDeviceOrderController")
 public class OrderController {
 

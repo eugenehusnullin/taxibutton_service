@@ -15,16 +15,8 @@
 	<!-- Scans within the base package of the application for @Components to 
 		configure as beans -->
 	<!-- @Controller, @Service, @Configuration, etc. -->
-	<context:component-scan base-package="tb2014.admin" />
+	<context:component-scan base-package="tb2014.apidevice" />
 
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<mvc:annotation-driven />
-
-	<mvc:resources mapping="/resources/**" location="/resources/" />
-
-	<bean
-		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix" value="/WEB-INF/dev/views/"></property>
-		<property name="suffix" value=".jsp"></property>
-	</bean>
 </beans>

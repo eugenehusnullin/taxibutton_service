@@ -30,6 +30,34 @@
 		<servlet-name>adminWebServlet</servlet-name>
 		<url-pattern>/admin/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>apideviceWebServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring/apideviceWebServlet.cfg.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>apideviceWebServlet</servlet-name>
+		<url-pattern>/apidevice/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>apibrokerWebServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring/apibrokerWebServlet.cfg.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>apibrokerWebServlet</servlet-name>
+		<url-pattern>/apibroker/*</url-pattern>
+	</servlet-mapping>
 
 <!-- 	<filter> -->
 <!-- 		<filter-name>springSecurityFilter</filter-name> -->
