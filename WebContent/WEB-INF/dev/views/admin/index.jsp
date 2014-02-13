@@ -12,8 +12,8 @@
 	rel="stylesheet" />
 <body>
 	<div class="mainDiv">
-		<a href="orders">Заказы</a><br /> <a href="brokers">Диспетчерские</a><br />
-		<a href="devices">Устройства</a>
+		<a href="order/list">Заказы</a><br /> <a href="broker/list">Диспетчерские</a><br />
+		<a href="device/list">Устройства</a>
 	</div>
 </body>
 </html>
