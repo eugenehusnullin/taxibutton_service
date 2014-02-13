@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
-import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOfferedOrderBrokerBusiness;
 import tb2014.business.IOrderAcceptAlacrityBusiness;
@@ -41,7 +40,7 @@ import tb2014.service.serialize.OrderSerializer;
 @Service("ordersProcessing")
 public class OrderProcessing {
 
-	private static final Logger log = LoggerFactory.getLogger(Run.class);
+	private static final Logger log = LoggerFactory.getLogger(OrderProcessing.class);
 
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
