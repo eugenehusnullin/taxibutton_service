@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.FetchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import tb2014.dao.IOrderDao;
 import tb2014.domain.Device;
+import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
 
 @Repository("OrderDao")
@@ -78,6 +80,26 @@ public class OrderDao implements IOrderDao {
 		return (Order) sessionFactory.getCurrentSession()
 				.createCriteria(Order.class).add(Restrictions.eq("uuid", uuid))
 				.setFetchMode("broker", FetchMode.JOIN).uniqueResult();
+	}
+
+	@Override
+	public AddressPoint getSourcePoint(Order order) {
+
+		return (AddressPoint) sessionFactory.getCurrentSession()
+				.createCriteria(AddressPoint.class)
+				.add(Restrictions.eq("order", order))
+				.add(Restrictions.eq("indexNumber", 0)).uniqueResult();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Order> getAllWithChilds() {
+		return sessionFactory
+				.getCurrentSession()
+				.createCriteria(Order.class)
+				//.setProjection(Projections.distinct(Projections.property("id")))
+				//.setFetchMode("destinations", FetchMode.JOIN)
+				.setFetchMode("broker", FetchMode.JOIN).list();
 	}
 
 }

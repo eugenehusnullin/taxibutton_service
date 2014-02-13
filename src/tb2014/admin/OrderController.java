@@ -66,7 +66,7 @@ public class OrderController {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
 
-		model.addAttribute("orders", orderBusiness.getAll());
+		model.addAttribute("orders", orderBusiness.getAllWithChilds());
 		return "order/list";
 	}
 
@@ -282,12 +282,12 @@ public class OrderController {
 
 		Order order = orderBusiness.get(orderId);
 		JSONObject getGeoDataJson = new JSONObject();
-		
+
 		getGeoDataJson.put("apiId", apiId);
 		getGeoDataJson.put("apiKey", apiKey);
 		getGeoDataJson.put("orderId", order.getUuid());
 		getGeoDataJson.put("lastDate", lastDate);
-		
+
 		try {
 
 			String url = "http://localhost:8080/tb2014/apidevice/order/geodata";

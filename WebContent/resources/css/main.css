@@ -13,3 +13,25 @@ div.mainDiv {
 div.mainDiv a {
 	line-height: 30px;
 }
+
+table.mainTable {
+	width: 50%;
+	border-style: solid;
+	border-width: 1px;
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+
+table.mainTable th {
+	border-style: solid;
+	border-width: 1px;
+}
+
+table.mainTable td.actionTd {
+	border-style: solid;
+	border-width: 1px;
+}
+
+table.mainTable tr.infoTr > td {
+	text-align: center;
+}

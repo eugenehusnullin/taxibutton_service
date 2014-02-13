@@ -129,7 +129,7 @@ public class OrderProcessing {
 		boolean result = true;
 		try {
 
-			String url = "http://localhost:8080/tb2014/test/give";
+			String url = "http://localhost:8080/tb2014/test/order/give";
 			// String url = broker.getApiurl() + "/give";
 			url += "?orderId=" + orderId.toString();
 			URL obj = new URL(url);

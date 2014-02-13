@@ -1,4 +1,4 @@
-package tb2014.mvc.controllers.order;
+package tb2014.test.brokerside;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@RequestMapping("/test")
-@Controller
-public class OrderControllerTest {
-	
+@RequestMapping("/order")
+@Controller("brokerSideOrderController")
+public class OrderController {
+
 	@RequestMapping(value = "/offer", method = RequestMethod.POST)
 	public void offer(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
@@ -34,7 +34,8 @@ public class OrderControllerTest {
 			TransformerFactory.newInstance().newTransformer()
 					.transform(source, outputTarget);
 		} catch (Exception ex) {
-			System.out.println("Error recieving XML document: " + ex.toString());
+			System.out
+					.println("Error recieving XML document: " + ex.toString());
 		}
 
 		response.setContentType("text/html");
@@ -42,22 +43,24 @@ public class OrderControllerTest {
 		response.setDateHeader("Expires", 0);
 		response.setHeader("Cache-Control", "no-cache");
 	}
-	
+
 	@RequestMapping(value = "/give", method = RequestMethod.GET)
-	public void give(@RequestParam("orderId") Long orderId, HttpServletResponse response) {
-		
+	public void give(@RequestParam("orderId") Long orderId,
+			HttpServletResponse response) {
+
 		@SuppressWarnings("unused")
 		Long result = orderId;
-		
+
 		response.setStatus(200);
 	}
-	
+
 	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
-	public void cancel(@RequestParam("orderId") Long orderId, @RequestParam("reason") String reason, HttpServletResponse response) {
-		
+	public void cancel(@RequestParam("orderId") Long orderId,
+			@RequestParam("reason") String reason, HttpServletResponse response) {
+
 		@SuppressWarnings("unused")
 		Long result = orderId;
-		
+
 		response.setStatus(200);
 	}
 }
