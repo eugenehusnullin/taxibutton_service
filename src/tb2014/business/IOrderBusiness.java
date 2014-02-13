@@ -3,6 +3,7 @@ package tb2014.business;
 import java.util.List;
 
 import tb2014.domain.Device;
+import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
 
 public interface IOrderBusiness {
@@ -17,6 +18,8 @@ public interface IOrderBusiness {
 	
 	List<Order> getAll();
 
+	List<Order> getAllWithChilds();
+	
 	List<Order> getAll(Device device);
 
 	void save(Order order);
@@ -24,4 +27,6 @@ public interface IOrderBusiness {
 	void delete(Order order);
 
 	void saveOrUpdate(Order order);
+	
+	AddressPoint getSourcePoint(Order order);
 }

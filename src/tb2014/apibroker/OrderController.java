@@ -24,7 +24,7 @@ import tb2014.domain.order.OrderAcceptAlacrity;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 
-@RequestMapping("/apibroker/order")
+@RequestMapping("/order")
 @Controller("apiBrokerOrderController")
 public class OrderController {
 

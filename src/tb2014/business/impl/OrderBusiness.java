@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tb2014.business.IOrderBusiness;
 import tb2014.dao.IOrderDao;
 import tb2014.domain.Device;
+import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
 
 @Service("OrderBusiness")
@@ -68,10 +69,22 @@ public class OrderBusiness implements IOrderBusiness {
 	public Order get(String uuid) {
 		return orderDao.get(uuid);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public Order getWithChilds(String uuid) {
 		return orderDao.getWithChilds(uuid);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public AddressPoint getSourcePoint(Order order) {
+		return orderDao.getSourcePoint(order);
+	}
+
+	@Transactional
+	@Override
+	public List<Order> getAllWithChilds() {
+		return orderDao.getAllWithChilds();
 	}
 }

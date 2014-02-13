@@ -1,4 +1,4 @@
-package tb2014.mvc.controllers.tariff;
+package tb2014.test.brokerside;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,12 +13,13 @@ import org.slf4j.LoggerFactory;
 
 import tb2014.Run;
 
-@Controller
+@RequestMapping("/tariff")
+@Controller("brokerSideTariffController")
 public class TariffController {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
-	@RequestMapping(value = "/tariff", method = RequestMethod.GET)
+	@RequestMapping(value = "/get", method = RequestMethod.GET)
 	public Document tariff() {
 
 		try {
