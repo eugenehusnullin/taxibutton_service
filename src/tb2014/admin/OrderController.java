@@ -495,7 +495,7 @@ public class OrderController {
 	@RequestMapping(value = "/send", method = RequestMethod.GET)
 	public String send(@RequestParam("id") Long orderId, Model model) {
 
-		orderProcessing.offerOrder(orderId);
+		orderProcessing.offerOrder(orderBusiness.getWithChilds(orderId));
 
 		return "redirect:list";
 	}

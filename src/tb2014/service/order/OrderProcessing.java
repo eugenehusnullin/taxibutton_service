@@ -48,8 +48,6 @@ public class OrderProcessing {
 	private IOrderStatusBusiness orderStatusBusiness;
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 
-	private ChooseWinnerProcessing chooseWinnerProcessing;
-
 	@Autowired
 	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
 			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
@@ -59,16 +57,13 @@ public class OrderProcessing {
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
-
-		chooseWinnerProcessing = new ChooseWinnerProcessing(alacrityBuiness, this, orderStatusBusiness);
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
-	public void offerOrder(Long orderId) {
-		Order order = orderBusiness.getWithChilds(orderId);
+	public boolean offerOrder(Order order) {		
 		List<Broker> brokers = brokerBusiness.getAll();
-
+		
 		Document orderXml = OrderSerializer.OrderToXml(order);
 
 		boolean offered = false;
@@ -88,9 +83,7 @@ public class OrderProcessing {
 			}
 		}
 
-		if (offered) {
-			chooseWinnerProcessing.addOrder(order);
-		}
+		return offered;
 	}
 
 	// offer order via HTTP protocol
@@ -180,7 +173,7 @@ public class OrderProcessing {
 			OrderStatus orderStatus = new OrderStatus();
 
 			orderStatus.setOrder(order);
-			orderStatus.setStatus(OrderStatusType.valueOf("Cancelled"));
+			orderStatus.setStatus(OrderStatusType.Cancelled);
 			orderStatus.setDate(new Date());
 
 			orderStatusBusiness.save(orderStatus);

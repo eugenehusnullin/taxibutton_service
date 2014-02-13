@@ -1,7 +1,6 @@
 package tb2014.service.order;
 
 import java.util.ArrayDeque;
-import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -9,15 +8,10 @@ import java.util.concurrent.Executors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import tb2014.business.IOrderAcceptAlacrityBusiness;
-import tb2014.business.IOrderStatusBusiness;
-import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
-import tb2014.domain.order.OrderStatus;
-import tb2014.domain.order.OrderStatusType;
 
 @Service
-public class ChooseWinnerProcessing {
+public class OfferOrderProcessing {
 
 	class RecieverOrderRunnable implements Runnable {
 		@Override
@@ -36,35 +30,26 @@ public class ChooseWinnerProcessing {
 				}
 
 				if (order != null) {
-					ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(order);
-					executor.execute(chooseWinnerRunnable);
+					OfferOrderRunnable offerOrderRunnable = new OfferOrderRunnable(order);
+					executor.execute(offerOrderRunnable);
 				}
 			}
 		}
 	}
 
-	class ChooseWinnerRunnable implements Runnable {
+	class OfferOrderRunnable implements Runnable {
 		private Order order;
 
-		public ChooseWinnerRunnable(Order order) {
+		public OfferOrderRunnable(Order order) {
 			this.order = order;
 		}
 
 		@Override
 		public void run() {
-			boolean success = false;
-			Broker winner = alacrityBuiness.getWinner(order);
-
-			if (winner != null) {
-				success = orderProcessing.giveOrder(order.getId(), winner);
-			}
-
-			if (success) {
-				OrderStatus orderStatus = new OrderStatus();
-				orderStatus.setDate(new Date());
-				orderStatus.setOrder(order);
-				orderStatus.setStatus(OrderStatusType.Taked);
-				orderStatusBusiness.save(orderStatus);
+			boolean offered = orderProcessing.offerOrder(order);
+			
+			if (offered) {
+				chooseWinnerProcessing.addOrder(order);
 			} else {
 				try {
 					Thread.sleep(5000);
@@ -82,16 +67,14 @@ public class ChooseWinnerProcessing {
 	private Thread mainThread;
 	private boolean processing = true;
 	private ExecutorService executor;
-	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;
-	private IOrderStatusBusiness orderStatusBusiness;
+	private ChooseWinnerProcessing chooseWinnerProcessing;
 
 	@Autowired
-	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing,
-			IOrderStatusBusiness orderStatusBusiness) {
-		this.alacrityBuiness = alacrityBuiness;
+	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing) {
 		this.orderProcessing = orderProcessing;
-		this.orderStatusBusiness = orderStatusBusiness;
+		this.chooseWinnerProcessing = chooseWinnerProcessing;
+
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
 	}

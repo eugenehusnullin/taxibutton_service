@@ -22,7 +22,7 @@ public interface IOrderBusiness {
 	
 	List<Order> getAll(Device device);
 
-	void save(Order order);
+	void saveNewOrder(Order order);
 
 	void delete(Order order);
 
