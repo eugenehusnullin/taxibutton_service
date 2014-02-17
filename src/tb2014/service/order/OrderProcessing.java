@@ -52,16 +52,20 @@ public class OrderProcessing {
 	private ChooseWinnerProcessing chooseWinnerProcessing;
 
 	@Autowired
-	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
-			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
-			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness, IOrderAcceptAlacrityBusiness alacrityBuiness) {
+	public OrderProcessing(IOrderBusiness orderBusiness,
+			IBrokerBusiness brokerBusiness,
+			IOrderCancelBusiness orderCancelBusiness,
+			IOrderStatusBusiness orderStatusBusiness,
+			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness,
+			IOrderAcceptAlacrityBusiness alacrityBuiness) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
 
-		chooseWinnerProcessing = new ChooseWinnerProcessing(alacrityBuiness, this, orderStatusBusiness);
+		chooseWinnerProcessing = new ChooseWinnerProcessing(alacrityBuiness,
+				this, orderStatusBusiness);
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
@@ -85,7 +89,8 @@ public class OrderProcessing {
 				offeredOrderBroker.setTimestamp(new Date());
 				offeredOrderBrokerBusiness.save(offeredOrderBroker);
 			} catch (Exception ex) {
-				log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
+				log.error("Offer order to broker " + currentBroker.getId()
+						+ " error: " + ex.toString());
 			}
 		}
 
@@ -95,8 +100,9 @@ public class OrderProcessing {
 	}
 
 	// offer order via HTTP protocol
-	private void offerOrderHTTP(Broker broker, Document document) throws IOException,
-			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+	private void offerOrderHTTP(Broker broker, Document document)
+			throws IOException, TransformerConfigurationException,
+			TransformerException, TransformerFactoryConfigurationError {
 		// String url = broker.getApiurl() + "/offer";
 		String url = "http://localhost:8080/tb2014/test/offer";
 		URL obj = new URL(url);
@@ -112,14 +118,16 @@ public class OrderProcessing {
 		Source source = new DOMSource(document);
 		Result result = new StreamResult(wr);
 
-		TransformerFactory.newInstance().newTransformer().transform(source, result);
+		TransformerFactory.newInstance().newTransformer()
+				.transform(source, result);
 		wr.flush();
 		wr.close();
 
 		int responceCode = connection.getResponseCode();
 
 		if (responceCode != 200) {
-			log.info("Error offering order to broker (code: " + responceCode + "): " + broker.getId().toString());
+			log.info("Error offering order to broker (code: " + responceCode
+					+ "): " + broker.getId().toString());
 		}
 	}
 
@@ -129,19 +137,21 @@ public class OrderProcessing {
 		boolean result = true;
 		try {
 
-			String url = "http://localhost:8080/tb2014/test/order/give";
-			// String url = broker.getApiurl() + "/give";
+			String url = broker.getApiurl() + "/order/give";
 			url += "?orderId=" + orderId.toString();
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
 
 			connection.setRequestMethod("GET");
 
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
+
 				result = false;
-				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
+				log.info("Error giving order to broker (code: " + responceCode
+						+ "): " + broker.getId().toString());
 			} else {
 
 				Order order = orderBusiness.get(orderId);
@@ -150,28 +160,36 @@ public class OrderProcessing {
 				orderBusiness.saveOrUpdate(order);
 			}
 		} catch (Exception ex) {
+
 			result = false;
-			log.info("Giving order for broker " + broker.getId() + " error: " + ex.toString());
+			log.info("Giving order for broker " + broker.getId() + " error: "
+					+ ex.toString());
 		}
 
 		return result;
 	}
 
 	// cancelling order
-	public void cancelOrder(Order order, String reason) {
+	public Boolean cancelOrder(Order order, String reason) throws Exception {
 
-		@SuppressWarnings("unused")
+		Boolean result = true;
 		Broker broker = order.getBroker();
 
-		// String url = broker.getApiurl() + "/cancel";
-		String url = "/tb2014/test/cancel";
-		String params = "orderId=" + order.getId() + "&reason=" + reason;
+		// irder is taked bu broker
+		if (broker != null) {
 
-		int resultCode = sendHttpGet(url, params);
+			String url = broker.getApiurl() + "/order/cancel";
+			String params = "orderId=" + order.getId() + "&reason=" + reason;
 
-		if (resultCode == 200) {// if broker has accepted cancelling order,
-								// adding cancel row into the table & saving a
-								// status of order as Cancelled
+			int resultCode = sendHttpGet(url, params);
+
+			if (resultCode != 200) {
+				result = false;
+				return result;
+			}
+		}
+
+		try {
 			OrderCancel orderCancel = new OrderCancel();
 			orderCancel.setOrder(order);
 			orderCancel.setReason(reason);
@@ -185,26 +203,39 @@ public class OrderProcessing {
 			orderStatus.setDate(new Date());
 
 			orderStatusBusiness.save(orderStatus);
+		} catch (Exception ex) {
+			
+			System.out.println("Error cancelling order: " + ex.toString());
+			return false;
 		}
+
+		return result;
 	}
 
 	// sending HTTP GET request
 	private int sendHttpGet(String url, String params) {
 
+		String protocol = url.split(":")[0];
+		String[] fullAddress = url.split("//")[1].split("/", 2);
+		String address = fullAddress[0];
+		String path = "/" + fullAddress[1];
+		
 		int responseCode = 0;
 
 		try {
-			URI uriObject = new URI("http", "localhost:8080", url, params, null);
+			URI uriObject = new URI(protocol, address, path, params, null);
 
 			URL obj = uriObject.toURL();
-			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
 
 			connection.setRequestMethod("GET");
 
 			responseCode = connection.getResponseCode();
 		} catch (Exception ex) {
 
-			System.out.println("Sending HTTP GET to: " + url + " FAILED, error: " + ex.toString());
+			System.out.println("Sending HTTP GET to: " + url
+					+ " FAILED, error: " + ex.toString());
 			responseCode = -1;
 		}
 

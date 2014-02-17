@@ -29,6 +29,7 @@ import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.GeoData;
 import tb2014.domain.order.OrderStatusType;
+import tb2014.service.order.OrderProcessing;
 import tb2014.service.serialize.OrderJsonParser;
 import tb2014.utils.DeviceUtil;
 
@@ -41,17 +42,19 @@ public class OrderController {
 	private IOrderAcceptAlacrityBusiness orderAcceptAlacrityBusiness;
 	private IGeoDataBusiness geoDataBusiness;
 	private DeviceUtil deviceUtil;
+	private OrderProcessing orderProcessing;
 
 	@Autowired
 	public OrderController(IOrderBusiness orderBusiness, DeviceUtil deviceUtil,
 			IOrderStatusBusiness orderStatusBusines,
 			IOrderAcceptAlacrityBusiness orderAcceptAlacrityBusiness,
-			IGeoDataBusiness geoDataBusiness) {
+			IGeoDataBusiness geoDataBusiness, OrderProcessing orderProcessing) {
 		this.orderBusiness = orderBusiness;
 		this.deviceUtil = deviceUtil;
 		this.orderStatusBusiness = orderStatusBusines;
 		this.orderAcceptAlacrityBusiness = orderAcceptAlacrityBusiness;
 		this.geoDataBusiness = geoDataBusiness;
+		this.orderProcessing = orderProcessing;
 	}
 
 	// create an order from apk request (json string)
@@ -69,9 +72,8 @@ public class OrderController {
 					stringBuffer.toString()).nextValue();
 
 			String apiId = createOrderObject.getString("apiId");
-			String apiKey = createOrderObject.getString("apiKey");
 
-			if (deviceUtil.checkDevice(apiId, apiKey)) {
+			if (deviceUtil.checkDevice(apiId)) {
 
 				JSONObject orderObject = createOrderObject
 						.getJSONObject("order");
@@ -115,6 +117,66 @@ public class OrderController {
 		}
 	}
 
+	// cancel order
+	@RequestMapping(value = "/cancel", method = RequestMethod.POST)
+	public void cancel(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+
+			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
+			JSONObject cancelOrderJson = (JSONObject) new JSONTokener(
+					stringBuffer.toString()).nextValue();
+			System.out.println(cancelOrderJson.toString());
+
+			String apiId = cancelOrderJson.getString("apiId");
+
+			if (deviceUtil.checkDevice(apiId)) {
+
+				String orderUuid = cancelOrderJson.getString("orderId");
+				String reason = cancelOrderJson.getString("reason");
+				Order order = orderBusiness.getWithChilds(orderUuid);
+
+				if (order == null) {
+					response.setStatus(404);
+					return;
+				}
+
+				if (!order.getDevice().getApiId().equals(apiId)) {
+					response.setStatus(403);
+					return;
+				}
+
+				OrderStatus status = orderStatusBusiness
+						.getLastWithChilds(order);
+
+				if (status == null) {
+					response.setStatus(404);
+					return;
+				}
+
+				if (status.getStatus() == OrderStatusType.Created
+						|| status.getStatus() == OrderStatusType.Taked) {
+
+					if (orderProcessing.cancelOrder(order, reason)) {
+						response.setStatus(200);
+						return;
+					} else {
+						response.setStatus(500);
+						return;
+					}
+				} else {
+					response.setStatus(500);
+					return;
+				}
+			}
+		} catch (Exception ex) {
+			System.out
+					.println("Error parsing JSON to object: " + ex.toString());
+			response.setStatus(500);
+			return;
+		}
+	}
+
 	// get status of order
 	@RequestMapping(value = "/status", method = RequestMethod.POST)
 	public void getatus(HttpServletRequest request, HttpServletResponse response) {
@@ -126,9 +188,8 @@ public class OrderController {
 					stringBuffer.toString()).nextValue();
 
 			String apiId = getStatusObject.getString("apiId");
-			String apiKey = getStatusObject.getString("apiKey");
 
-			if (deviceUtil.checkDevice(apiId, apiKey)) {
+			if (deviceUtil.checkDevice(apiId)) {
 
 				String orderUuid = getStatusObject.getString("orderId");
 				Order order = orderBusiness.getWithChilds(orderUuid);
@@ -189,15 +250,12 @@ public class OrderController {
 		try {
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
 
-			System.out.println(stringBuffer.toString());
-
 			JSONObject getGeoObject = (JSONObject) new JSONTokener(
 					stringBuffer.toString()).nextValue();
 
 			String apiId = getGeoObject.getString("apiId");
-			String apiKey = getGeoObject.getString("apiKey");
 
-			if (deviceUtil.checkDevice(apiId, apiKey)) {
+			if (deviceUtil.checkDevice(apiId)) {
 
 				String orderUuid = getGeoObject.getString("orderId");
 				Order order = orderBusiness.get(orderUuid);

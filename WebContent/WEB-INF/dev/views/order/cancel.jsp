@@ -6,13 +6,16 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Get status</title>
+<title>Cancelling order</title>
 </head>
 <body>
 	<form method="POST">
 		<input type="hidden" name="orderId" value="${orderId}" />
 		Api id:<br />
 		<input type="text" name="apiId" />
+		<br />
+		Reason:<br />
+		<input type="text" name="reason" />
 		<br />
 		<input type="submit" value="Get" />
 	</form>

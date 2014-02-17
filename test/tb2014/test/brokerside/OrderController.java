@@ -55,11 +55,11 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
-	public void cancel(@RequestParam("orderId") Long orderId,
+	public void cancel(@RequestParam("orderId") String orderId,
 			@RequestParam("reason") String reason, HttpServletResponse response) {
 
 		@SuppressWarnings("unused")
-		Long result = orderId;
+		String result = orderId;
 
 		response.setStatus(200);
 	}

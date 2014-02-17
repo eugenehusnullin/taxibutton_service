@@ -10,8 +10,8 @@
 </head>
 <body>
 	<form method="post">
-		<br/>Api key
-		<input type="text" name="apiKey" />
+		<br/>Phone
+		<input type="text" name="phone" />
 		<br />
 		<input type="submit" value="save" />
 	</form>

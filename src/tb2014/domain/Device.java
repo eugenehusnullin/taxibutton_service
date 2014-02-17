@@ -4,7 +4,7 @@ public class Device {
 
 	private Long id;
 	private String apiId;
-	private String apiKey;
+	private String phone;
 
 	public Long getId() {
 		return id;
@@ -22,11 +22,11 @@ public class Device {
 		this.apiId = apiId;
 	}
 
-	public String getApiKey() {
-		return apiKey;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 }

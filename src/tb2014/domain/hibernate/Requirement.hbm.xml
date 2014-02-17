@@ -9,7 +9,7 @@
 			<generator class="identity" />
 		</id>
 		<many-to-one name="order" class="tb2014.domain.order.Order">
-			<column name="orderId" not-null="true" />
+			<column name="orderId" />
 		</many-to-one>
 		<property name="type" length="40" type="java.lang.String" />
 		<property name="options" length="100" type="java.lang.String" />

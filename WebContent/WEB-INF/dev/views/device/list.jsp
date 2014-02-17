@@ -20,7 +20,7 @@
 			<tr>
 				<th>#</th>
 				<th>Api id</th>
-				<th>Api key</th>
+				<th>Phone</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -28,10 +28,7 @@
 				<tr class="infoTr">
 					<td>${device.getId()}</td>
 					<td>${device.getApiId()}</td>
-					<td>${device.getApiKey()}</td>
-				</tr>
-				<tr class="actionTr">
-					<td class="actionTd" colspan="3"><a href="#">Edit</a></td>
+					<td>${device.getPhone()}</td>
 				</tr>
 			</c:forEach>
 		</tbody>

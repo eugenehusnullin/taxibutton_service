@@ -35,7 +35,8 @@ public class OrderDao implements IOrderDao {
 				.createCriteria(Order.class).add(Restrictions.eq("id", id))
 				.setFetchMode("destinations", FetchMode.JOIN)
 				.setFetchMode("requirements", FetchMode.JOIN)
-				.setFetchMode("broker", FetchMode.JOIN).uniqueResult();
+				.setFetchMode("broker", FetchMode.JOIN)
+				.setFetchMode("device", FetchMode.JOIN).uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -79,7 +80,8 @@ public class OrderDao implements IOrderDao {
 
 		return (Order) sessionFactory.getCurrentSession()
 				.createCriteria(Order.class).add(Restrictions.eq("uuid", uuid))
-				.setFetchMode("broker", FetchMode.JOIN).uniqueResult();
+				.setFetchMode("broker", FetchMode.JOIN)
+				.setFetchMode("device", FetchMode.JOIN).uniqueResult();
 	}
 
 	@Override
@@ -94,12 +96,68 @@ public class OrderDao implements IOrderDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Order> getAllWithChilds() {
-		return sessionFactory
-				.getCurrentSession()
-				.createCriteria(Order.class)
-				//.setProjection(Projections.distinct(Projections.property("id")))
-				//.setFetchMode("destinations", FetchMode.JOIN)
+		return sessionFactory.getCurrentSession().createCriteria(Order.class)
 				.setFetchMode("broker", FetchMode.JOIN).list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Order> getAllWithParams(String orderField,
+			String orderDirection, int start, int count) {
+
+		if (orderDirection.equals("asc")) {
+
+			if (orderField.equals("supplyDate")) {
+				return sessionFactory
+						.getCurrentSession()
+						.createCriteria(Order.class)
+						.addOrder(org.hibernate.criterion.Order.asc(orderField))
+						.addOrder(
+								org.hibernate.criterion.Order.asc("supplyHour"))
+						.addOrder(
+								org.hibernate.criterion.Order.asc("supplyMin"))
+						.setFirstResult(start).setMaxResults(count)
+						.setFetchMode("broker", FetchMode.JOIN).list();
+			} else {
+				return sessionFactory
+						.getCurrentSession()
+						.createCriteria(Order.class)
+						.addOrder(org.hibernate.criterion.Order.asc(orderField))
+						.setFirstResult(start).setMaxResults(count)
+						.setFetchMode("broker", FetchMode.JOIN).list();
+			}
+		} else {
+
+			if (orderField.equals("supplyDate")) {
+				return sessionFactory
+						.getCurrentSession()
+						.createCriteria(Order.class)
+						.addOrder(
+								org.hibernate.criterion.Order.desc(orderField))
+						.addOrder(
+								org.hibernate.criterion.Order
+										.desc("supplyHour"))
+						.addOrder(
+								org.hibernate.criterion.Order.desc("supplyMin"))
+						.setFirstResult(start).setMaxResults(count)
+						.setFetchMode("broker", FetchMode.JOIN).list();
+			} else {
+				return sessionFactory
+						.getCurrentSession()
+						.createCriteria(Order.class)
+						.addOrder(
+								org.hibernate.criterion.Order.desc(orderField))
+						.setFirstResult(start).setMaxResults(count)
+						.setFetchMode("broker", FetchMode.JOIN).list();
+			}
+		}
+	}
+
+	@Override
+	public Long getAllOrdersCount() {
+		return (Long) sessionFactory.getCurrentSession()
+				.createCriteria(Order.class)
+				.setProjection(Projections.rowCount()).uniqueResult();
 	}
 
 }

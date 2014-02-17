@@ -21,6 +21,8 @@ public interface IOrderDao {
 	List<Order> getAllWithChilds();
 
 	List<Order> getAll(Device device);
+	
+	List<Order> getAllWithParams(String orderField, String orderDirection, int start, int count);
 
 	void save(Order order);
 
@@ -29,4 +31,6 @@ public interface IOrderDao {
 	void saveOrUpdate(Order order);
 
 	AddressPoint getSourcePoint(Order order);
+	
+	Long getAllOrdersCount();
 }

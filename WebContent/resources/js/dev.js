@@ -1,12 +1,21 @@
 $(document).ready(function() {
-	$("tr.actionTr").hide();
+	$("div.actionTr").hide();
 
-	$("tr.infoTr").mouseenter(function() {
-		$("tr.actionTr").hide();
-		$(this).next().show();
+	$("tr.infoTr").mouseenter(function(e) {
+		$("div.actionTr").hide();
+
+		$(this).find("div.actionTr").show();
 	});
 
-	$("tr.actionTr").mouseleave(function() {
+	$("div.actionTr").mouseleave(function() {
 		$(this).hide();
+	});
+
+	$("table.mainTable").mouseleave(function() {
+		$("div.actionTr").hide();
+	});
+
+	$("table.mainTable").find("th").mouseenter(function() {
+		$("div.actionTr").hide();
 	});
 });

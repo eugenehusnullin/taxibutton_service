@@ -64,9 +64,55 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String list(Model model) {
+	public String list(HttpServletRequest request, Model model) {
 
-		model.addAttribute("orders", orderBusiness.getAllWithChilds());
+		String orderField = null;
+		String orderDirection = null;
+		int start = 0;
+		int count = 0;
+
+		if (request.getParameter("orderField") == null) {
+			orderField = "supplyDate";
+		} else {
+			orderField = request.getParameter("orderField");
+		}
+
+		if (request.getParameter("orderDirection") == null) {
+			orderDirection = "desc";
+		} else {
+			orderDirection = request.getParameter("orderDirection");
+		}
+
+		if (request.getParameter("start") == null) {
+			start = 0;
+		} else {
+			start = Integer.parseInt(request.getParameter("start"));
+		}
+
+		if (request.getParameter("count") == null) {
+			count = 10;
+		} else {
+			count = Integer.parseInt(request.getParameter("count"));
+		}
+
+		List<Order> orderList = orderBusiness.getAllWithParams(orderField,
+				orderDirection, start, count);
+		Long allOrdersCount = orderBusiness.getAllOrdersCount();
+
+		model.addAttribute("orders", orderList);
+
+		int pagesCount = (int) Math.ceil(allOrdersCount / (double) count);
+		int[] pages = new int[pagesCount];
+
+		for (int i = 0; i < pagesCount; i++) {
+			pages[i] = i + 1;
+		}
+
+		model.addAttribute("pages", pages);
+		model.addAttribute("orderField", orderField);
+		model.addAttribute("orderDirection", orderDirection);
+		model.addAttribute("start", start);
+		model.addAttribute("count", count);
 		return "order/list";
 	}
 
@@ -222,14 +268,12 @@ public class OrderController {
 
 	@RequestMapping(value = "/getStatus", method = RequestMethod.POST)
 	public String getStatus(@RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey, Model model) {
+			@RequestParam("apiId") String apiId, Model model) {
 
 		Order order = orderBusiness.get(orderId);
 		JSONObject getStatusJson = new JSONObject();
 
 		getStatusJson.put("apiId", apiId);
-		getStatusJson.put("apiKey", apiKey);
 		getStatusJson.put("orderId", order.getUuid());
 
 		try {
@@ -264,7 +308,7 @@ public class OrderController {
 			System.out.println("Error getting order status: " + ex.toString());
 		}
 
-		return "order/result";
+		return "result";
 	}
 
 	@RequestMapping(value = "/getGeoData", method = RequestMethod.GET)
@@ -277,14 +321,12 @@ public class OrderController {
 	@RequestMapping(value = "/getGeoData", method = RequestMethod.POST)
 	public String getGeoData(@RequestParam("orderId") Long orderId,
 			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey,
 			@RequestParam("lastDate") String lastDate, Model model) {
 
 		Order order = orderBusiness.get(orderId);
 		JSONObject getGeoDataJson = new JSONObject();
 
 		getGeoDataJson.put("apiId", apiId);
-		getGeoDataJson.put("apiKey", apiKey);
 		getGeoDataJson.put("orderId", order.getUuid());
 		getGeoDataJson.put("lastDate", lastDate);
 
@@ -320,7 +362,7 @@ public class OrderController {
 			System.out.println("Error getting order status: " + ex.toString());
 		}
 
-		return "order/result";
+		return "result";
 	}
 
 	@RequestMapping(value = "/showStatus", method = RequestMethod.GET)
@@ -343,14 +385,57 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
-	public String cancel(@RequestParam("id") Long orderId) {
+	public String cancel(@RequestParam("id") Long orderId, Model model) {
 
-		String reason = "temp reason of cancelling";
-		Order order = orderBusiness.getWithChilds(orderId);
+		model.addAttribute("orderId", orderId);
+		return "order/cancel";
+	}
 
-		orderProcessing.cancelOrder(order, reason);
+	@RequestMapping(value = "/cancel", method = RequestMethod.POST)
+	public String cancel(HttpServletRequest request, Model model) {
 
-		return "redirect:list";
+		JSONObject cancelOrderJson = new JSONObject();
+
+		Order order = orderBusiness.get(Long.parseLong(request.getParameter("orderId")));
+
+		cancelOrderJson.put("apiId", request.getParameter("apiId"));
+		cancelOrderJson.put("orderId", order.getUuid());
+		cancelOrderJson.put("reason", request.getParameter("reason"));
+
+		String jsonResult = cancelOrderJson.toString();
+		int responseCode = 0;
+		
+		try {
+
+			String url = "http://localhost:8080/tb2014/apidevice/order/cancel";
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj
+					.openConnection();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			connection.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(
+					connection.getOutputStream());
+
+			wr.writeBytes(jsonResult);
+			wr.flush();
+			wr.close();
+
+			responseCode = connection.getResponseCode();
+
+			if (responseCode != 200) {
+				System.out.println("Error cancelling order");
+			}
+		} catch (Exception ex) {
+			System.out.println("Error cancelling order (client): "
+					+ ex.toString());
+		}
+
+		model.addAttribute("result", "Response code is: " + responseCode);
+		return "result";
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
@@ -364,7 +449,6 @@ public class OrderController {
 		JSONObject createOrderJson = new JSONObject();
 
 		createOrderJson.put("apiId", request.getParameter("apiId"));
-		createOrderJson.put("apiKey", request.getParameter("apiKey"));
 
 		JSONObject orderJson = new JSONObject();
 

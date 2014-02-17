@@ -1,5 +1,7 @@
 package tb2014.domain.order;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +23,8 @@ public class Order {
 	private Broker broker;
 	private List<AddressPoint> destinations;
 	private Set<Requirement> requirements;
+	private Set<OrderStatus> statuses;
+	private Set<OrderCancel> orderCancel;
 
 	public Long getId() {
 		return id;
@@ -62,6 +66,23 @@ public class Order {
 		this.supplyMin = supplyMin;
 	}
 
+	public Date getSupplyTime() {
+
+		Date result = new Date();
+		result.setTime(this.supplyDate.getTime() + this.supplyHour * 3600000
+				+ this.supplyMin * 60000);
+
+		return result;
+	}
+
+	public String getSupplyTime(String format) {
+
+		DateFormat df = new SimpleDateFormat(format);
+		String result = df.format(this.getSupplyTime());
+
+		return result;
+	}
+
 	public Broker getBroker() {
 		return broker;
 	}
@@ -69,7 +90,7 @@ public class Order {
 	public void setBroker(Broker broker) {
 		this.broker = broker;
 	}
-	
+
 	public List<AddressPoint> getDestinations() {
 		return destinations;
 	}
@@ -95,6 +116,10 @@ public class Order {
 		return null;
 	}
 
+	public OrderStatus getLastStatus() {
+		return statuses.iterator().next();
+	}
+
 	public Set<Requirement> getRequirements() {
 		return requirements;
 	}
@@ -117,5 +142,21 @@ public class Order {
 
 	public void setDevice(Device device) {
 		this.device = device;
+	}
+
+	public Set<OrderStatus> getStatuses() {
+		return statuses;
+	}
+
+	public void setStatuses(Set<OrderStatus> statuses) {
+		this.statuses = statuses;
+	}
+
+	public Set<OrderCancel> getOrderCancel() {
+		return orderCancel;
+	}
+
+	public void setOrderCancel(Set<OrderCancel> orderCancel) {
+		this.orderCancel = orderCancel;
 	}
 }

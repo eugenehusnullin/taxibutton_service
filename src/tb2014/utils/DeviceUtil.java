@@ -17,15 +17,11 @@ public class DeviceUtil {
 		this.deviceBusiness = deviceBusiness;
 	}
 
-	public Boolean checkDevice(String apiId, String apiKey) {
+	public Boolean checkDevice(String apiId) {
 
 		Device device = deviceBusiness.get(apiId);
 
 		if (device == null) {
-			return false;
-		}
-
-		if (device.getApiKey().trim().equals(apiKey.trim()) == false) {
 			return false;
 		}
 

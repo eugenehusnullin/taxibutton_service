@@ -87,4 +87,18 @@ public class OrderBusiness implements IOrderBusiness {
 	public List<Order> getAllWithChilds() {
 		return orderDao.getAllWithChilds();
 	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<Order> getAllWithParams(String orderField,
+			String orderDirection, int start, int count) {
+		return orderDao.getAllWithParams(orderField, orderDirection, start,
+				count);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public Long getAllOrdersCount() {
+		return orderDao.getAllOrdersCount();
+	}
 }

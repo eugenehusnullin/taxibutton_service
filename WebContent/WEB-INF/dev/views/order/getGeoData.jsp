@@ -14,9 +14,6 @@
 		Api id:<br />
 		<input type="text" name="apiId" />
 		<br />
-		Api key:<br />
-		<input type="text" name="apiKey" />
-		<br />
 		Last date:<br />
 		<input type="text" name="lastDate" />
 		<br />
