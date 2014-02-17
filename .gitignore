@@ -5,3 +5,4 @@ target/*
 /build
 /target
 jdbc.settings
+log4j.properties

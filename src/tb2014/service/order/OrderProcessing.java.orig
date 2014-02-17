@@ -60,7 +60,12 @@ public class OrderProcessing {
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
+<<<<<<< HEAD
+
+		chooseWinnerProcessing = new ChooseWinnerProcessing(alacrityBuiness,
 				this, orderStatusBusiness);
+=======
+>>>>>>> 5ef4a72b06c4e1f4d8742bd35cbe3400bf8b973b
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share

@@ -24,7 +24,7 @@ public interface IOrderBusiness {
 	
 	List<Order> getAllWithParams(String orderField, String orderDirection, int start, int count);
 
-	void save(Order order);
+	void saveNewOrder(Order order);
 
 	void delete(Order order);
 

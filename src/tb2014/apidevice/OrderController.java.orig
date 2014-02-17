@@ -32,8 +32,11 @@ import tb2014.domain.order.GeoData;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
-import tb2014.service.order.OfferOrderProcessing;
+<<<<<<< HEAD
 import tb2014.service.order.OrderProcessing;
+=======
+import tb2014.service.order.OfferOrderProcessing;
+>>>>>>> 5ef4a72b06c4e1f4d8742bd35cbe3400bf8b973b
 import tb2014.service.serialize.OrderJsonParser;
 import tb2014.utils.DeviceUtil;
 
@@ -53,21 +56,36 @@ public class OrderController {
 	private IGeoDataBusiness geoDataBusiness;
 	@Autowired
 	private DeviceUtil deviceUtil;
+<<<<<<< HEAD
 	private OrderProcessing orderProcessing;
+
+	@Autowired
+	public OrderController(IOrderBusiness orderBusiness, DeviceUtil deviceUtil,
+			IOrderStatusBusiness orderStatusBusines,
+			IOrderAcceptAlacrityBusiness orderAcceptAlacrityBusiness,
+			IGeoDataBusiness geoDataBusiness, OrderProcessing orderProcessing) {
+		this.orderBusiness = orderBusiness;
+		this.deviceUtil = deviceUtil;
+		this.orderStatusBusiness = orderStatusBusines;
+		this.orderAcceptAlacrityBusiness = orderAcceptAlacrityBusiness;
+		this.geoDataBusiness = geoDataBusiness;
+		this.orderProcessing = orderProcessing;
+	}
+=======
 	@Autowired
 	private OfferOrderProcessing offerOrderProcessing;
 
 //	@Autowired
 //	public OrderController(IOrderBusiness orderBusiness, DeviceUtil deviceUtil,
 //			IOrderStatusBusiness orderStatusBusines, IOrderAcceptAlacrityBusiness orderAcceptAlacrityBusiness,
-//			IGeoDataBusiness geoDataBusiness, OrderProcessing orderProcessing) {
+//			IGeoDataBusiness geoDataBusiness) {
 //		this.orderBusiness = orderBusiness;
 //		this.deviceUtil = deviceUtil;
 //		this.orderStatusBusiness = orderStatusBusines;
 //		this.orderAcceptAlacrityBusiness = orderAcceptAlacrityBusiness;
-		this.orderProcessing = orderProcessing;
 //		this.geoDataBusiness = geoDataBusiness;
 //	}
+>>>>>>> 5ef4a72b06c4e1f4d8742bd35cbe3400bf8b973b
 
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -248,7 +266,14 @@ public class OrderController {
 		try {
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
 
+<<<<<<< HEAD
+			JSONObject getGeoObject = (JSONObject) new JSONTokener(
+					stringBuffer.toString()).nextValue();
+=======
+			System.out.println(stringBuffer.toString());
+
 			JSONObject getGeoObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+>>>>>>> 5ef4a72b06c4e1f4d8742bd35cbe3400bf8b973b
 
 			String apiId = getGeoObject.getString("apiId");
 

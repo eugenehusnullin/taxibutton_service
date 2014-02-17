@@ -42,7 +42,7 @@ public class OrderBusiness implements IOrderBusiness {
 
 	@Transactional
 	@Override
-	public void save(Order order) {
+	public void saveNewOrder(Order order) {
 		orderDao.save(order);
 	}
 
