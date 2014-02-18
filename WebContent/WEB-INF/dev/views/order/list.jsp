@@ -120,7 +120,6 @@
 								href="getGeoData?id=${order.getId()}">Get geo data</a>---<a
 								href="cancel?id=${order.getId()}">Cancel</a>---<a
 								href="delete?id=${order.getId()}">Delete</a>---<a
-								href="getStatus?id=${order.getId()}">Get status</a> ---<a
 								href="alacrity?id=${order.getId()}">Alacrity</a>
 						</div>
 					</td>

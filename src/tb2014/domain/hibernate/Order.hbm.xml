@@ -26,7 +26,7 @@
 			<key>
 				<column name="orderId" />
 			</key>
-			<index column="id"/>
+			<index column="id" />
 			<one-to-many class="tb2014.domain.order.AddressPoint" />
 		</list>
 		<set name="statuses" cascade="all" lazy="false" order-by="date desc">
@@ -40,6 +40,12 @@
 				<column name="orderId" />
 			</key>
 			<one-to-many class="tb2014.domain.order.OrderCancel" />
+		</set>
+		<set name="geoData" cascade="all">
+			<key>
+				<column name="orderId" />
+			</key>
+			<one-to-many class="tb2014.domain.order.GeoData" />
 		</set>
 	</class>
 </hibernate-mapping>

@@ -40,7 +40,8 @@ import tb2014.service.serialize.OrderSerializer;
 @Service("ordersProcessing")
 public class OrderProcessing {
 
-	private static final Logger log = LoggerFactory.getLogger(OrderProcessing.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(OrderProcessing.class);
 
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
@@ -60,14 +61,13 @@ public class OrderProcessing {
 		this.orderCancelBusiness = orderCancelBusiness;
 		this.orderStatusBusiness = orderStatusBusiness;
 		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
-				this, orderStatusBusiness);
 	}
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
-	public boolean offerOrder(Order order) {		
+	public boolean offerOrder(Order order) {
 		List<Broker> brokers = brokerBusiness.getAll();
-		
+
 		Document orderXml = OrderSerializer.OrderToXml(order);
 
 		boolean offered = false;
@@ -150,6 +150,13 @@ public class OrderProcessing {
 
 				order.setBroker(broker);
 				orderBusiness.saveOrUpdate(order);
+
+				OrderStatus orderStatus = new OrderStatus();
+
+				orderStatus.setDate(new Date());
+				orderStatus.setOrder(order);
+				orderStatus.setStatus(OrderStatusType.Taked);
+				orderStatusBusiness.save(orderStatus);
 			}
 		} catch (Exception ex) {
 
@@ -162,12 +169,12 @@ public class OrderProcessing {
 	}
 
 	// cancelling order
-	public Boolean cancelOrder(Order order, String reason) throws Exception {
+	public Boolean cancelOrder(Order order, String reason) {
 
 		Boolean result = true;
 		Broker broker = order.getBroker();
 
-		// irder is taked bu broker
+		// if order is taked by broker
 		if (broker != null) {
 
 			String url = broker.getApiurl() + "/order/cancel";
@@ -196,7 +203,7 @@ public class OrderProcessing {
 
 			orderStatusBusiness.save(orderStatus);
 		} catch (Exception ex) {
-			
+
 			System.out.println("Error cancelling order: " + ex.toString());
 			return false;
 		}
@@ -211,7 +218,7 @@ public class OrderProcessing {
 		String[] fullAddress = url.split("//")[1].split("/", 2);
 		String address = fullAddress[0];
 		String path = "/" + fullAddress[1];
-		
+
 		int responseCode = 0;
 
 		try {

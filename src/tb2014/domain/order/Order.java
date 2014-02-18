@@ -25,6 +25,7 @@ public class Order {
 	private Set<Requirement> requirements;
 	private Set<OrderStatus> statuses;
 	private Set<OrderCancel> orderCancel;
+	private Set<GeoData> geoData;
 
 	public Long getId() {
 		return id;
@@ -158,5 +159,13 @@ public class Order {
 
 	public void setOrderCancel(Set<OrderCancel> orderCancel) {
 		this.orderCancel = orderCancel;
+	}
+
+	public Set<GeoData> getGeoData() {
+		return geoData;
+	}
+
+	public void setGeoData(Set<GeoData> geoData) {
+		this.geoData = geoData;
 	}
 }

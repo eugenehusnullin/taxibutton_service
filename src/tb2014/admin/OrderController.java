@@ -183,11 +183,13 @@ public class OrderController {
 			@RequestParam("apiKey") String apiKey,
 			@RequestParam("status") String status) throws IOException {
 
+		Order order = orderBusiness.get(orderId);
+		
 		String url = "http://localhost:8080/tb2014/apibroker/order/setStatus";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + orderId.toString() + "&apiId=" + apiId
+		String params = "orderId=" + order.getUuid() + "&apiId=" + apiId
 				+ "&apiKey=" + apiKey + "&status=" + status;
 
 		connection.setRequestMethod("POST");
