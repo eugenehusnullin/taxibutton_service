@@ -31,19 +31,15 @@ public class OrderDao implements IOrderDao {
 
 	@Override
 	public Order getWithChilds(Long id) {
-		return (Order) sessionFactory.getCurrentSession()
-				.createCriteria(Order.class).add(Restrictions.eq("id", id))
-				.setFetchMode("destinations", FetchMode.JOIN)
-				.setFetchMode("requirements", FetchMode.JOIN)
-				.setFetchMode("broker", FetchMode.JOIN)
-				.setFetchMode("device", FetchMode.JOIN).uniqueResult();
+		return (Order) sessionFactory.getCurrentSession().createCriteria(Order.class).add(Restrictions.eq("id", id))
+				.setFetchMode("destinations", FetchMode.JOIN).setFetchMode("requirements", FetchMode.JOIN)
+				.setFetchMode("broker", FetchMode.JOIN).setFetchMode("device", FetchMode.JOIN).uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Order> getAll() {
-		return sessionFactory.getCurrentSession().createCriteria(Order.class)
-				.list();
+		return sessionFactory.getCurrentSession().createCriteria(Order.class).list();
 	}
 
 	@Override
@@ -64,99 +60,75 @@ public class OrderDao implements IOrderDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Order> getAll(Device device) {
-		return sessionFactory.getCurrentSession().createCriteria(Order.class)
-				.add(Restrictions.eq("device", device)).list();
+		return sessionFactory.getCurrentSession().createCriteria(Order.class).add(Restrictions.eq("device", device))
+				.list();
 	}
 
 	@Override
 	public Order get(String uuid) {
-		return (Order) sessionFactory.getCurrentSession()
-				.createCriteria(Order.class).add(Restrictions.eq("uuid", uuid))
-				.uniqueResult();
+		return (Order) sessionFactory.getCurrentSession().createCriteria(Order.class)
+				.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 
 	@Override
 	public Order getWithChilds(String uuid) {
 
-		return (Order) sessionFactory.getCurrentSession()
-				.createCriteria(Order.class).add(Restrictions.eq("uuid", uuid))
-				.setFetchMode("broker", FetchMode.JOIN)
+		return (Order) sessionFactory.getCurrentSession().createCriteria(Order.class)
+				.add(Restrictions.eq("uuid", uuid)).setFetchMode("broker", FetchMode.JOIN)
 				.setFetchMode("device", FetchMode.JOIN).uniqueResult();
 	}
 
 	@Override
 	public AddressPoint getSourcePoint(Order order) {
 
-		return (AddressPoint) sessionFactory.getCurrentSession()
-				.createCriteria(AddressPoint.class)
-				.add(Restrictions.eq("order", order))
-				.add(Restrictions.eq("indexNumber", 0)).uniqueResult();
+		return (AddressPoint) sessionFactory.getCurrentSession().createCriteria(AddressPoint.class)
+				.add(Restrictions.eq("order", order)).add(Restrictions.eq("indexNumber", 0)).uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Order> getAllWithChilds() {
-		return sessionFactory.getCurrentSession().createCriteria(Order.class)
-				.setFetchMode("broker", FetchMode.JOIN).list();
+		return sessionFactory.getCurrentSession().createCriteria(Order.class).setFetchMode("broker", FetchMode.JOIN)
+				.list();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Order> getAllWithParams(String orderField,
-			String orderDirection, int start, int count) {
+	public List<Order> getAllWithParams(String orderField, String orderDirection, int start, int count) {
 
 		if (orderDirection.equals("asc")) {
 
 			if (orderField.equals("supplyDate")) {
-				return sessionFactory
-						.getCurrentSession()
-						.createCriteria(Order.class)
+				return sessionFactory.getCurrentSession().createCriteria(Order.class)
 						.addOrder(org.hibernate.criterion.Order.asc(orderField))
-						.addOrder(
-								org.hibernate.criterion.Order.asc("supplyHour"))
-						.addOrder(
-								org.hibernate.criterion.Order.asc("supplyMin"))
-						.setFirstResult(start).setMaxResults(count)
-						.setFetchMode("broker", FetchMode.JOIN).list();
+						.addOrder(org.hibernate.criterion.Order.asc("supplyHour"))
+						.addOrder(org.hibernate.criterion.Order.asc("supplyMin")).setFirstResult(start)
+						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
 			} else {
-				return sessionFactory
-						.getCurrentSession()
-						.createCriteria(Order.class)
-						.addOrder(org.hibernate.criterion.Order.asc(orderField))
-						.setFirstResult(start).setMaxResults(count)
-						.setFetchMode("broker", FetchMode.JOIN).list();
+				return sessionFactory.getCurrentSession().createCriteria(Order.class)
+						.addOrder(org.hibernate.criterion.Order.asc(orderField)).setFirstResult(start)
+						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
 			}
 		} else {
 
 			if (orderField.equals("supplyDate")) {
-				return sessionFactory
-						.getCurrentSession()
-						.createCriteria(Order.class)
-						.addOrder(
-								org.hibernate.criterion.Order.desc(orderField))
-						.addOrder(
-								org.hibernate.criterion.Order
-										.desc("supplyHour"))
-						.addOrder(
-								org.hibernate.criterion.Order.desc("supplyMin"))
-						.setFirstResult(start).setMaxResults(count)
-						.setFetchMode("broker", FetchMode.JOIN).list();
+
+				return sessionFactory.getCurrentSession().createCriteria(Order.class)
+						.addOrder(org.hibernate.criterion.Order.desc(orderField))
+						.addOrder(org.hibernate.criterion.Order.desc("supplyHour"))
+						.addOrder(org.hibernate.criterion.Order.desc("supplyMin")).setFirstResult(start)
+						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
 			} else {
-				return sessionFactory
-						.getCurrentSession()
-						.createCriteria(Order.class)
-						.addOrder(
-								org.hibernate.criterion.Order.desc(orderField))
-						.setFirstResult(start).setMaxResults(count)
-						.setFetchMode("broker", FetchMode.JOIN).list();
+				return sessionFactory.getCurrentSession().createCriteria(Order.class)
+						.addOrder(org.hibernate.criterion.Order.desc(orderField)).setFirstResult(start)
+						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
 			}
 		}
 	}
 
 	@Override
 	public Long getAllOrdersCount() {
-		return (Long) sessionFactory.getCurrentSession()
-				.createCriteria(Order.class)
+		return (Long) sessionFactory.getCurrentSession().createCriteria(Order.class)
 				.setProjection(Projections.rowCount()).uniqueResult();
 	}
 

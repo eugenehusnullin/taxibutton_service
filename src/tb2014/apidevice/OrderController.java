@@ -41,8 +41,7 @@ import tb2014.utils.DeviceUtil;
 @Controller("apiDeviceOrderController")
 public class OrderController {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(OrderController.class);
+	private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 
 	@Autowired
 	private IOrderBusiness orderBusiness;
@@ -62,23 +61,20 @@ public class OrderController {
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@Transactional
-	public void createOrder(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	public void createOrder(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		try {
 
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
 			log.trace(stringBuffer.toString());
 
-			JSONObject createOrderObject = (JSONObject) new JSONTokener(
-					stringBuffer.toString()).nextValue();
+			JSONObject createOrderObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
 			String apiId = createOrderObject.getString("apiId");
 
 			if (deviceUtil.checkDevice(apiId)) {
 
-				JSONObject orderObject = createOrderObject
-						.getJSONObject("order");
+				JSONObject orderObject = createOrderObject.getJSONObject("order");
 
 				Order order = OrderJsonParser.Json2Order(orderObject);
 				deviceUtil.assignDevice(apiId, order);
@@ -92,14 +88,11 @@ public class OrderController {
 				orderStatus.setStatus(OrderStatusType.Created);
 				orderStatusBusiness.save(orderStatus);
 
-				// write order.getId(); or order.getUUID() to response stream
-				// (JSON format)
 				JSONObject responceJson = new JSONObject();
 				responceJson.put("status", "ok");
 				responceJson.put("orderId", order.getUuid().toString());
 
-				DataOutputStream outputStream = new DataOutputStream(
-						response.getOutputStream());
+				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 				outputStream.writeBytes(responceJson.toString());
 				outputStream.flush();
 				outputStream.close();
@@ -121,8 +114,7 @@ public class OrderController {
 		try {
 
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			JSONObject cancelOrderJson = (JSONObject) new JSONTokener(
-					stringBuffer.toString()).nextValue();
+			JSONObject cancelOrderJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 			System.out.println(cancelOrderJson.toString());
 
 			String apiId = cancelOrderJson.getString("apiId");
@@ -143,16 +135,14 @@ public class OrderController {
 					return;
 				}
 
-				OrderStatus status = orderStatusBusiness
-						.getLastWithChilds(order);
+				OrderStatus status = orderStatusBusiness.getLastWithChilds(order);
 
 				if (status == null) {
 					response.setStatus(404);
 					return;
 				}
 
-				if (status.getStatus() == OrderStatusType.Created
-						|| status.getStatus() == OrderStatusType.Taked) {
+				if (status.getStatus() == OrderStatusType.Created || status.getStatus() == OrderStatusType.Taked) {
 
 					if (orderProcessing.cancelOrder(order, reason)) {
 						response.setStatus(200);
@@ -167,8 +157,7 @@ public class OrderController {
 				}
 			}
 		} catch (Exception ex) {
-			System.out
-					.println("Error parsing JSON to object: " + ex.toString());
+			System.out.println("Error parsing JSON to object: " + ex.toString());
 			response.setStatus(500);
 			return;
 		}
@@ -176,14 +165,12 @@ public class OrderController {
 
 	// get status of order
 	@RequestMapping(value = "/status", method = RequestMethod.POST)
-	public void getstatus(HttpServletRequest request,
-			HttpServletResponse response) {
+	public void getstatus(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			JSONObject getStatusObject = (JSONObject) new JSONTokener(
-					stringBuffer.toString()).nextValue();
+			JSONObject getStatusObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
 			String apiId = getStatusObject.getString("apiId");
 
@@ -197,8 +184,7 @@ public class OrderController {
 					return;
 				}
 
-				OrderStatus status = orderStatusBusiness
-						.getLastWithChilds(order);
+				OrderStatus status = orderStatusBusiness.getLastWithChilds(order);
 
 				if (status != null) {
 
@@ -224,8 +210,7 @@ public class OrderController {
 						statusJson.put("date", status.getDate());
 					}
 
-					DataOutputStream outputStream = new DataOutputStream(
-							response.getOutputStream());
+					DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 
 					outputStream.writeBytes(statusJson.toString());
 					outputStream.flush();
@@ -235,21 +220,18 @@ public class OrderController {
 				response.setStatus(403);
 			}
 		} catch (Exception ex) {
-			System.out
-					.println("Error parsing JSON to object: " + ex.toString());
+			System.out.println("Error parsing JSON to object: " + ex.toString());
 		}
 	}
 
 	// get order geo data
 	@RequestMapping(value = "/geodata", method = RequestMethod.POST)
-	public void getGeoData(HttpServletRequest request,
-			HttpServletResponse response) {
+	public void getGeoData(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
 
-			JSONObject getGeoObject = (JSONObject) new JSONTokener(
-					stringBuffer.toString()).nextValue();
+			JSONObject getGeoObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
 			String apiId = getGeoObject.getString("apiId");
 
@@ -281,8 +263,7 @@ public class OrderController {
 						System.out.println(e.toString());
 					}
 
-					DateFormat dateFormat = new SimpleDateFormat(
-							"yyyy-MM-dd HH:mm:ss.SSS");
+					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 					System.out.println(dateFormat.format(date));
 
 					geoDataList = geoDataBusiness.getAll(order, date);
@@ -299,11 +280,9 @@ public class OrderController {
 
 					currentPointJson.put("lat", currentPoint.getLat());
 					currentPointJson.put("lon", currentPoint.getLon());
-					currentPointJson.put("direction",
-							currentPoint.getDirection());
+					currentPointJson.put("direction", currentPoint.getDirection());
 					currentPointJson.put("speed", currentPoint.getSpeed());
-					currentPointJson
-							.put("category", currentPoint.getCategory());
+					currentPointJson.put("category", currentPoint.getCategory());
 					currentPointJson.put("date", currentPoint.getDate());
 
 					geoPointsArrayJson.put(currentPointJson);
@@ -311,8 +290,7 @@ public class OrderController {
 
 				geoDataJson.put("points", geoPointsArrayJson);
 
-				DataOutputStream outputStream = new DataOutputStream(
-						response.getOutputStream());
+				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 
 				outputStream.writeBytes(geoDataJson.toString());
 				outputStream.flush();
@@ -322,13 +300,11 @@ public class OrderController {
 				response.setStatus(403);
 			}
 		} catch (Exception ex) {
-			System.out
-					.println("Error parsing JSON to object: " + ex.toString());
+			System.out.println("Error parsing JSON to object: " + ex.toString());
 		}
 	}
 
-	private StringBuffer getHttpServletRequestBuffer(HttpServletRequest request)
-			throws Exception {
+	private StringBuffer getHttpServletRequestBuffer(HttpServletRequest request) throws Exception {
 		StringBuffer stringBuffer = new StringBuffer();
 		String line = null;
 
@@ -341,8 +317,7 @@ public class OrderController {
 
 			return stringBuffer;
 		} catch (Exception ex) {
-			log.error("Error creating string buffer from HttpServletRequest.",
-					ex);
+			log.error("Error creating string buffer from HttpServletRequest.", ex);
 			throw ex;
 		}
 	}

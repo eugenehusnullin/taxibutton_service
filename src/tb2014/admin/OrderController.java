@@ -493,7 +493,7 @@ public class OrderController {
 		destinationsJson.put(destinationJson);
 
 		orderJson.put("destinations", destinationsJson);
-		orderJson.put("bookingType", request.getParameter("orderType"));
+		orderJson.put("urgent", request.getParameter("orderType"));
 		orderJson.put("bookingDate", request.getParameter("bookingDate"));
 		orderJson.put("bookingHour", request.getParameter("bookingHour"));
 		orderJson.put("bookingMin", request.getParameter("bookingMin"));

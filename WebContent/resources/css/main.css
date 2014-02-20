@@ -47,3 +47,12 @@ table.mainTable div.actionTr {
 	border-width: 1px;
 	background-color: white;
 }
+
+div.grouping {
+	border-style: solid;
+	border-width: 1px;
+	background-color: white;
+	position: absolute;
+	top: 5%;
+	left: 65%;
+}

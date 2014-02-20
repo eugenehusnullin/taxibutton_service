@@ -16,8 +16,8 @@
 		<br />
 		<h3>Order</h3>
 		Type:<br />
-		<input type="radio" name="orderType" value="urgent" checked /> urgent order
-		<input type="radio" name="orderType" value="nonUrgent" /> non-urgent order
+		<input type="radio" name="orderType" value="true" checked /> urgent order
+		<input type="radio" name="orderType" value="false" /> non-urgent order
 		<br />
 		Client phone:<br />
 		<input type="text" name="phone" /><br />

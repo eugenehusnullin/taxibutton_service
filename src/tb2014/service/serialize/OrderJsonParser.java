@@ -20,7 +20,7 @@ public class OrderJsonParser {
 
 		Order order = new Order();
 
-		order.setType(jsonObject.getString("bookingType"));
+		order.setUrgent(Boolean.parseBoolean(jsonObject.getString("urgent")));
 		order.setPhone(jsonObject.getString("recipientPhone"));
 
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");

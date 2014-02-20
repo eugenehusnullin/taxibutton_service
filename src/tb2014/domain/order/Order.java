@@ -15,7 +15,7 @@ public class Order {
 	private Long id;
 	private String uuid;
 	private Device device;
-	private String type;
+	private Boolean urgent;
 	private String phone;
 	private Date supplyDate;
 	private int supplyHour;
@@ -100,14 +100,6 @@ public class Order {
 		this.destinations = destinations;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public AddressPoint getSource() {
 		for (AddressPoint currentPoint : destinations) {
 			if (currentPoint.getIndexNumber() == 0) {
@@ -167,5 +159,13 @@ public class Order {
 
 	public void setGeoData(Set<GeoData> geoData) {
 		this.geoData = geoData;
+	}
+
+	public Boolean getUrgent() {
+		return urgent;
+	}
+
+	public void setUrgent(Boolean urgent) {
+		this.urgent = urgent;
 	}
 }

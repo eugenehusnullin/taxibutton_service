@@ -169,7 +169,7 @@ public class OrderSerializer {
 
 			Element bookingTime = doc.createElement("BookingTime");
 
-			bookingTime.setAttribute("type", order.getType());
+			bookingTime.setAttribute("urgent", order.getUrgent().toString());
 
 			bookingTime
 					.appendChild(doc.createTextNode((order.getSupplyDate() == null ? "-"
