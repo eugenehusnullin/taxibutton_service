@@ -161,7 +161,7 @@ public class OrderController {
 			if (broker.getApiKey().trim().equals(apiKey.trim()) == false) {
 				broker = null;
 			}
-		}		
+		}
 		return broker;
 	}
 

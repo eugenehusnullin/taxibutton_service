@@ -69,7 +69,7 @@ public class OrderController {
 			log.trace(stringBuffer.toString());
 
 			JSONObject createOrderObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
-
+			System.out.println("Json request: " + createOrderObject.toString());
 			String apiId = createOrderObject.getString("apiId");
 
 			if (deviceUtil.checkDevice(apiId)) {

@@ -21,11 +21,17 @@ public class OrderJsonParser {
 		Order order = new Order();
 
 		order.setUrgent(Boolean.parseBoolean(jsonObject.getString("urgent")));
-		order.setPhone(jsonObject.getString("recipientPhone"));
+
+		if (!jsonObject.isNull("recipientPhone")) {
+			order.setPhone(jsonObject.getString("recipientPhone"));
+		} else {
+			order.setPhone("");
+		}
 
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
 
 		if (jsonObject.getString("bookingDate").isEmpty() == false) {
+
 			String orderDate = jsonObject.getString("bookingDate");
 			Date resultDate = null;
 
@@ -33,19 +39,16 @@ public class OrderJsonParser {
 				resultDate = dateFormatter.parse(orderDate);
 				order.setSupplyDate(resultDate);
 			} catch (Exception ex) {
-				System.out.println("Exception parsing order supply date: "
-						+ ex.toString());
+				System.out.println("Exception parsing order supply date: " + ex.toString());
 			}
 		}
 
 		if (jsonObject.getString("bookingHour").isEmpty() == false) {
-			order.setSupplyHour(Integer.parseInt(jsonObject
-					.getString("bookingHour")));
+			order.setSupplyHour(Integer.parseInt(jsonObject.getString("bookingHour")));
 		}
 
 		if (jsonObject.getString("bookingMin").isEmpty() == false) {
-			order.setSupplyMin(Integer.parseInt(jsonObject
-					.getString("bookingMin")));
+			order.setSupplyMin(Integer.parseInt(jsonObject.getString("bookingMin")));
 		}
 
 		List<AddressPoint> addressPoints = new ArrayList<AddressPoint>();
@@ -78,29 +81,23 @@ public class OrderJsonParser {
 		for (int i = 0; i < destinationsJson.length(); i++) {
 
 			JSONObject destinationJson = destinationsJson.getJSONObject(i);
-			AddressPoint destination = new AddressPoint();			
+			AddressPoint destination = new AddressPoint();
 
 			if (destinationJson.getString("lon").isEmpty() == false) {
-				destination.setLon(Double.parseDouble(destinationJson
-						.getString("lon")));
+				destination.setLon(Double.parseDouble(destinationJson.getString("lon")));
 			}
 
 			if (destinationJson.getString("lat").isEmpty() == false) {
-				destination.setLat(Double.parseDouble(destinationJson
-						.getString("lat")));
+				destination.setLat(Double.parseDouble(destinationJson.getString("lat")));
 			}
 
 			if (destinationJson.getString("index").isEmpty() == false) {
-				destination.setIndexNumber(Integer.parseInt(destinationJson
-						.getString("index")));
+				destination.setIndexNumber(Integer.parseInt(destinationJson.getString("index")));
 			}
 
-			destination.setFullAddress(destinationJson
-					.getString("fullAddress"));
-			destination.setShortAddress(destinationJson
-					.getString("shortAddress"));
-			destination.setClosesStation(destinationJson
-					.getString("closestStation"));
+			destination.setFullAddress(destinationJson.getString("fullAddress"));
+			destination.setShortAddress(destinationJson.getString("shortAddress"));
+			destination.setClosesStation(destinationJson.getString("closestStation"));
 			destination.setCounty(destinationJson.getString("country"));
 			destination.setLocality(destinationJson.getString("locality"));
 			destination.setStreet(destinationJson.getString("street"));
@@ -120,10 +117,10 @@ public class OrderJsonParser {
 
 			JSONObject requirementJson = requirementsJson.getJSONObject(i);
 			Requirement currentRequirement = new Requirement();
-			
+
 			currentRequirement.setType(requirementJson.getString("name"));
-			
-			if(requirementJson.getString("value").equals("yes") == false) {
+
+			if (requirementJson.getString("value").equals("yes") == false) {
 				currentRequirement.setOptions(requirementJson.getString("value"));
 			}
 

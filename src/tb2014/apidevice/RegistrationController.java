@@ -54,8 +54,7 @@ public class RegistrationController {
 
 			responseJson.put("apiId", device.getApiId());
 
-			DataOutputStream outputStream = new DataOutputStream(
-					response.getOutputStream());
+			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 
 			outputStream.writeBytes(responseJson.toString());
 			outputStream.flush();
