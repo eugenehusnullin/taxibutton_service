@@ -21,6 +21,7 @@
 				<th>#</th>
 				<th>Api id</th>
 				<th>Phone</th>
+				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -29,11 +30,12 @@
 					<td>${device.getId()}</td>
 					<td>${device.getApiId()}</td>
 					<td>${device.getPhone()}</td>
+					<td><a href="tariffs?id=${device.getId()}">Tariffs</a></td>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
 	<br />
-	<a href="create">Create</a>
+	<a href="create">Create</a><br />
 </body>
 </html>

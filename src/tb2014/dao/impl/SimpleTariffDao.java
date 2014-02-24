@@ -2,6 +2,7 @@ package tb2014.dao.impl;
 
 import java.util.List;
 
+import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +24,13 @@ public class SimpleTariffDao implements ISimpleTariffDao {
 
 	@Override
 	public SimpleTariff get(Long id) {
-		return (SimpleTariff) sessionFactory.getCurrentSession().get(
-				SimpleTariff.class, id);
+		return (SimpleTariff) sessionFactory.getCurrentSession().get(SimpleTariff.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<SimpleTariff> getAll() {
-		return sessionFactory.getCurrentSession()
-				.createCriteria(SimpleTariff.class).list();
+		return sessionFactory.getCurrentSession().createCriteria(SimpleTariff.class).list();
 	}
 
 	@Override
@@ -41,13 +40,19 @@ public class SimpleTariffDao implements ISimpleTariffDao {
 
 	@Override
 	public SimpleTariff get(Broker broker) {
-		return (SimpleTariff) sessionFactory.getCurrentSession()
-				.createCriteria(SimpleTariff.class)
+		return (SimpleTariff) sessionFactory.getCurrentSession().createCriteria(SimpleTariff.class)
 				.add(Restrictions.eq("broker", broker)).uniqueResult();
 	}
 
 	@Override
 	public void saveOrUpdate(SimpleTariff tariff) {
-		sessionFactory.getCurrentSession().saveOrUpdate(tariff);	
+		sessionFactory.getCurrentSession().saveOrUpdate(tariff);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<SimpleTariff> getAllWithChilds() {
+		return sessionFactory.getCurrentSession().createCriteria(SimpleTariff.class)
+				.setFetchMode("broker", FetchMode.JOIN).list();
 	}
 }

@@ -20,8 +20,7 @@ public class SimpleTariffController {
 	private IBrokerBusiness brokerBusiness;
 
 	@Autowired
-	public SimpleTariffController(ISimpleTariffBusiness simpleTariffBusiness,
-			IBrokerBusiness brokerBusiness) {
+	public SimpleTariffController(ISimpleTariffBusiness simpleTariffBusiness, IBrokerBusiness brokerBusiness) {
 		this.simpleTariffBusiness = simpleTariffBusiness;
 		this.brokerBusiness = brokerBusiness;
 	}
@@ -39,17 +38,17 @@ public class SimpleTariffController {
 	}
 
 	@RequestMapping(value = "/tariff", method = RequestMethod.POST)
-	public String tariff(@RequestParam("tariff") String tariff,
-			@RequestParam("brokerId") Long brokerId, Model model) {
+	public String tariff(@RequestParam("tariff") String tariff, @RequestParam("brokerId") Long brokerId, Model model) {
+
 		Broker broker = brokerBusiness.getById(brokerId);
 		SimpleTariff simpleTariff = simpleTariffBusiness.get(broker);
 
 		if (simpleTariff == null) {
 
 			simpleTariff = new SimpleTariff();
+			simpleTariff.setBroker(broker);
 		}
 
-		simpleTariff.setBroker(broker);
 		simpleTariff.setTariffs(tariff);
 
 		simpleTariffBusiness.saveOrUpdate(simpleTariff);

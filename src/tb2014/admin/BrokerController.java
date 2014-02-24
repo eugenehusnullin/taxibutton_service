@@ -1,5 +1,7 @@
 package tb2014.admin;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +45,7 @@ public class BrokerController {
 		broker.setApiurl(apiurl);
 		broker.setApiId(apiId);
 		broker.setApiKey(apiKey);
+		broker.setUuid(UUID.randomUUID().toString());
 		brokerBusiness.add(broker);
 
 		return "redirect:list";

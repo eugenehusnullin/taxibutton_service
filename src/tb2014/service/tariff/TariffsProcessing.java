@@ -10,6 +10,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
@@ -29,8 +31,7 @@ public class TariffsProcessing {
 	private ISimpleTariffBusiness simpleTariffBusiness;
 
 	@Autowired
-	public TariffsProcessing(IBrokerBusiness brokerBusiness,
-			ISimpleTariffBusiness simpleTariffBusiness) {
+	public TariffsProcessing(IBrokerBusiness brokerBusiness, ISimpleTariffBusiness simpleTariffBusiness) {
 
 		this.brokerBusiness = brokerBusiness;
 		this.simpleTariffBusiness = simpleTariffBusiness;
@@ -45,9 +46,11 @@ public class TariffsProcessing {
 			try {
 
 				Document currentXMLResponce = GetTariffsHTTP(currentBroker);
-				String currentStringResponce = ConverterUtil
-						.XmlToString(currentXMLResponce);
+				String currentStringResponce = ConverterUtil.XmlToString(currentXMLResponce);
 
+				// получаем типы тарифов, которые заключены в XML документ
+				NodeList typesTags = currentXMLResponce.getElementsByTagName("type");
+				
 				UpdateBrokerTariffs(currentBroker, currentStringResponce);
 			} catch (Exception ex) {
 				log.info("Get XML tariffs error: " + ex.toString());
@@ -85,16 +88,15 @@ public class TariffsProcessing {
 	private void UpdateBrokerTariffs(Broker broker, String tariff) {
 
 		SimpleTariff simpleTariff = simpleTariffBusiness.get(broker);
-		
-		if(simpleTariff == null) {
-			
+
+		if (simpleTariff == null) {
+
 			simpleTariff = new SimpleTariff();
-			
 			simpleTariff.setBroker(broker);
 		}
-		
+
 		simpleTariff.setTariffs(tariff);
-		
+
 		simpleTariffBusiness.saveOrUpdate(simpleTariff);
 	}
 }

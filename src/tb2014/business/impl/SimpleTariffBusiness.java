@@ -50,4 +50,10 @@ public class SimpleTariffBusiness implements ISimpleTariffBusiness {
 	public void saveOrUpdate(SimpleTariff tariff) {
 		simpleTariffDao.saveOrUpdate(tariff);
 	}
+
+	@Transactional
+	@Override
+	public List<SimpleTariff> getAllWithChilds() {
+		return simpleTariffDao.getAllWithChilds();
+	}
 }

@@ -88,12 +88,12 @@ public class OrderController {
 				orderStatus.setStatus(OrderStatusType.Created);
 				orderStatusBusiness.save(orderStatus);
 
-				JSONObject responceJson = new JSONObject();
-				responceJson.put("status", "ok");
-				responceJson.put("orderId", order.getUuid().toString());
+				JSONObject responseJson = new JSONObject();
+				responseJson.put("status", "ok");
+				responseJson.put("orderId", order.getUuid().toString());
 
 				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-				outputStream.writeBytes(responceJson.toString());
+				outputStream.writeBytes(responseJson.toString());
 				outputStream.flush();
 				outputStream.close();
 

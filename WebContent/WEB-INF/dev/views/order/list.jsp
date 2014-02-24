@@ -96,16 +96,18 @@
 		</select> rows <a href="#" id="setCountRef">apply</a><br />
 	</div>
 	<div class="grouping">
-		Group by status:<br />
-		<input type="checkbox" name="statusGroup[]" value="Created"> Created <br />
-		<input type="checkbox" name="statusGroup[]" value="Taked"> Taked <br />
-		<input type="checkbox" name="statusGroup[]" value="Driving"> Driving <br />
-		<input type="checkbox" name="statusGroup[]" value="Waiting"> Waiting <br />
-		<input type="checkbox" name="statusGroup[]" value="Transporting"> Transporting <br />
-		<input type="checkbox" name="statusGroup[]" value="Completed"> Completed <br />
-		<input type="checkbox" name="statusGroup[]" value="Cancelled"> Cancelled <br />
-		<input type="checkbox" name="statusGroup[]" value="Failed"> Failed <br />
-		<a href="#">Group</a>
+		Group by status:<br /> <input type="checkbox" name="statusGroup[]"
+			value="Created"> Created <br /> <input type="checkbox"
+			name="statusGroup[]" value="Taked"> Taked <br /> <input
+			type="checkbox" name="statusGroup[]" value="Driving"> Driving
+		<br /> <input type="checkbox" name="statusGroup[]" value="Waiting">
+		Waiting <br /> <input type="checkbox" name="statusGroup[]"
+			value="Transporting"> Transporting <br /> <input
+			type="checkbox" name="statusGroup[]" value="Completed">
+		Completed <br /> <input type="checkbox" name="statusGroup[]"
+			value="Cancelled"> Cancelled <br /> <input type="checkbox"
+			name="statusGroup[]" value="Failed"> Failed <br /> <a
+			href="#">Group</a>
 	</div>
 	<div>
 		<table class="mainTable" id="mainTable">
@@ -118,6 +120,7 @@
 					<th><a href="#" class="notSorted">Broker</a></th>
 					<th><a href="#" id="phone">Phone</a></th>
 					<th><a href="#" class="notSorted">Status</a></th>
+					<th>Uuid</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -144,6 +147,7 @@
 									href="alacrity?id=${order.getId()}">Alacrity</a>
 							</div>
 						</td>
+						<td>${order.getUuid()}</td>
 					</tr>
 				</c:forEach>
 			</tbody>

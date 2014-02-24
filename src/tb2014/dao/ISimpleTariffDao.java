@@ -12,6 +12,8 @@ public interface ISimpleTariffDao {
 	SimpleTariff get(Broker broker);
 
 	List<SimpleTariff> getAll();
+	
+	List<SimpleTariff> getAllWithChilds();
 
 	void save(SimpleTariff tariff);
 	

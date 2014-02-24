@@ -20,7 +20,7 @@ public class OrderJsonParser {
 
 		Order order = new Order();
 
-		order.setUrgent(Boolean.parseBoolean(jsonObject.getString("urgent")));
+		order.setUrgent(jsonObject.getBoolean("urgent"));
 
 		if (!jsonObject.isNull("recipientPhone")) {
 			order.setPhone(jsonObject.getString("recipientPhone"));

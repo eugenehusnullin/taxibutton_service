@@ -1,6 +1,8 @@
 package tb2014.admin;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb2014.business.IDeviceBusiness;
+import tb2014.domain.Device;
 import tb2014.utils.NetStreamUtils;
 
 @RequestMapping("/device")
@@ -49,16 +52,14 @@ public class DeviceController {
 		try {
 			String url = "http://localhost:8080/tb2014/apidevice/device/register";
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(
-					connection.getOutputStream());
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
 			wr.writeBytes(createDeviceObject.toString());
 			wr.flush();
@@ -70,17 +71,71 @@ public class DeviceController {
 				System.out.println("Error creating an ");
 			}
 
-			JSONObject responseJson = (JSONObject) new JSONTokener(
-					NetStreamUtils.getStringFromInputStream(connection
-							.getInputStream())).nextValue();
+			JSONObject responseJson = (JSONObject) new JSONTokener(NetStreamUtils.getStringFromInputStream(connection
+					.getInputStream())).nextValue();
 
 			model.addAttribute("result", responseJson);
 
 			return "result";
 		} catch (Exception ex) {
-
+			System.out.println("Error creating device: " + ex.toString());
 		}
 
 		return "redirect:list";
+	}
+
+	@RequestMapping(value = "/tariffs", method = RequestMethod.GET)
+	public String getTariffs(@RequestParam("id") Long deviceId, Model model) {
+
+		Device device = deviceBusiness.get(deviceId);
+		JSONObject requestJson = new JSONObject();
+
+		requestJson.put("apiId", device.getApiId());
+
+		try {
+
+			String url = "http://localhost:8080/tb2014/apidevice/tariff/get";
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			connection.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+
+			wr.writeBytes(requestJson.toString());
+			wr.flush();
+			wr.close();
+
+			int responceCode = connection.getResponseCode();
+
+			if (responceCode != 200) {
+				System.out.println("Error getting tariffs");
+			}
+
+			StringBuffer stringBuffer = new StringBuffer();
+			String line = null;
+
+			try {
+
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+				while ((line = bufferedReader.readLine()) != null) {
+					stringBuffer.append(line);
+				}
+			} catch (Exception ex) {
+				System.out.println("Error receiving server respone: " + ex.toString());
+			}
+
+			model.addAttribute("result", stringBuffer.toString());
+		} catch (Exception ex) {
+
+			model.addAttribute("result", "Error");
+			System.out.println("Error receiving tariffs: " + ex.toString());
+		}
+
+		return "result";
 	}
 }
