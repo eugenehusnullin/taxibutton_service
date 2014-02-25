@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import tb2014.business.IBrokerBusiness;
 import tb2014.business.IGeoDataBusiness;
 import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
@@ -45,6 +46,8 @@ public class OrderController {
 
 	@Autowired
 	private IOrderBusiness orderBusiness;
+	@Autowired
+	private IBrokerBusiness brokerBusiness;
 	@Autowired
 	private IOrderStatusBusiness orderStatusBusiness;
 	@Autowired
@@ -76,7 +79,7 @@ public class OrderController {
 
 				JSONObject orderObject = createOrderObject.getJSONObject("order");
 
-				Order order = OrderJsonParser.Json2Order(orderObject);
+				Order order = OrderJsonParser.Json2Order(orderObject, brokerBusiness);
 				deviceUtil.assignDevice(apiId, order);
 				order.setUuid(UUID.randomUUID().toString());
 				orderBusiness.saveNewOrder(order);

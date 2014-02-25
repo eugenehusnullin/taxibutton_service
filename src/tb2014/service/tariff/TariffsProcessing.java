@@ -10,8 +10,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
@@ -48,9 +46,6 @@ public class TariffsProcessing {
 				Document currentXMLResponce = GetTariffsHTTP(currentBroker);
 				String currentStringResponce = ConverterUtil.XmlToString(currentXMLResponce);
 
-				// получаем типы тарифов, которые заключены в XML документ
-				NodeList typesTags = currentXMLResponce.getElementsByTagName("type");
-				
 				UpdateBrokerTariffs(currentBroker, currentStringResponce);
 			} catch (Exception ex) {
 				log.info("Get XML tariffs error: " + ex.toString());

@@ -26,6 +26,8 @@ public class Order {
 	private Set<OrderStatus> statuses;
 	private Set<OrderCancel> orderCancel;
 	private Set<GeoData> geoData;
+	private Set<Broker> offerBrokerList;
+	private VehicleClass orderVehicleClass;
 
 	public Long getId() {
 		return id;
@@ -70,8 +72,7 @@ public class Order {
 	public Date getSupplyTime() {
 
 		Date result = new Date();
-		result.setTime(this.supplyDate.getTime() + this.supplyHour * 3600000
-				+ this.supplyMin * 60000);
+		result.setTime(this.supplyDate.getTime() + this.supplyHour * 3600000 + this.supplyMin * 60000);
 
 		return result;
 	}
@@ -167,5 +168,21 @@ public class Order {
 
 	public void setUrgent(Boolean urgent) {
 		this.urgent = urgent;
+	}
+
+	public VehicleClass getOrderVehicleClass() {
+		return orderVehicleClass;
+	}
+
+	public void setOrderVehicleClass(VehicleClass orderVehicleClass) {
+		this.orderVehicleClass = orderVehicleClass;
+	}
+
+	public Set<Broker> getOfferBrokerList() {
+		return offerBrokerList;
+	}
+
+	public void setOfferBrokerList(Set<Broker> offerBrokerList) {
+		this.offerBrokerList = offerBrokerList;
 	}
 }

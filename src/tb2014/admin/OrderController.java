@@ -50,10 +50,8 @@ public class OrderController {
 	private IGeoDataBusiness geoDataBusiness;
 
 	@Autowired
-	public OrderController(IOrderBusiness orderBusiness,
-			IBrokerBusiness brokerBusiness,
-			IOrderStatusBusiness orderStatusBusiness,
-			IOrderAcceptAlacrityBusiness orderAlacrityBusiness,
+	public OrderController(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
+			IOrderStatusBusiness orderStatusBusiness, IOrderAcceptAlacrityBusiness orderAlacrityBusiness,
 			IGeoDataBusiness geoDataBusiness, OrderProcessing orderProcessing) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
@@ -95,8 +93,7 @@ public class OrderController {
 			count = Integer.parseInt(request.getParameter("count"));
 		}
 
-		List<Order> orderList = orderBusiness.getAllWithParams(orderField,
-				orderDirection, start, count);
+		List<Order> orderList = orderBusiness.getAllWithParams(orderField, orderDirection, start, count);
 		Long allOrdersCount = orderBusiness.getAllOrdersCount();
 
 		model.addAttribute("orders", orderList);
@@ -134,29 +131,21 @@ public class OrderController {
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + request.getParameter("orderId")
-				+ "&apiId=" + request.getParameter("apiId") + "&apiKey="
-				+ request.getParameter("apiKey") + "&driverName="
-				+ request.getParameter("driverName") + "&driverSecondName="
-				+ request.getParameter("driverSecondName")
-				+ "&driverThirdName=" + request.getParameter("driverThirdName")
-				+ "&driverPhone=" + request.getParameter("driverPhone")
-				+ "&carNumber=" + request.getParameter("carNumber")
-				+ "&carColor=" + request.getParameter("carColor") + "&carMark="
-				+ request.getParameter("carMark") + "&carModel="
-				+ request.getParameter("carModel");
+		String params = "orderId=" + request.getParameter("orderId") + "&apiId=" + request.getParameter("apiId")
+				+ "&apiKey=" + request.getParameter("apiKey") + "&driverName=" + request.getParameter("driverName")
+				+ "&driverSecondName=" + request.getParameter("driverSecondName") + "&driverThirdName="
+				+ request.getParameter("driverThirdName") + "&driverPhone=" + request.getParameter("driverPhone")
+				+ "&carNumber=" + request.getParameter("carNumber") + "&carColor=" + request.getParameter("carColor")
+				+ "&carMark=" + request.getParameter("carMark") + "&carModel=" + request.getParameter("carModel");
 
 		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type",
-				"application/x-www-form-urlencoded");
+		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		connection.setRequestProperty("Content-Length",
-				"" + Integer.toString(params.getBytes().length));
+		connection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
 
 		connection.setDoOutput(true);
 
-		DataOutputStream outputStream = new DataOutputStream(
-				connection.getOutputStream());
+		DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
 
 		outputStream.writeBytes(params);
 		outputStream.flush();
@@ -178,31 +167,25 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/setStatus", method = RequestMethod.POST)
-	public String sendStatus(@RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey,
-			@RequestParam("status") String status) throws IOException {
+	public String sendStatus(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey, @RequestParam("status") String status) throws IOException {
 
 		Order order = orderBusiness.get(orderId);
-		
+
 		String url = "http://localhost:8080/tb2014/apibroker/order/setStatus";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + order.getUuid() + "&apiId=" + apiId
-				+ "&apiKey=" + apiKey + "&status=" + status;
+		String params = "orderId=" + order.getUuid() + "&apiId=" + apiId + "&apiKey=" + apiKey + "&status=" + status;
 
 		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type",
-				"application/x-www-form-urlencoded");
+		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		connection.setRequestProperty("Content-Length",
-				"" + Integer.toString(params.getBytes().length));
+		connection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
 
 		connection.setDoOutput(true);
 
-		DataOutputStream outputStream = new DataOutputStream(
-				connection.getOutputStream());
+		DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
 
 		outputStream.writeBytes(params);
 		outputStream.flush();
@@ -222,34 +205,26 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
-	public String setGeoData(@RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey,
-			@RequestParam("lon") Double lon, @RequestParam("lat") Double lat,
-			@RequestParam("direction") int direction,
-			@RequestParam("speed") Double speed,
+	public String setGeoData(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey, @RequestParam("lon") Double lon, @RequestParam("lat") Double lat,
+			@RequestParam("direction") int direction, @RequestParam("speed") Double speed,
 			@RequestParam("category") String category) throws IOException {
 
 		String url = "http://localhost:8080/tb2014/apibroker/order/setGeoData";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + orderId.toString() + "&apiId=" + apiId
-				+ "&apiKey=" + apiKey + "&lon=" + lon + "&lat=" + lat
-				+ "&direction=" + direction + "&speed=" + speed + "&category="
-				+ category;
+		String params = "orderId=" + orderId.toString() + "&apiId=" + apiId + "&apiKey=" + apiKey + "&lon=" + lon
+				+ "&lat=" + lat + "&direction=" + direction + "&speed=" + speed + "&category=" + category;
 
 		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type",
-				"application/x-www-form-urlencoded");
+		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		connection.setRequestProperty("Content-Length",
-				"" + Integer.toString(params.getBytes().length));
+		connection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
 
 		connection.setDoOutput(true);
 
-		DataOutputStream outputStream = new DataOutputStream(
-				connection.getOutputStream());
+		DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
 
 		outputStream.writeBytes(params);
 		outputStream.flush();
@@ -269,8 +244,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getStatus", method = RequestMethod.POST)
-	public String getStatus(@RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId, Model model) {
+	public String getStatus(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
 
 		Order order = orderBusiness.get(orderId);
 		JSONObject getStatusJson = new JSONObject();
@@ -282,16 +256,14 @@ public class OrderController {
 
 			String url = "http://localhost:8080/tb2014/apidevice/order/status";
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(
-					connection.getOutputStream());
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
 			wr.writeBytes(getStatusJson.toString());
 			wr.flush();
@@ -303,8 +275,7 @@ public class OrderController {
 				System.out.println("Error sending order to server");
 			}
 
-			model.addAttribute("result",
-					getStringFromInputStream(connection.getInputStream()));
+			model.addAttribute("result", getStringFromInputStream(connection.getInputStream()));
 
 		} catch (Exception ex) {
 			System.out.println("Error getting order status: " + ex.toString());
@@ -321,8 +292,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getGeoData", method = RequestMethod.POST)
-	public String getGeoData(@RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId,
+	public String getGeoData(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
 			@RequestParam("lastDate") String lastDate, Model model) {
 
 		Order order = orderBusiness.get(orderId);
@@ -336,16 +306,14 @@ public class OrderController {
 
 			String url = "http://localhost:8080/tb2014/apidevice/order/geodata";
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(
-					connection.getOutputStream());
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
 			wr.writeBytes(getGeoDataJson.toString());
 			wr.flush();
@@ -357,8 +325,7 @@ public class OrderController {
 				System.out.println("Error sending order to server");
 			}
 
-			model.addAttribute("result",
-					getStringFromInputStream(connection.getInputStream()));
+			model.addAttribute("result", getStringFromInputStream(connection.getInputStream()));
 
 		} catch (Exception ex) {
 			System.out.println("Error getting order status: " + ex.toString());
@@ -381,8 +348,7 @@ public class OrderController {
 	@RequestMapping(value = "/showGeoData", method = RequestMethod.GET)
 	public String showGeoData(@RequestParam("id") Long orderId, Model model) {
 
-		model.addAttribute("geoList",
-				geoDataBusiness.getAll(orderBusiness.get(orderId)));
+		model.addAttribute("geoList", geoDataBusiness.getAll(orderBusiness.get(orderId)));
 		return "order/geoList";
 	}
 
@@ -406,21 +372,19 @@ public class OrderController {
 
 		String jsonResult = cancelOrderJson.toString();
 		int responseCode = 0;
-		
+
 		try {
 
 			String url = "http://localhost:8080/tb2014/apidevice/order/cancel";
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(
-					connection.getOutputStream());
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
 			wr.writeBytes(jsonResult);
 			wr.flush();
@@ -432,8 +396,7 @@ public class OrderController {
 				System.out.println("Error cancelling order");
 			}
 		} catch (Exception ex) {
-			System.out.println("Error cancelling order (client): "
-					+ ex.toString());
+			System.out.println("Error cancelling order (client): " + ex.toString());
 		}
 
 		model.addAttribute("result", "Response code is: " + responseCode);
@@ -441,7 +404,9 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
-	public String create() {
+	public String create(Model model) {
+
+		model.addAttribute("brokers", brokerBusiness.getAll());
 		return "order/create";
 	}
 
@@ -464,8 +429,7 @@ public class OrderController {
 		sourceJson.put("lat", request.getParameter("sourceLat"));
 		sourceJson.put("fullAddress", request.getParameter("sFullAddress"));
 		sourceJson.put("shortAddress", request.getParameter("sShortAddress"));
-		sourceJson.put("closestStation",
-				request.getParameter("sClosestStation"));
+		sourceJson.put("closestStation", request.getParameter("sClosestStation"));
 		sourceJson.put("country", request.getParameter("sCountry"));
 		sourceJson.put("locality", request.getParameter("sLocality"));
 		sourceJson.put("street", request.getParameter("sStreet"));
@@ -479,12 +443,9 @@ public class OrderController {
 		destinationJson.put("index", "1");
 		destinationJson.put("lon", request.getParameter("destinationLon"));
 		destinationJson.put("lat", request.getParameter("destinationLat"));
-		destinationJson
-				.put("fullAddress", request.getParameter("dFullAddress"));
-		destinationJson.put("shortAddress",
-				request.getParameter("dShortAddress"));
-		destinationJson.put("closestStation",
-				request.getParameter("dClosestStation"));
+		destinationJson.put("fullAddress", request.getParameter("dFullAddress"));
+		destinationJson.put("shortAddress", request.getParameter("dShortAddress"));
+		destinationJson.put("closestStation", request.getParameter("dClosestStation"));
 		destinationJson.put("country", request.getParameter("dCountry"));
 		destinationJson.put("locality", request.getParameter("dLocality"));
 		destinationJson.put("street", request.getParameter("dStreet"));
@@ -509,8 +470,7 @@ public class OrderController {
 			currentRequirementJson.put("name", currentRequirementName);
 
 			if (currentRequirementName.trim().equals("isChildChair")) {
-				currentRequirementJson.put("value",
-						request.getParameter("childAge"));
+				currentRequirementJson.put("value", request.getParameter("childAge"));
 			} else {
 				currentRequirementJson.put("value", "yes");
 			}
@@ -520,6 +480,11 @@ public class OrderController {
 
 		orderJson.put("requirements", requirementsJson);
 
+		String[] brokers = request.getParameterValues("brokers");
+
+		orderJson.put("vehicleClass", "Standard");
+		orderJson.put("brokers", brokers);
+
 		createOrderJson.put("order", orderJson);
 
 		String jsonResult = createOrderJson.toString();
@@ -528,16 +493,14 @@ public class OrderController {
 
 			String url = "http://localhost:8080/tb2014/apidevice/order/create";
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(
-					connection.getOutputStream());
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
 			wr.writeBytes(jsonResult);
 			wr.flush();
@@ -555,22 +518,18 @@ public class OrderController {
 
 			try {
 
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(connection.getInputStream()));
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
 				while ((line = bufferedReader.readLine()) != null) {
 					stringBuffer.append(line);
 				}
 			} catch (Exception ex) {
-				System.out.println("Error receiving server respone: "
-						+ ex.toString());
+				System.out.println("Error receiving server respone: " + ex.toString());
 			}
 
-			JSONObject responseJson = (JSONObject) new JSONTokener(
-					stringBuffer.toString()).nextValue();
+			JSONObject responseJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
-			System.out.println("Server JSON response: "
-					+ responseJson.toString());
+			System.out.println("Server JSON response: " + responseJson.toString());
 		} catch (Exception ex) {
 			System.out.println("Error creating new order: " + ex.toString());
 		}
@@ -602,8 +561,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/give", method = RequestMethod.POST)
-	public String give(@RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId) {
+	public String give(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId) {
 
 		Broker broker = brokerBusiness.getByApiId(apiId);
 
@@ -613,21 +571,17 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/offer", method = RequestMethod.POST)
-	public void offer(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public void offer(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		DataInputStream inputStream = new DataInputStream(
-				request.getInputStream());
+		DataInputStream inputStream = new DataInputStream(request.getInputStream());
 
 		try {
 			Source source = new StreamSource(inputStream);
 			Result outputTarget = new StreamResult(System.out);
 
-			TransformerFactory.newInstance().newTransformer()
-					.transform(source, outputTarget);
+			TransformerFactory.newInstance().newTransformer().transform(source, outputTarget);
 		} catch (Exception ex) {
-			System.out
-					.println("Error recieving XML document: " + ex.toString());
+			System.out.println("Error recieving XML document: " + ex.toString());
 		}
 
 		response.setContentType("text/html");
@@ -643,15 +597,13 @@ public class OrderController {
 
 		try {
 
-			BufferedReader bufferedReader = new BufferedReader(
-					new InputStreamReader(stream));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
 
 			while ((line = bufferedReader.readLine()) != null) {
 				stringBuffer.append(line);
 			}
 		} catch (Exception ex) {
-			System.out.println("Error greating string from input stream: "
-					+ ex.toString());
+			System.out.println("Error greating string from input stream: " + ex.toString());
 		}
 
 		return stringBuffer.toString();

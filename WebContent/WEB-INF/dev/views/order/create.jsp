@@ -116,7 +116,10 @@
 		<input type="checkbox" name="requirements" value="noSmoking"> no smoking<br />
 		<input type="checkbox" name="requirements" value="isUniversal"> universal<br />
 		<input type="checkbox" name="requirements" value="isCoupon"> coupon<br />
-		<br />
+		<br /><br />
+		<c:forEach items="${brokers}" var="broker">
+			<input type="checkbox" name="brokers" value="${broker.getUuid()}" />${broker.getName()}<br />
+		</c:forEach>
 		<input type="submit" value="save" />
 	</form>
 </body>

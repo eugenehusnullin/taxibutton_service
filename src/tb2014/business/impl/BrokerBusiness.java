@@ -44,4 +44,10 @@ public class BrokerBusiness implements IBrokerBusiness {
 		return brokerDao.getByApiId(id);
 	}
 
+	@Transactional(readOnly=true)
+	@Override
+	public Broker get(String uuid) {
+		return brokerDao.get(uuid);
+	}
+
 }

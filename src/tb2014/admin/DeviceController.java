@@ -129,6 +129,7 @@ public class DeviceController {
 				System.out.println("Error receiving server respone: " + ex.toString());
 			}
 
+			System.out.println(stringBuffer.toString());
 			model.addAttribute("result", stringBuffer.toString());
 		} catch (Exception ex) {
 

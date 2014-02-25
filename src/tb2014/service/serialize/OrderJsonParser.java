@@ -7,16 +7,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import tb2014.business.IBrokerBusiness;
+import tb2014.domain.Broker;
 import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Requirement;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.VehicleClass;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class OrderJsonParser {
 
-	public static Order Json2Order(JSONObject jsonObject) {
+	public static Order Json2Order(JSONObject jsonObject, IBrokerBusiness brokerBusiness) {
 
 		Order order = new Order();
 
@@ -129,6 +132,23 @@ public class OrderJsonParser {
 		}
 
 		order.setRequirements(requirements);
+
+		VehicleClass vehicleClass = VehicleClass.valueOf(jsonObject.getString("vehicleClass"));
+
+		order.setOrderVehicleClass(vehicleClass);
+
+		Set<Broker> offerBrokerList = new HashSet<Broker>();
+		JSONArray brokersUuids = jsonObject.getJSONArray("brokers");
+
+		for (int i = 0; i < brokersUuids.length(); i++) {
+
+			String currentBrokerUuid = brokersUuids.getString(i);
+			Broker broker = brokerBusiness.get(currentBrokerUuid);
+
+			offerBrokerList.add(broker);
+		}
+
+		order.setOfferBrokerList(offerBrokerList);
 
 		return order;
 	}

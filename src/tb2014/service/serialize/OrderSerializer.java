@@ -21,8 +21,7 @@ public class OrderSerializer {
 
 		try {
 
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 			Document doc = docBuilder.newDocument();
@@ -35,6 +34,12 @@ public class OrderSerializer {
 			orderId.appendChild(doc.createTextNode(Long.toString(order.getId())));
 			offer.appendChild(orderId);
 
+			Element orderType = doc.createElement("OrderType");
+			int intVehicleClass = order.getOrderVehicleClass().index();
+
+			orderType.appendChild(doc.createTextNode(Integer.toString(intVehicleClass)));
+			offer.appendChild(orderType);
+
 			Element recipient = doc.createElement("Recipient");
 
 			recipient.setAttribute("blacklisted", "no");
@@ -45,27 +50,22 @@ public class OrderSerializer {
 			Element source = doc.createElement("Source");
 			Element fullAddress = doc.createElement("FullAddress");
 
-			fullAddress.appendChild(doc.createTextNode(order.getSource()
-					.getFullAddress()));
+			fullAddress.appendChild(doc.createTextNode(order.getSource().getFullAddress()));
 
 			Element shortAddress = doc.createElement("ShortAddress");
 
-			shortAddress.appendChild(doc.createTextNode(order.getSource()
-					.getShortAddress()));
+			shortAddress.appendChild(doc.createTextNode(order.getSource().getShortAddress()));
 
 			Element closestStation = doc.createElement("ClosestStation");
 
-			closestStation.appendChild(doc.createTextNode(order.getSource()
-					.getClosesStation()));
+			closestStation.appendChild(doc.createTextNode(order.getSource().getClosesStation()));
 
 			Element point = doc.createElement("Point");
 			Element lon = doc.createElement("Lon");
 			Element lat = doc.createElement("Lat");
 
-			lon.appendChild(doc.createTextNode(Double.toString(order
-					.getSource().getLon())));
-			lat.appendChild(doc.createTextNode(Double.toString(order
-					.getSource().getLat())));
+			lon.appendChild(doc.createTextNode(Double.toString(order.getSource().getLon())));
+			lat.appendChild(doc.createTextNode(Double.toString(order.getSource().getLat())));
 			point.appendChild(lon);
 			point.appendChild(lat);
 
@@ -75,14 +75,10 @@ public class OrderSerializer {
 			Element street = doc.createElement("Street");
 			Element housing = doc.createElement("Housing");
 
-			country.appendChild(doc.createTextNode(order.getSource()
-					.getCounty()));
-			locality.appendChild(doc.createTextNode(order.getSource()
-					.getLocality()));
-			street.appendChild(doc
-					.createTextNode(order.getSource().getStreet()));
-			housing.appendChild(doc.createTextNode(order.getSource()
-					.getHousing()));
+			country.appendChild(doc.createTextNode(order.getSource().getCounty()));
+			locality.appendChild(doc.createTextNode(order.getSource().getLocality()));
+			street.appendChild(doc.createTextNode(order.getSource().getStreet()));
+			housing.appendChild(doc.createTextNode(order.getSource().getHousing()));
 
 			splittedAddress.appendChild(country);
 			splittedAddress.appendChild(locality);
@@ -112,27 +108,22 @@ public class OrderSerializer {
 
 				fullAddress = doc.createElement("FullAddress");
 
-				fullAddress.appendChild(doc.createTextNode(currentDestination
-						.getFullAddress()));
+				fullAddress.appendChild(doc.createTextNode(currentDestination.getFullAddress()));
 
 				shortAddress = doc.createElement("ShortAddress");
 
-				shortAddress.appendChild(doc.createTextNode(currentDestination
-						.getShortAddress()));
+				shortAddress.appendChild(doc.createTextNode(currentDestination.getShortAddress()));
 
 				closestStation = doc.createElement("ClosestStation");
 
-				closestStation.appendChild(doc
-						.createTextNode(currentDestination.getClosesStation()));
+				closestStation.appendChild(doc.createTextNode(currentDestination.getClosesStation()));
 
 				point = doc.createElement("Point");
 				lon = doc.createElement("Lon");
 				lat = doc.createElement("Lat");
 
-				lon.appendChild(doc.createTextNode(Double
-						.toString(currentDestination.getLon())));
-				lat.appendChild(doc.createTextNode(Double
-						.toString(currentDestination.getLat())));
+				lon.appendChild(doc.createTextNode(Double.toString(currentDestination.getLon())));
+				lat.appendChild(doc.createTextNode(Double.toString(currentDestination.getLat())));
 				point.appendChild(lon);
 				point.appendChild(lat);
 
@@ -142,14 +133,10 @@ public class OrderSerializer {
 				street = doc.createElement("Street");
 				housing = doc.createElement("Housing");
 
-				country.appendChild(doc.createTextNode(order.getSource()
-						.getCounty()));
-				locality.appendChild(doc.createTextNode(order.getSource()
-						.getLocality()));
-				street.appendChild(doc.createTextNode(order.getSource()
-						.getStreet()));
-				housing.appendChild(doc.createTextNode(order.getSource()
-						.getHousing()));
+				country.appendChild(doc.createTextNode(order.getSource().getCounty()));
+				locality.appendChild(doc.createTextNode(order.getSource().getLocality()));
+				street.appendChild(doc.createTextNode(order.getSource().getStreet()));
+				housing.appendChild(doc.createTextNode(order.getSource().getHousing()));
 
 				splittedAddress.appendChild(country);
 				splittedAddress.appendChild(locality);
@@ -171,13 +158,8 @@ public class OrderSerializer {
 
 			bookingTime.setAttribute("urgent", order.getUrgent().toString());
 
-			bookingTime
-					.appendChild(doc.createTextNode((order.getSupplyDate() == null ? "-"
-							: order.getSupplyDate().toString())
-							+ "T"
-							+ order.getSupplyHour()
-							+ ":"
-							+ order.getSupplyMin()));
+			bookingTime.appendChild(doc.createTextNode((order.getSupplyDate() == null ? "-" : order.getSupplyDate()
+					.toString()) + "T" + order.getSupplyHour() + ":" + order.getSupplyMin()));
 
 			offer.appendChild(bookingTime);
 
@@ -191,10 +173,7 @@ public class OrderSerializer {
 
 				if (currentRequirement.getOptions() != null) {
 					if (currentRequirement.getOptions().trim() != "") {
-						requirement
-								.appendChild(doc
-										.createTextNode(currentRequirement
-												.getOptions()));
+						requirement.appendChild(doc.createTextNode(currentRequirement.getOptions()));
 					}
 				}
 
@@ -206,8 +185,7 @@ public class OrderSerializer {
 			return doc;
 		} catch (Exception ex) {
 
-			log.info("Creating XML document from order object exception: "
-					+ ex.toString());
+			log.info("Creating XML document from order object exception: " + ex.toString());
 		}
 
 		return null;

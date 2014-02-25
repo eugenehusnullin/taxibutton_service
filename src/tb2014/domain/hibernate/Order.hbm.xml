@@ -47,5 +47,18 @@
 			</key>
 			<one-to-many class="tb2014.domain.order.GeoData" />
 		</set>
+		<set name="offerBrokerList" cascade="all" table="offerbroker">
+			<key>
+				<column name="orderId" not-null="true" />
+			</key>
+			<many-to-many entity-name="tb2014.domain.Broker">
+				<column name="brokerId" not-null="true" />
+			</many-to-many>
+		</set>
+		<property name="orderVehicleClass">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">tb2014.domain.order.VehicleClass</param>
+			</type>
+		</property>
 	</class>
 </hibernate-mapping>

@@ -25,6 +25,7 @@ public class BrokerController {
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
+
 		model.addAttribute("brokers", brokerBusiness.getAll());
 		return "broker/list";
 	}
@@ -35,10 +36,8 @@ public class BrokerController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(@RequestParam("name") String name,
-			@RequestParam("apiurl") String apiurl,
-			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey, Model model) {
+	public String create(@RequestParam("name") String name, @RequestParam("apiurl") String apiurl,
+			@RequestParam("apiId") String apiId, @RequestParam("apiKey") String apiKey, Model model) {
 
 		Broker broker = new Broker();
 		broker.setName(name);

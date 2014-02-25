@@ -6,6 +6,8 @@ import tb2014.domain.Broker;
 
 public interface IBrokerBusiness {
 	
+	Broker get(String uuid);
+	
 	Broker getById(Long id);
 
 	Broker getByApiId(String id);

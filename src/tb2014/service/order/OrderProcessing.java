@@ -36,12 +36,12 @@ import tb2014.domain.order.OrderCancel;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
+import tb2014.utils.ConverterUtil;
 
 @Service("ordersProcessing")
 public class OrderProcessing {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(OrderProcessing.class);
+	private static final Logger log = LoggerFactory.getLogger(OrderProcessing.class);
 
 	private IOrderBusiness orderBusiness;
 	private IBrokerBusiness brokerBusiness;
@@ -50,12 +50,9 @@ public class OrderProcessing {
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 
 	@Autowired
-	public OrderProcessing(IOrderBusiness orderBusiness,
-			IBrokerBusiness brokerBusiness,
-			IOrderCancelBusiness orderCancelBusiness,
-			IOrderStatusBusiness orderStatusBusiness,
-			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness,
-			IOrderAcceptAlacrityBusiness alacrityBuiness) {
+	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
+			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
+			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness, IOrderAcceptAlacrityBusiness alacrityBuiness) {
 		this.orderBusiness = orderBusiness;
 		this.brokerBusiness = brokerBusiness;
 		this.orderCancelBusiness = orderCancelBusiness;
@@ -66,13 +63,16 @@ public class OrderProcessing {
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
 	public boolean offerOrder(Order order) {
+
 		List<Broker> brokers = brokerBusiness.getAll();
-
 		Document orderXml = OrderSerializer.OrderToXml(order);
-
+		System.out.println(ConverterUtil.XmlToString(orderXml));
 		boolean offered = false;
+
 		for (Broker currentBroker : brokers) {
+
 			try {
+
 				offerOrderHTTP(currentBroker, orderXml);
 
 				offered = true;
@@ -83,8 +83,7 @@ public class OrderProcessing {
 				offeredOrderBroker.setTimestamp(new Date());
 				offeredOrderBrokerBusiness.save(offeredOrderBroker);
 			} catch (Exception ex) {
-				log.error("Offer order to broker " + currentBroker.getId()
-						+ " error: " + ex.toString());
+				log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
 			}
 		}
 
@@ -92,9 +91,9 @@ public class OrderProcessing {
 	}
 
 	// offer order via HTTP protocol
-	private void offerOrderHTTP(Broker broker, Document document)
-			throws IOException, TransformerConfigurationException,
-			TransformerException, TransformerFactoryConfigurationError {
+	private void offerOrderHTTP(Broker broker, Document document) throws IOException,
+			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+
 		// String url = broker.getApiurl() + "/offer";
 		String url = "http://localhost:8080/tb2014/test/offer";
 		URL obj = new URL(url);
@@ -110,16 +109,14 @@ public class OrderProcessing {
 		Source source = new DOMSource(document);
 		Result result = new StreamResult(wr);
 
-		TransformerFactory.newInstance().newTransformer()
-				.transform(source, result);
+		TransformerFactory.newInstance().newTransformer().transform(source, result);
 		wr.flush();
 		wr.close();
 
 		int responceCode = connection.getResponseCode();
 
 		if (responceCode != 200) {
-			log.info("Error offering order to broker (code: " + responceCode
-					+ "): " + broker.getId().toString());
+			log.info("Error offering order to broker (code: " + responceCode + "): " + broker.getId().toString());
 		}
 	}
 
@@ -132,8 +129,7 @@ public class OrderProcessing {
 			String url = broker.getApiurl() + "/order/give";
 			url += "?orderId=" + orderId.toString();
 			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("GET");
 
@@ -142,8 +138,7 @@ public class OrderProcessing {
 			if (responceCode != 200) {
 
 				result = false;
-				log.info("Error giving order to broker (code: " + responceCode
-						+ "): " + broker.getId().toString());
+				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
 
 				Order order = orderBusiness.get(orderId);
@@ -161,8 +156,7 @@ public class OrderProcessing {
 		} catch (Exception ex) {
 
 			result = false;
-			log.info("Giving order for broker " + broker.getId() + " error: "
-					+ ex.toString());
+			log.info("Giving order for broker " + broker.getId() + " error: " + ex.toString());
 		}
 
 		return result;
@@ -225,16 +219,14 @@ public class OrderProcessing {
 			URI uriObject = new URI(protocol, address, path, params, null);
 
 			URL obj = uriObject.toURL();
-			HttpURLConnection connection = (HttpURLConnection) obj
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("GET");
 
 			responseCode = connection.getResponseCode();
 		} catch (Exception ex) {
 
-			System.out.println("Sending HTTP GET to: " + url
-					+ " FAILED, error: " + ex.toString());
+			System.out.println("Sending HTTP GET to: " + url + " FAILED, error: " + ex.toString());
 			responseCode = -1;
 		}
 

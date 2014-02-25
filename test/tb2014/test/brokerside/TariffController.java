@@ -24,8 +24,7 @@ public class TariffController {
 
 		try {
 
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 			Document doc = docBuilder.newDocument();
@@ -45,13 +44,11 @@ public class TariffController {
 				tariffs.appendChild(id);
 
 				Element name = doc.createElement("Name");
-				name.appendChild(doc.createTextNode("name"
-						+ Integer.toString(i)));
+				name.appendChild(doc.createTextNode("name" + Integer.toString(i)));
 				tariffs.appendChild(name);
 
 				Element description = doc.createElement("Descriptions");
-				description.appendChild(doc.createTextNode("description"
-						+ Integer.toString(i)));
+				description.appendChild(doc.createTextNode("description" + Integer.toString(i)));
 				tariffs.appendChild(description);
 			}
 

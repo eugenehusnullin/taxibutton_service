@@ -8,8 +8,10 @@ public interface IBrokerDao {
 
 	Broker get(Long id);
 
+	Broker get(String uuid);
+
 	Broker getByApiId(String id);
-	
+
 	List<Broker> getAll();
 
 	void save(Broker broker);

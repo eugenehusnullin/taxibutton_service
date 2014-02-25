@@ -22,15 +22,19 @@ public class BrokerDao implements IBrokerDao {
 
 	@Override
 	public Broker get(Long id) {
-		return (Broker) sessionFactory.getCurrentSession()
-				.get(Broker.class, id);
+		return (Broker) sessionFactory.getCurrentSession().get(Broker.class, id);
+	}
+
+	@Override
+	public Broker get(String uuid) {
+		return (Broker) sessionFactory.getCurrentSession().createCriteria(Broker.class)
+				.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Broker> getAll() {
-		return sessionFactory.getCurrentSession().createCriteria(Broker.class)
-				.list();
+		return sessionFactory.getCurrentSession().createCriteria(Broker.class).list();
 	}
 
 	@Override
@@ -40,9 +44,8 @@ public class BrokerDao implements IBrokerDao {
 
 	@Override
 	public Broker getByApiId(String id) {
-		return (Broker) sessionFactory.getCurrentSession()
-				.createCriteria(Broker.class).add(Restrictions.eq("apiId", id))
-				.uniqueResult();
+		return (Broker) sessionFactory.getCurrentSession().createCriteria(Broker.class)
+				.add(Restrictions.eq("apiId", id)).uniqueResult();
 	}
 
 }

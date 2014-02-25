@@ -13,5 +13,13 @@
 		<property name="apiKey" length="20" unique-key="broker_uk2" />
 		<property name="name" length="100" />
 		<property name="apiurl" length="100" />
+		<set name="offerOrderList" table="offerbroker">
+			<key>
+				<column name="brokerId" not-null="true" />
+			</key>
+			<many-to-many entity-name="tb2014.domain.order.Order" >
+				<column name="orderId" not-null="true" />
+			</many-to-many>
+		</set>
 	</class>
 </hibernate-mapping>
