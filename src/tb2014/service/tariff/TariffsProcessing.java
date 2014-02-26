@@ -1,26 +1,22 @@
 package tb2014.service.tariff;
 
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
+import org.springframework.stereotype.Service;
 
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.ISimpleTariffBusiness;
-import tb2014.utils.ConverterUtil;
 import tb2014.domain.Broker;
 import tb2014.domain.tariff.SimpleTariff;
+import tb2014.utils.NetStreamUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@Service("tariffsProcessing")
 public class TariffsProcessing {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
@@ -43,8 +39,7 @@ public class TariffsProcessing {
 
 			try {
 
-				Document currentXMLResponce = GetTariffsHTTP(currentBroker);
-				String currentStringResponce = ConverterUtil.XmlToString(currentXMLResponce);
+				String currentStringResponce = GetTariffsHTTP(currentBroker);
 
 				UpdateBrokerTariffs(currentBroker, currentStringResponce);
 			} catch (Exception ex) {
@@ -54,30 +49,27 @@ public class TariffsProcessing {
 		}
 	}
 
-	private Document GetTariffsHTTP(Broker broker) {
+	private String GetTariffsHTTP(Broker broker) {
 
-		Document doc = null;
+		String result = null;
 		URL url = null;
 		HttpURLConnection connection = null;
 
 		try {
 
-			url = new URL(broker.getApiurl() + "/tariff");
+			url = new URL(broker.getApiurl() + "/tariff/get");
 			connection = (HttpURLConnection) url.openConnection();
 
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Accept", "application/xml");
 
-			InputStream xml = connection.getInputStream();
+			result = NetStreamUtils.getStringFromInputStream(connection.getInputStream());
 
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			doc = db.parse(xml);
 		} catch (Exception ex) {
 			log.info("Get XML tariffs HTTP error: " + ex.toString());
 		}
 
-		return doc;
+		return result;
 	}
 
 	private void UpdateBrokerTariffs(Broker broker, String tariff) {

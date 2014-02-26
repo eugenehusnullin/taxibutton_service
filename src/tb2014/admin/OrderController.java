@@ -205,17 +205,27 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
-	public String setGeoData(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey, @RequestParam("lon") Double lon, @RequestParam("lat") Double lat,
-			@RequestParam("direction") int direction, @RequestParam("speed") Double speed,
-			@RequestParam("category") String category) throws IOException {
+	public String setGeoData(HttpServletRequest request) throws IOException {
 
 		String url = "http://localhost:8080/tb2014/apibroker/order/setGeoData";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + orderId.toString() + "&apiId=" + apiId + "&apiKey=" + apiKey + "&lon=" + lon
-				+ "&lat=" + lat + "&direction=" + direction + "&speed=" + speed + "&category=" + category;
+		String params = "orderId=" + request.getParameter("orderId") + "&apiId=" + request.getParameter("apiId")
+				+ "&apiKey=" + request.getParameter("apiKey") + "&lon=" + request.getParameter("lon") + "&lat="
+				+ request.getParameter("lat");
+
+		if (request.getParameter("direction") != null) {
+			params += "&direction=" + request.getParameter("direction");
+		}
+
+		if (request.getParameter("speed") != null) {
+			params += "&speed=" + request.getParameter("speed");
+		}
+
+		if (request.getParameter("category") != null) {
+			params += "&category=" + request.getParameter("category");
+		}
 
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

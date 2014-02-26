@@ -99,7 +99,7 @@ public class DeviceController {
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
 			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			connection.setDoOutput(true);
@@ -120,7 +120,8 @@ public class DeviceController {
 
 			try {
 
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(),
+						"UTF-8"));
 
 				while ((line = bufferedReader.readLine()) != null) {
 					stringBuffer.append(line);

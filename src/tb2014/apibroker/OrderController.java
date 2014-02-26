@@ -140,11 +140,22 @@ public class OrderController {
 			GeoData geoData = new GeoData();
 			geoData.setOrder(order);
 			geoData.setDate(new Date());
-			geoData.setCategory(request.getParameter("category"));
-			geoData.setDirection(Integer.parseInt(request.getParameter("direction")));
+
+			if (request.getParameter("category") != null && !request.getParameter("category").isEmpty()) {
+				geoData.setCategory(request.getParameter("category"));
+			}
+
+			if (request.getParameter("direction") != null && !request.getParameter("direction").isEmpty()) {
+				geoData.setDirection(Integer.parseInt(request.getParameter("direction")));
+			}
+
 			geoData.setLat(Double.parseDouble(request.getParameter("lat")));
 			geoData.setLon(Double.parseDouble(request.getParameter("lon")));
-			geoData.setSpeed(Double.parseDouble(request.getParameter("speed")));
+
+			if (request.getParameter("speed") != null && !request.getParameter("speed").isEmpty()) {
+				geoData.setSpeed(Double.parseDouble(request.getParameter("speed")));
+			}
+
 			geoDataBusiness.save(geoData);
 		} catch (Exception ex) {
 			log.warn("Parsing geo data error.", ex);

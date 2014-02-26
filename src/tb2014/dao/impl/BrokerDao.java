@@ -48,4 +48,14 @@ public class BrokerDao implements IBrokerDao {
 				.add(Restrictions.eq("apiId", id)).uniqueResult();
 	}
 
+	@Override
+	public void delete(Broker broker) {
+		sessionFactory.getCurrentSession().delete(broker);
+	}
+
+	@Override
+	public void saveOrUpdate(Broker broker) {
+		sessionFactory.getCurrentSession().saveOrUpdate(broker);
+	}
+
 }

@@ -15,4 +15,8 @@ public interface IBrokerDao {
 	List<Broker> getAll();
 
 	void save(Broker broker);
+	
+	void saveOrUpdate(Broker broker);
+	
+	void delete(Broker broker);
 }

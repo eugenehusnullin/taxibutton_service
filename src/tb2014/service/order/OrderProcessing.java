@@ -94,8 +94,7 @@ public class OrderProcessing {
 	private void offerOrderHTTP(Broker broker, Document document) throws IOException,
 			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
 
-		// String url = broker.getApiurl() + "/offer";
-		String url = "http://localhost:8080/tb2014/test/offer";
+		String url = broker.getApiurl() + "/offer";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 

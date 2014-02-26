@@ -59,7 +59,9 @@ public class TariffController {
 
 				System.out.println("Tariffs JSON: " + responseJson);
 				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-				outputStream.writeBytes(responseJson.toString());
+				byte[] bytes = responseJson.toString().getBytes("UTF-8");
+
+				outputStream.write(bytes);
 				outputStream.flush();
 				outputStream.close();
 			} else {

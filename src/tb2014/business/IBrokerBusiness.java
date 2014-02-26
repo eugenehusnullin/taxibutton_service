@@ -15,4 +15,8 @@ public interface IBrokerBusiness {
 	List<Broker> getAll();
 
 	void add(Broker broker);
+	
+	void delete(Broker broker);
+	
+	void saveOrUpdate(Broker broker);
 }

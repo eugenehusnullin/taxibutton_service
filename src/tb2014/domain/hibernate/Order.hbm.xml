@@ -47,9 +47,9 @@
 			</key>
 			<one-to-many class="tb2014.domain.order.GeoData" />
 		</set>
-		<set name="offerBrokerList" cascade="all" table="offerbroker">
+		<set name="offerBrokerList" table="offerbroker">
 			<key>
-				<column name="orderId" not-null="true" />
+				<column name="orderId" />
 			</key>
 			<many-to-many entity-name="tb2014.domain.Broker">
 				<column name="brokerId" not-null="true" />

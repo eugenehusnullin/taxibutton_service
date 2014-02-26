@@ -15,22 +15,19 @@ public class NetStreamUtils {
 
 		try {
 
-			BufferedReader bufferedReader = new BufferedReader(
-					new InputStreamReader(stream));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
 
 			while ((line = bufferedReader.readLine()) != null) {
 				stringBuffer.append(line);
 			}
 		} catch (Exception ex) {
-			System.out.println("Error greating string from input stream: "
-					+ ex.toString());
+			System.out.println("Error greating string from input stream: " + ex.toString());
 		}
 
 		return stringBuffer.toString();
 	}
 
-	public static StringBuffer getHttpServletRequestBuffer(
-			HttpServletRequest request) {
+	public static StringBuffer getHttpServletRequestBuffer(HttpServletRequest request) {
 
 		StringBuffer stringBuffer = new StringBuffer();
 		String line = null;
@@ -43,9 +40,7 @@ public class NetStreamUtils {
 				stringBuffer.append(line);
 			}
 		} catch (Exception ex) {
-			System.out
-					.println("Error creating string buffer from HttpServletRequest: "
-							+ ex.toString());
+			System.out.println("Error creating string buffer from HttpServletRequest: " + ex.toString());
 		}
 
 		return stringBuffer;

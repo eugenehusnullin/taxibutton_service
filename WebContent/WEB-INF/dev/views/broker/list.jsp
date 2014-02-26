@@ -38,12 +38,16 @@
 					<td class="actionTd" colspan="5"><a
 						href="../tariff/tariff?id=${broker.getId()}">Tariff</a>---<a
 						href="../phone/blackList?id=${broker.getId()}">Black list</a>---<a
-						href="qiwi?id=${broker.getId()}">QIWI</a></td>
+						href="qiwi?id=${broker.getId()}">QIWI</a>--- <a
+						href="delete?id=${broker.getId()}">Delete</a>---<a
+						href="edit?id=${broker.getId()}">Edit</a></td>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
 	<br />
 	<a href="create">Create</a>
+	<br />
+	<a href="tariffs">Get tariffs</a>
 </body>
 </html>
