@@ -6,6 +6,8 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +98,7 @@ public class ChooseWinnerProcessing {
 		executor = Executors.newFixedThreadPool(5);
 	}
 
+	@PostConstruct
 	public void startProcessing() {
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);

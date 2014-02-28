@@ -5,12 +5,14 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tb2014.domain.order.Order;
 
-@Service
+@Service()
 public class OfferOrderProcessing {
 
 	class RecieverOrderRunnable implements Runnable {
@@ -78,7 +80,8 @@ public class OfferOrderProcessing {
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
 	}
-
+	
+	@PostConstruct
 	public void startProcessing() {
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);
