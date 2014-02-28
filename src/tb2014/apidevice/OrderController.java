@@ -122,47 +122,74 @@ public class OrderController {
 
 			String apiId = cancelOrderJson.getString("apiId");
 
-			if (deviceUtil.checkDevice(apiId)) {
+			String orderUuid = cancelOrderJson.getString("orderId");
+			String reason = cancelOrderJson.getString("reason");
+			Order order = orderBusiness.getWithChilds(orderUuid);
 
-				String orderUuid = cancelOrderJson.getString("orderId");
-				String reason = cancelOrderJson.getString("reason");
-				Order order = orderBusiness.getWithChilds(orderUuid);
+			int statusCode = cancelAction(order, reason, apiId);
 
-				if (order == null) {
-					response.setStatus(404);
-					return;
-				}
+			response.setStatus(statusCode);
 
-				if (!order.getDevice().getApiId().equals(apiId)) {
-					response.setStatus(403);
-					return;
-				}
+			JSONObject responseJson = new JSONObject();
 
-				OrderStatus status = orderStatusBusiness.getLastWithChilds(order);
-
-				if (status == null) {
-					response.setStatus(404);
-					return;
-				}
-
-				if (status.getStatus() == OrderStatusType.Created || status.getStatus() == OrderStatusType.Taked) {
-
-					if (orderProcessing.cancelOrder(order, reason)) {
-						response.setStatus(200);
-						return;
-					} else {
-						response.setStatus(500);
-						return;
-					}
-				} else {
-					response.setStatus(500);
-					return;
-				}
+			if (statusCode != 200) {
+				responseJson.put("status", "error");
+			} else {
+				responseJson.put("status", "success");
 			}
+			
+			responseJson.put("orderId", order.getUuid().toString());
+
+			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
+			outputStream.writeBytes(responseJson.toString());
+			outputStream.flush();
+			outputStream.close();
 		} catch (Exception ex) {
 			System.out.println("Error parsing JSON to object: " + ex.toString());
 			response.setStatus(500);
 			return;
+		}
+	}
+
+	private int cancelAction(Order order, String reason, String apiId) {
+
+		int resultCode = 0;
+
+		if (deviceUtil.checkDevice(apiId)) {
+
+			if (order == null) {
+				resultCode = 404;
+				return resultCode;
+			}
+
+			if (!order.getDevice().getApiId().equals(apiId)) {
+				resultCode = 403;
+				return resultCode;
+			}
+
+			OrderStatus status = orderStatusBusiness.getLastWithChilds(order);
+
+			if (status == null) {
+				resultCode = 404;
+				return resultCode;
+			}
+
+			if (status.getStatus() == OrderStatusType.Created || status.getStatus() == OrderStatusType.Taked) {
+
+				if (orderProcessing.cancelOrder(order, reason)) {
+					resultCode = 200;
+					return resultCode;
+				} else {
+					resultCode = 500;
+					return resultCode;
+				}
+			} else {
+				resultCode = 500;
+				return resultCode;
+			}
+		} else {
+			resultCode = 403;
+			return resultCode;
 		}
 	}
 
@@ -199,10 +226,10 @@ public class OrderController {
 					if (order.getBroker() == null) {
 
 						// no alacrities
-						if (orderAcceptAlacrityBusiness.getAll(order) == null) {
+						if (orderAcceptAlacrityBusiness.getAll(order).size() == 0) {
 							statusJson.put("status", "Created");
 						} else {// there are any alacrities
-							statusJson.put("status", "Taked");
+							statusJson.put("status", "Prepared");
 						}
 
 						statusJson.put("date", new Date());

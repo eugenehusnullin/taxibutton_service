@@ -133,19 +133,23 @@ public class OrderJsonParser {
 
 		order.setRequirements(requirements);
 
-		VehicleClass vehicleClass = VehicleClass.valueOf(jsonObject.getString("vehicleClass"));
-
-		order.setOrderVehicleClass(vehicleClass);
+		if (!jsonObject.isNull("vehicleClass")) {
+			order.setOrderVehicleClass(VehicleClass.values()[jsonObject.getInt("vehicleClass")]);
+		}
 
 		Set<Broker> offerBrokerList = new HashSet<Broker>();
-		JSONArray brokersUuids = jsonObject.getJSONArray("brokers");
 
-		for (int i = 0; i < brokersUuids.length(); i++) {
+		if (!jsonObject.isNull("brokers")) {
 
-			String currentBrokerUuid = brokersUuids.getString(i);
-			Broker broker = brokerBusiness.get(currentBrokerUuid);
+			JSONArray brokersUuids = jsonObject.getJSONArray("brokers");
 
-			offerBrokerList.add(broker);
+			for (int i = 0; i < brokersUuids.length(); i++) {
+
+				String currentBrokerUuid = brokersUuids.getString(i);
+				Broker broker = brokerBusiness.get(currentBrokerUuid);
+
+				offerBrokerList.add(broker);
+			}
 		}
 
 		order.setOfferBrokerList(offerBrokerList);
