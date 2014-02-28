@@ -57,7 +57,7 @@ public class TariffsProcessing {
 
 		try {
 
-			url = new URL(broker.getApiurl() + "/tariff/get");
+			url = new URL(broker.getApiurl() + "/tariff");
 			connection = (HttpURLConnection) url.openConnection();
 
 			connection.setRequestMethod("GET");

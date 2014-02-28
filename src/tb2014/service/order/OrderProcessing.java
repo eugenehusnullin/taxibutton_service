@@ -124,9 +124,10 @@ public class OrderProcessing {
 
 		boolean result = true;
 		try {
+			Order order = orderBusiness.get(orderId);
 
-			String url = broker.getApiurl() + "/order/give";
-			url += "?orderId=" + orderId.toString();
+			String url = broker.getApiurl() + "/give";
+			url += "?orderId=" + order.getUuid();
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -139,9 +140,6 @@ public class OrderProcessing {
 				result = false;
 				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
-
-				Order order = orderBusiness.get(orderId);
-
 				order.setBroker(broker);
 				orderBusiness.saveOrUpdate(order);
 
@@ -170,8 +168,8 @@ public class OrderProcessing {
 		// if order is taked by broker
 		if (broker != null) {
 
-			String url = broker.getApiurl() + "/order/cancel";
-			String params = "orderId=" + order.getId() + "&reason=" + reason;
+			String url = broker.getApiurl() + "/cancel";
+			String params = "orderId=" + order.getUuid() + "&reason=" + reason;
 
 			int resultCode = sendHttpGet(url, params);
 

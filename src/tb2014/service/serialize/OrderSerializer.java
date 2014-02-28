@@ -31,7 +31,7 @@ public class OrderSerializer {
 
 			Element orderId = doc.createElement("OrderId");
 
-			orderId.appendChild(doc.createTextNode(Long.toString(order.getId())));
+			orderId.appendChild(doc.createTextNode(order.getUuid()));
 			offer.appendChild(orderId);
 
 			Element orderType = doc.createElement("OrderType");

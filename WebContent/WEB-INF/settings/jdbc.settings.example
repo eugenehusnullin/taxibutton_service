@@ -1,3 +1,12 @@
+; file with examples
+; hibernate update structure
+hibernate.hbm2ddl.auto=update
+
+; hibernate recreate structure
+hibernate.hbm2ddl.auto=create-drop
+
+
+; HSQLDB in memory
 jdbc.driverClassName=org.hsqldb.jdbcDriver
 jdbc.url=jdbc:hsqldb:mem:tb2014
 jdbc.username=sa
@@ -6,15 +15,21 @@ hibernate.dialect=org.hibernate.dialect.HSQLDialect
 hibernate.show_sql=true
 hibernate.hbm2ddl.auto=create-drop
 
-
-hibernate.hbm2ddl.auto=update
-
-
-
+; HSQLDB on disk
 jdbc.driverClassName=org.hsqldb.jdbcDriver
 jdbc.url=jdbc:hsqldb:file:D:/hsqldb/tb2014
 jdbc.username=sa
 jdbc.password=
 hibernate.dialect=org.hibernate.dialect.HSQLDialect
+hibernate.show_sql=true
+hibernate.hbm2ddl.auto=create-drop
+
+
+; POSTGRES
+jdbc.driverClassName=org.postgresql.Driver
+jdbc.url=jdbc:postgresql://localhost:5432/tb2014
+jdbc.username=tb2014
+jdbc.password=tb2014
+hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect
 hibernate.show_sql=true
 hibernate.hbm2ddl.auto=create-drop
