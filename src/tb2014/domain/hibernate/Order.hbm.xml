@@ -47,7 +47,7 @@
 			</key>
 			<one-to-many class="tb2014.domain.order.GeoData" />
 		</set>
-		<set name="offerBrokerList" table="offerbroker">
+		<set name="offerBrokerList" cascade="delete" table="offerbroker">
 			<key>
 				<column name="orderId" />
 			</key>

@@ -8,11 +8,11 @@
 		<id name="id">
 			<generator class="identity" />
 		</id>
-		<many-to-one name="order" class="Order">
-			<column name="orderId" not-null="true" />
+		<many-to-one name="order" class="tb2014.domain.order.Order">
+			<column name="orderId" />
 		</many-to-one>
 		<many-to-one name="broker" class="tb2014.domain.Broker">
-			<column name="brokerId" not-null="true" />
+			<column name="brokerId" />
 		</many-to-one>
 		<property name="timestamp"></property>
 	</class>

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.hsqldb.lib.DataOutputStream;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,16 @@ public class TariffController {
 
 			StringBuffer stringBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
 			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			int statusCode = 0;
+			String apiId = null;
 
-			String apiId = requestJson.getString("apiId");
+			try {
+				apiId = requestJson.getString("apiId");
+			} catch (JSONException ex) {
+				statusCode = 403;
+				response.setStatus(statusCode);
+				return;
+			}
 
 			if (deviceUtil.checkDevice(apiId)) {
 
@@ -57,7 +66,6 @@ public class TariffController {
 					responseJson.put(currentTariffJson);
 				}
 
-				System.out.println("Tariffs JSON: " + responseJson);
 				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 				byte[] bytes = responseJson.toString().getBytes("UTF-8");
 

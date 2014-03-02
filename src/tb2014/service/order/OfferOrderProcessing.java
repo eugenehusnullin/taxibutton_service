@@ -49,7 +49,7 @@ public class OfferOrderProcessing {
 		@Override
 		public void run() {
 			boolean offered = orderProcessing.offerOrder(order);
-			
+
 			if (offered) {
 				chooseWinnerProcessing.addOrder(order);
 			} else {
@@ -80,7 +80,7 @@ public class OfferOrderProcessing {
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
 	}
-	
+
 	@PostConstruct
 	public void startProcessing() {
 		Runnable processRunnable = new RecieverOrderRunnable();
@@ -98,6 +98,12 @@ public class OfferOrderProcessing {
 		synchronized (queue) {
 			queue.add(order);
 			queue.notifyAll();
+		}
+	}
+
+	public void removeOrder(Order order) {
+		synchronized (queue) {
+			queue.remove(order);
 		}
 	}
 }

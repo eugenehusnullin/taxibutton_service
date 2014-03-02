@@ -36,7 +36,6 @@ import tb2014.domain.order.OrderCancel;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
-import tb2014.utils.ConverterUtil;
 
 @Service("ordersProcessing")
 public class OrderProcessing {
@@ -66,7 +65,6 @@ public class OrderProcessing {
 
 		List<Broker> brokers = brokerBusiness.getAll();
 		Document orderXml = OrderSerializer.OrderToXml(order);
-		System.out.println(ConverterUtil.XmlToString(orderXml));
 		boolean offered = false;
 
 		for (Broker currentBroker : brokers) {

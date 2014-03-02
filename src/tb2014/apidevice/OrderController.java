@@ -73,34 +73,53 @@ public class OrderController {
 
 			JSONObject createOrderObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 			System.out.println("Json request: " + createOrderObject.toString());
-			String apiId = createOrderObject.getString("apiId");
+
+			String apiId = null;
+
+			if (!createOrderObject.isNull("apiId")) {
+				apiId = createOrderObject.getString("apiId");
+			} else {
+				response.setStatus(403);
+				return;
+			}
 
 			if (deviceUtil.checkDevice(apiId)) {
 
 				JSONObject orderObject = createOrderObject.getJSONObject("order");
-
-				Order order = OrderJsonParser.Json2Order(orderObject, brokerBusiness);
-				deviceUtil.assignDevice(apiId, order);
-				order.setUuid(UUID.randomUUID().toString());
-				orderBusiness.saveNewOrder(order);
-
-				// create new order status (Created)
-				OrderStatus orderStatus = new OrderStatus();
-				orderStatus.setDate(new Date());
-				orderStatus.setOrder(order);
-				orderStatus.setStatus(OrderStatusType.Created);
-				orderStatusBusiness.save(orderStatus);
-
 				JSONObject responseJson = new JSONObject();
-				responseJson.put("status", "ok");
-				responseJson.put("orderId", order.getUuid().toString());
+				Order order = OrderJsonParser.Json2Order(orderObject, brokerBusiness);
+
+				if (order == null) {
+
+					responseJson.put("status", "error");
+					responseJson.put("orderId", "null");
+					response.setStatus(403);
+				} else {
+
+					deviceUtil.assignDevice(apiId, order);
+					order.setUuid(UUID.randomUUID().toString());
+					orderBusiness.saveNewOrder(order);
+
+					// create new order status (Created)
+					OrderStatus orderStatus = new OrderStatus();
+					orderStatus.setDate(new Date());
+					orderStatus.setOrder(order);
+					orderStatus.setStatus(OrderStatusType.Created);
+					orderStatusBusiness.save(orderStatus);
+
+					responseJson.put("status", "ok");
+					responseJson.put("orderId", order.getUuid().toString());
+					response.setStatus(200);
+				}
 
 				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 				outputStream.writeBytes(responseJson.toString());
 				outputStream.flush();
 				outputStream.close();
 
-				offerOrderProcessing.addOrder(order);
+				if (order != null) {
+					offerOrderProcessing.addOrder(order);
+				}
 			} else {
 				response.setStatus(403);
 			}
@@ -118,26 +137,47 @@ public class OrderController {
 
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
 			JSONObject cancelOrderJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
-			System.out.println(cancelOrderJson.toString());
+			JSONObject responseJson = new JSONObject();
+			int statusCode = 0;
+			String apiId = null;
 
-			String apiId = cancelOrderJson.getString("apiId");
+			try {
+				apiId = cancelOrderJson.getString("apiId");
+			} catch (JSONException ex) {
+				statusCode = 403;
+				response.setStatus(statusCode);
+				return;
+			}
 
-			String orderUuid = cancelOrderJson.getString("orderId");
-			String reason = cancelOrderJson.getString("reason");
+			String orderUuid = null;
+			String reason = null;
+
+			try {
+
+				orderUuid = cancelOrderJson.getString("orderId");
+				reason = cancelOrderJson.getString("reason");
+			} catch (JSONException ex) {
+				statusCode = 403;
+				response.setStatus(statusCode);
+				return;
+			}
+
 			Order order = orderBusiness.getWithChilds(orderUuid);
 
-			int statusCode = cancelAction(order, reason, apiId);
+			if (order == null) {
+				statusCode = 404;
+			} else {
+				statusCode = cancelAction(order, reason, apiId);
+			}
 
 			response.setStatus(statusCode);
-
-			JSONObject responseJson = new JSONObject();
 
 			if (statusCode != 200) {
 				responseJson.put("status", "error");
 			} else {
 				responseJson.put("status", "success");
 			}
-			
+
 			responseJson.put("orderId", order.getUuid().toString());
 
 			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
@@ -201,12 +241,29 @@ public class OrderController {
 
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
 			JSONObject getStatusObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			int statusCode = 0;
+			String apiId = null;
 
-			String apiId = getStatusObject.getString("apiId");
+			try {
+				apiId = getStatusObject.getString("apiId");
+			} catch (JSONException ex) {
+				statusCode = 403;
+				response.setStatus(statusCode);
+				return;
+			}
 
 			if (deviceUtil.checkDevice(apiId)) {
 
-				String orderUuid = getStatusObject.getString("orderId");
+				String orderUuid = null;
+
+				try {
+					orderUuid = getStatusObject.getString("orderId");
+				} catch (JSONException ex) {
+					statusCode = 403;
+					response.setStatus(statusCode);
+					return;
+				}
+
 				Order order = orderBusiness.getWithChilds(orderUuid);
 
 				if (order == null) {
@@ -245,6 +302,9 @@ public class OrderController {
 					outputStream.writeBytes(statusJson.toString());
 					outputStream.flush();
 					outputStream.close();
+				} else {
+					response.setStatus(404);
+					return;
 				}
 			} else {
 				response.setStatus(403);
@@ -260,14 +320,30 @@ public class OrderController {
 
 		try {
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-
 			JSONObject getGeoObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			int statusCode = 0;
+			String apiId = null;
 
-			String apiId = getGeoObject.getString("apiId");
+			try {
+				apiId = getGeoObject.getString("apiId");
+			} catch (JSONException ex) {
+				statusCode = 403;
+				response.setStatus(statusCode);
+				return;
+			}
 
 			if (deviceUtil.checkDevice(apiId)) {
 
-				String orderUuid = getGeoObject.getString("orderId");
+				String orderUuid = null;
+
+				try {
+					orderUuid = getGeoObject.getString("orderId");
+				} catch (JSONException ex) {
+					statusCode = 403;
+					response.setStatus(statusCode);
+					return;
+				}
+
 				Order order = orderBusiness.get(orderUuid);
 
 				if (order == null) {
@@ -276,9 +352,18 @@ public class OrderController {
 				}
 
 				List<GeoData> geoDataList = null;
+				String lastDate = null;
+
+				try {
+					lastDate = getGeoObject.getString("lastDate");
+				} catch (JSONException ex) {
+					statusCode = 403;
+					response.setStatus(statusCode);
+					return;
+				}
 
 				// first request for order geo data
-				if (getGeoObject.getString("lastDate").isEmpty()) {
+				if (lastDate.isEmpty()) {
 					geoDataList = geoDataBusiness.getAll(order);
 				} else {
 

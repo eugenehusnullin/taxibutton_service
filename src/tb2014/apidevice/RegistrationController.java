@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.hsqldb.lib.DataOutputStream;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,18 +30,21 @@ public class RegistrationController {
 	}
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public void register(HttpServletRequest request,
-			HttpServletResponse response) {
+	public void register(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringBuffer requestBuffer = NetStreamUtils
-					.getHttpServletRequestBuffer(request);
+			StringBuffer requestBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
 
 			System.out.println(requestBuffer.toString());
-			JSONObject reuqestJson = (JSONObject) new JSONTokener(
-					requestBuffer.toString()).nextValue();
+			JSONObject requestJson = (JSONObject) new JSONTokener(requestBuffer.toString()).nextValue();
 
-			String phone = reuqestJson.getString("phone");
+			String phone = null;
+
+			try {
+				phone = requestJson.getString("phone");
+			} catch (JSONException ex) {
+				phone = "";
+			}
 
 			Device device = new Device();
 			String resultUuid = UUID.randomUUID().toString();

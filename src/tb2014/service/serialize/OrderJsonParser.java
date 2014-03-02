@@ -1,5 +1,6 @@
 package tb2014.service.serialize;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,7 @@ import tb2014.domain.order.Order;
 import tb2014.domain.order.VehicleClass;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OrderJsonParser {
@@ -23,118 +25,176 @@ public class OrderJsonParser {
 
 		Order order = new Order();
 
-		order.setUrgent(jsonObject.getBoolean("urgent"));
+		Boolean urgent = null;
+		String recipientPhone = null;
+		Date supplyDate = null;
+		int bookingHour = 0;
+		int bookingMinute = 0;
 
-		if (!jsonObject.isNull("recipientPhone")) {
-			order.setPhone(jsonObject.getString("recipientPhone"));
-		} else {
-			order.setPhone("");
+		try {
+			urgent = jsonObject.getBoolean("urgent");
+			recipientPhone = jsonObject.getString("recipientPhone");
+		} catch (JSONException ex) {
+			return null;
 		}
 
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+		try {
 
-		if (jsonObject.getString("bookingDate").isEmpty() == false) {
-
-			String orderDate = jsonObject.getString("bookingDate");
-			Date resultDate = null;
-
-			try {
-				resultDate = dateFormatter.parse(orderDate);
-				order.setSupplyDate(resultDate);
-			} catch (Exception ex) {
-				System.out.println("Exception parsing order supply date: " + ex.toString());
-			}
+			String bookingDate = jsonObject.getString("bookingDate");
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+			supplyDate = dateFormatter.parse(bookingDate);
+		} catch (JSONException ex) {
+			return null;
+		} catch (ParseException ex) {
+			return null;
 		}
 
-		if (jsonObject.getString("bookingHour").isEmpty() == false) {
-			order.setSupplyHour(Integer.parseInt(jsonObject.getString("bookingHour")));
-		}
-
-		if (jsonObject.getString("bookingMin").isEmpty() == false) {
-			order.setSupplyMin(Integer.parseInt(jsonObject.getString("bookingMin")));
+		try {
+			bookingHour = jsonObject.getInt("bookingHour");
+			bookingMinute = jsonObject.getInt("bookingMin");
+		} catch (JSONException ex) {
+			return null;
 		}
 
 		List<AddressPoint> addressPoints = new ArrayList<AddressPoint>();
 		AddressPoint source = new AddressPoint();
+		JSONObject sourceJson = null;
+		Double lon = null;
+		Double lat = null;
+		String fullAddress = null;
+		String shortAddress = null;
+		String closestStation = null;
+		String country = null;
+		String locality = null;
+		String street = null;
+		String housing = null;
+
 		source.setIndexNumber(0);
 
-		JSONObject sourceJson = jsonObject.getJSONObject("source");
-
-		if (sourceJson.getString("lon").isEmpty() == false) {
-			source.setLon(Double.parseDouble(sourceJson.getString("lon")));
+		try {
+			sourceJson = jsonObject.getJSONObject("source");
+		} catch (JSONException ex) {
+			return null;
 		}
 
-		if (sourceJson.getString("lat").isEmpty() == false) {
-			source.setLat(Double.parseDouble(sourceJson.getString("lat")));
+		try {
+			lon = sourceJson.getDouble("lon");
+			lat = sourceJson.getDouble("lat");
+		} catch (JSONException ex) {
+			return null;
 		}
 
-		source.setFullAddress(sourceJson.getString("fullAddress"));
-		source.setShortAddress(sourceJson.getString("shortAddress"));
-		source.setClosesStation(sourceJson.getString("closestStation"));
-		source.setCounty(sourceJson.getString("country"));
-		source.setLocality(sourceJson.getString("locality"));
-		source.setStreet(sourceJson.getString("street"));
-		source.setHousing(sourceJson.getString("housing"));
+		try {
+
+			fullAddress = sourceJson.getString("fullAddress");
+			shortAddress = sourceJson.getString("shortAddress");
+			closestStation = sourceJson.getString("closestStation");
+			country = sourceJson.getString("country");
+			locality = sourceJson.getString("locality");
+			street = sourceJson.getString("street");
+			housing = sourceJson.getString("housing");
+		} catch (JSONException ex) {
+			return null;
+		}
+
+		source.setLon(lon);
+		source.setLat(lat);
+		source.setFullAddress(fullAddress);
+		source.setShortAddress(shortAddress);
+		source.setClosesStation(closestStation);
+		source.setCounty(country);
+		source.setLocality(locality);
+		source.setStreet(street);
+		source.setHousing(housing);
 		source.setOrder(order);
 
 		addressPoints.add(source);
 
-		JSONArray destinationsJson = jsonObject.getJSONArray("destinations");
+		JSONArray destinationsJson = null;
+
+		try {
+			destinationsJson = jsonObject.getJSONArray("destinations");
+		} catch (JSONException ex) {
+			return null;
+		}
 
 		for (int i = 0; i < destinationsJson.length(); i++) {
 
 			JSONObject destinationJson = destinationsJson.getJSONObject(i);
 			AddressPoint destination = new AddressPoint();
+			lon = null;
+			lat = null;
+			int index = 0;
 
-			if (destinationJson.getString("lon").isEmpty() == false) {
-				destination.setLon(Double.parseDouble(destinationJson.getString("lon")));
+			try {
+
+				lon = destinationJson.getDouble("lon");
+				lat = destinationJson.getDouble("lat");
+				index = destinationJson.getInt("index");
+				fullAddress = destinationJson.getString("fullAddress");
+				shortAddress = destinationJson.getString("shortAddress");
+				closestStation = destinationJson.getString("closestStation");
+				country = destinationJson.getString("country");
+				locality = destinationJson.getString("locality");
+				street = destinationJson.getString("street");
+				housing = destinationJson.getString("housing");
+			} catch (JSONException ex) {
+				return null;
 			}
 
-			if (destinationJson.getString("lat").isEmpty() == false) {
-				destination.setLat(Double.parseDouble(destinationJson.getString("lat")));
-			}
-
-			if (destinationJson.getString("index").isEmpty() == false) {
-				destination.setIndexNumber(Integer.parseInt(destinationJson.getString("index")));
-			}
-
-			destination.setFullAddress(destinationJson.getString("fullAddress"));
-			destination.setShortAddress(destinationJson.getString("shortAddress"));
-			destination.setClosesStation(destinationJson.getString("closestStation"));
-			destination.setCounty(destinationJson.getString("country"));
-			destination.setLocality(destinationJson.getString("locality"));
-			destination.setStreet(destinationJson.getString("street"));
-			destination.setHousing(destinationJson.getString("housing"));
+			destination.setLon(lon);
+			destination.setLat(lat);
+			destination.setIndexNumber(index);
+			destination.setFullAddress(fullAddress);
+			destination.setShortAddress(shortAddress);
+			destination.setClosesStation(closestStation);
+			destination.setCounty(country);
+			destination.setLocality(locality);
+			destination.setStreet(street);
+			destination.setHousing(housing);
 			destination.setOrder(order);
 
 			addressPoints.add(destination);
 		}
 
-		order.setDestinations(addressPoints);
-
 		Set<Requirement> requirements = new HashSet<Requirement>();
+		JSONArray requirementsJson = null;
 
-		JSONArray requirementsJson = jsonObject.getJSONArray("requirements");
+		try {
+			requirementsJson = jsonObject.getJSONArray("requirements");
+		} catch (JSONException ex) {
+			return null;
+		}
 
 		for (int i = 0; i < requirementsJson.length(); i++) {
 
 			JSONObject requirementJson = requirementsJson.getJSONObject(i);
 			Requirement currentRequirement = new Requirement();
+			String name = null;
+			String value = null;
 
-			currentRequirement.setType(requirementJson.getString("name"));
-
-			if (requirementJson.getString("value").equals("yes") == false) {
-				currentRequirement.setOptions(requirementJson.getString("value"));
+			try {
+				name = requirementJson.getString("name");
+				value = requirementJson.getString("value");
+			} catch (JSONException ex) {
+				return null;
 			}
 
+			if (value.equals("yes") == false) {
+				currentRequirement.setOptions(value);
+			}
+
+			currentRequirement.setType(name);
 			currentRequirement.setOrder(order);
 			requirements.add(currentRequirement);
 		}
 
-		order.setRequirements(requirements);
+		try {
 
-		if (!jsonObject.isNull("vehicleClass")) {
-			order.setOrderVehicleClass(VehicleClass.values()[jsonObject.getInt("vehicleClass")]);
+			int vehicleClass = jsonObject.getInt("vehicleClass");
+			order.setOrderVehicleClass(VehicleClass.values()[vehicleClass]);
+		} catch (JSONException ex) {
+			return null;
 		}
 
 		Set<Broker> offerBrokerList = new HashSet<Broker>();
@@ -152,6 +212,13 @@ public class OrderJsonParser {
 			}
 		}
 
+		order.setUrgent(urgent);
+		order.setPhone(recipientPhone);
+		order.setSupplyDate(supplyDate);
+		order.setSupplyHour(bookingHour);
+		order.setSupplyMin(bookingMinute);
+		order.setDestinations(addressPoints);
+		order.setRequirements(requirements);
 		order.setOfferBrokerList(offerBrokerList);
 
 		return order;
