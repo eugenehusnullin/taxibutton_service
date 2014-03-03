@@ -34,8 +34,15 @@ public class ChooseWinnerProcessing {
 				}
 
 				if (order != null) {
-					ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(order);
-					executor.execute(chooseWinnerRunnable);
+					boolean canceled = false;
+					synchronized (canceledQueue) {
+						canceled = canceledQueue.remove(order);
+					}
+
+					if (!canceled) {
+						ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(order);
+						executor.execute(chooseWinnerRunnable);
+					}
 				}
 			}
 		}
@@ -71,6 +78,7 @@ public class ChooseWinnerProcessing {
 	}
 
 	private Queue<Order> queue;
+	private Queue<Order> canceledQueue;
 	private Thread mainThread;
 	private boolean processing = true;
 	private ExecutorService executor;
@@ -82,6 +90,7 @@ public class ChooseWinnerProcessing {
 		this.alacrityBuiness = alacrityBuiness;
 		this.orderProcessing = orderProcessing;
 		queue = new ArrayDeque<Order>();
+		canceledQueue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
 	}
 
@@ -102,6 +111,13 @@ public class ChooseWinnerProcessing {
 		synchronized (queue) {
 			queue.add(order);
 			queue.notifyAll();
+		}
+	}
+
+	public void cancelOrder(Order order) {
+		synchronized (canceledQueue) {
+			canceledQueue.add(order);
+			canceledQueue.notifyAll();
 		}
 	}
 }

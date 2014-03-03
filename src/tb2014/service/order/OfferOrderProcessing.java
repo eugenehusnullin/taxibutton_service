@@ -100,10 +100,4 @@ public class OfferOrderProcessing {
 			queue.notifyAll();
 		}
 	}
-
-	public void removeOrder(Order order) {
-		synchronized (queue) {
-			queue.remove(order);
-		}
-	}
 }
