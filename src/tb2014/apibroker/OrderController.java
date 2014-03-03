@@ -68,6 +68,13 @@ public class OrderController {
 			return;
 		}
 
+		// проверка того, был-ли данный запрос на готовность выполнить от
+		// данного брокера по данному заказу
+		if (alacrityBuiness.get(order, broker) != null) {
+			response.setStatus(200);
+			return;
+		}
+
 		Driver driver = new Driver();
 		driver.setName(request.getParameter("driverName"));
 		driver.setSecondName(request.getParameter("driverSecondName"));

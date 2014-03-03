@@ -9,6 +9,8 @@ import tb2014.domain.order.OrderAcceptAlacrity;
 public interface IOrderAcceptAlacrityDao {
 
 	OrderAcceptAlacrity get(Long id);
+	
+	OrderAcceptAlacrity get(Order order, Broker broker);
 
 	List<OrderAcceptAlacrity> getAll();
 

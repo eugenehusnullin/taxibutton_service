@@ -13,8 +13,7 @@ import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderAcceptAlacrity;
 
 @Service("OrderAcceptAlacrityBusiness")
-public class OrderAcceptAlacrityBusiness implements
-		IOrderAcceptAlacrityBusiness {
+public class OrderAcceptAlacrityBusiness implements IOrderAcceptAlacrityBusiness {
 
 	private IOrderAcceptAlacrityDao alacrityDao;
 
@@ -27,6 +26,12 @@ public class OrderAcceptAlacrityBusiness implements
 	@Override
 	public OrderAcceptAlacrity get(Long id) {
 		return alacrityDao.get(id);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public OrderAcceptAlacrity get(Order order, Broker broker) {
+		return alacrityDao.get(order, broker);
 	}
 
 	@Transactional(readOnly = true)

@@ -24,15 +24,19 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 
 	@Override
 	public OrderAcceptAlacrity get(Long id) {
-		return (OrderAcceptAlacrity) sessionFactory.getCurrentSession().get(
-				OrderAcceptAlacrity.class, id);
+		return (OrderAcceptAlacrity) sessionFactory.getCurrentSession().get(OrderAcceptAlacrity.class, id);
+	}
+
+	@Override
+	public OrderAcceptAlacrity get(Order order, Broker broker) {
+		return (OrderAcceptAlacrity) sessionFactory.getCurrentSession().createCriteria(OrderAcceptAlacrity.class)
+				.add(Restrictions.eq("order", order)).add(Restrictions.eq("broker", broker)).uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<OrderAcceptAlacrity> getAll() {
-		return sessionFactory.getCurrentSession()
-				.createCriteria(OrderAcceptAlacrity.class).list();
+		return sessionFactory.getCurrentSession().createCriteria(OrderAcceptAlacrity.class).list();
 	}
 
 	@Override
@@ -48,24 +52,22 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<OrderAcceptAlacrity> getAll(Order order) {
-		return sessionFactory.getCurrentSession()
-				.createCriteria(OrderAcceptAlacrity.class)
+		return sessionFactory.getCurrentSession().createCriteria(OrderAcceptAlacrity.class)
 				.add(Restrictions.eq("order", order)).list();
 	}
 
 	@Override
 	public Broker getWinner(Order order) {
 
-		OrderAcceptAlacrity winnerAlacrity = (OrderAcceptAlacrity) sessionFactory
-				.getCurrentSession().createCriteria(OrderAcceptAlacrity.class)
-				.add(Restrictions.eq("order", order))
+		OrderAcceptAlacrity winnerAlacrity = (OrderAcceptAlacrity) sessionFactory.getCurrentSession()
+				.createCriteria(OrderAcceptAlacrity.class).add(Restrictions.eq("order", order))
 				.addOrder(org.hibernate.criterion.Order.asc("date")).setMaxResults(1).uniqueResult();
 
 		Broker winner = null;
 		if (winnerAlacrity != null) {
-			winner = winnerAlacrity.getBroker(); 
+			winner = winnerAlacrity.getBroker();
 		}
-		
-		return winner; 
+
+		return winner;
 	}
 }
