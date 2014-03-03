@@ -137,7 +137,7 @@ public class OrderController {
 			return;
 		}
 
-		Order order = orderBusiness.get(Long.parseLong(request.getParameter("orderId")));
+		Order order = orderBusiness.get(request.getParameter("orderId"));
 		if (this.checkOrder(request.getParameter("apiId"), order, broker) == false) {
 			response.setStatus(403);
 			return;
