@@ -1,25 +1,18 @@
 package tb2014.domain.order;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import tb2014.domain.Broker;
 
-public class OrderAcceptAlacrity {
+public class OrderAcceptAlacrity implements Serializable {
 
-	private Long id;
+	private static final long serialVersionUID = 1L;	
 	private Broker broker;
 	private Order order;
 	private Date date;
 	private Driver driver;
 	private Car car;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public Broker getBroker() {
 		return broker;

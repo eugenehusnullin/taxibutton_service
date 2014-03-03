@@ -5,11 +5,15 @@
 
 <hibernate-mapping package="tb2014.domain.order">
 	<class name="OrderAcceptAlacrity" table="orderacceptalacrity">
-		<id name="id" column="alacrityId">
-			<generator class="identity" />
-		</id>
-		<many-to-one name="broker" column="brokerId" />
-		<many-to-one name="order" column="orderId" />
+<!-- 		<id name="id" column="alacrityId"> -->
+<!-- 			<generator class="identity" /> -->
+<!-- 		</id> -->
+<!-- 		<many-to-one name="broker" column="brokerId" /> -->
+<!-- 		<many-to-one name="order" column="orderId" /> -->
+		<composite-id>
+			<key-many-to-one name="broker" column="brokerId"></key-many-to-one>
+			<key-many-to-one name="order" column="orderId"></key-many-to-one>
+		</composite-id>
 		<property name="date" type="date" />
 		<component name="driver" class="tb2014.domain.order.Driver"
 			insert="true" update="true" access="field">

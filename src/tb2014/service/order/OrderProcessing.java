@@ -134,7 +134,6 @@ public class OrderProcessing {
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
-
 				result = false;
 				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
@@ -142,7 +141,6 @@ public class OrderProcessing {
 				orderBusiness.saveOrUpdate(order);
 
 				OrderStatus orderStatus = new OrderStatus();
-
 				orderStatus.setDate(new Date());
 				orderStatus.setOrder(order);
 				orderStatus.setStatus(OrderStatusType.Taked);
