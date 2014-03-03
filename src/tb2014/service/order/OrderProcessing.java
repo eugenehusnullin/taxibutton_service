@@ -71,9 +71,7 @@ public class OrderProcessing {
 
 			try {
 
-				offerOrderHTTP(currentBroker, orderXml);
-
-				offered = true;
+				offered = offerOrderHTTP(currentBroker, orderXml);
 
 				OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
 				offeredOrderBroker.setOrder(order);
@@ -89,7 +87,7 @@ public class OrderProcessing {
 	}
 
 	// offer order via HTTP protocol
-	private void offerOrderHTTP(Broker broker, Document document) throws IOException,
+	private boolean offerOrderHTTP(Broker broker, Document document) throws IOException,
 			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
 
 		String url = broker.getApiurl() + "/offer";
@@ -114,6 +112,9 @@ public class OrderProcessing {
 
 		if (responceCode != 200) {
 			log.info("Error offering order to broker (code: " + responceCode + "): " + broker.getId().toString());
+			return false;
+		} else {
+			return true;
 		}
 	}
 
