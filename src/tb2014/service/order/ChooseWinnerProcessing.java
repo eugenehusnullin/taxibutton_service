@@ -58,7 +58,7 @@ public class ChooseWinnerProcessing {
 			Broker winner = alacrityBuiness.getWinner(order);
 
 			if (winner != null) {
-				success = orderProcessing.giveOrder(order.getId(), winner);
+				success = orderProcessing.giveOrder(order.getId(), winner.getId());
 			}
 
 			if (success) {

@@ -8,8 +8,8 @@
 		<id name="id" column="alacrityId">
 			<generator class="identity" />
 		</id>
-		<many-to-one name="broker" column="brokerId" unique-key="alacrity_uk1" />
-		<many-to-one name="order" column="orderId" unique-key="alacrity_uk2" />
+		<many-to-one name="broker" column="brokerId" />
+		<many-to-one name="order" column="orderId" />
 		<property name="date" type="date" />
 		<component name="driver" class="tb2014.domain.order.Driver"
 			insert="true" update="true" access="field">

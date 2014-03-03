@@ -50,7 +50,7 @@
 
 	<task:scheduled-tasks scheduler="tariffsProcessingScheduler">
 		<task:scheduled ref="tariffsProcessing" method="GetBrokersTariffs"
-			fixed-delay="60000" />
+			fixed-delay="3600000" />
 	</task:scheduled-tasks>
 
 	<task:scheduler id="tariffsProcessingScheduler"

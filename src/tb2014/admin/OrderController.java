@@ -575,7 +575,7 @@ public class OrderController {
 
 		Broker broker = brokerBusiness.getByApiId(apiId);
 
-		orderProcessing.giveOrder(orderId, broker);
+		orderProcessing.giveOrder(orderId, broker.getId());
 
 		return "redirect:list";
 	}

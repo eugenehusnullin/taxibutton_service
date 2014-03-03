@@ -21,11 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOfferedOrderBrokerBusiness;
-import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
@@ -42,22 +42,16 @@ public class OrderProcessing {
 
 	private static final Logger log = LoggerFactory.getLogger(OrderProcessing.class);
 
-	private IOrderBusiness orderBusiness;
-	private IBrokerBusiness brokerBusiness;
-	private IOrderCancelBusiness orderCancelBusiness;
-	private IOrderStatusBusiness orderStatusBusiness;
-	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
-
 	@Autowired
-	public OrderProcessing(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
-			IOrderCancelBusiness orderCancelBusiness, IOrderStatusBusiness orderStatusBusiness,
-			IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness, IOrderAcceptAlacrityBusiness alacrityBuiness) {
-		this.orderBusiness = orderBusiness;
-		this.brokerBusiness = brokerBusiness;
-		this.orderCancelBusiness = orderCancelBusiness;
-		this.orderStatusBusiness = orderStatusBusiness;
-		this.offeredOrderBrokerBusiness = offeredOrderBrokerBusiness;
-	}
+	private IOrderBusiness orderBusiness;
+	@Autowired
+	private IBrokerBusiness brokerBusiness;
+	@Autowired
+	private IOrderCancelBusiness orderCancelBusiness;
+	@Autowired
+	private IOrderStatusBusiness orderStatusBusiness;
+	@Autowired
+	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
@@ -73,11 +67,13 @@ public class OrderProcessing {
 
 				offered = offerOrderHTTP(currentBroker, orderXml);
 
-				OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
-				offeredOrderBroker.setOrder(order);
-				offeredOrderBroker.setBroker(currentBroker);
-				offeredOrderBroker.setTimestamp(new Date());
-				offeredOrderBrokerBusiness.save(offeredOrderBroker);
+				if (offered) {
+					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
+					offeredOrderBroker.setOrder(order);
+					offeredOrderBroker.setBroker(currentBroker);
+					offeredOrderBroker.setTimestamp(new Date());
+					offeredOrderBrokerBusiness.save(offeredOrderBroker);
+				}
 			} catch (Exception ex) {
 				log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
 			}
@@ -97,6 +93,7 @@ public class OrderProcessing {
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/xml");
 		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		connection.setReadTimeout(0);
 
 		connection.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
@@ -119,9 +116,11 @@ public class OrderProcessing {
 	}
 
 	// assign order executer
-	public boolean giveOrder(Long orderId, Broker broker) {
+	@Transactional
+	public boolean giveOrder(Long orderId, Long brokerId) {
 
 		boolean result = true;
+		Broker broker = brokerBusiness.getById(brokerId);
 		try {
 			Order order = orderBusiness.get(orderId);
 
@@ -150,9 +149,8 @@ public class OrderProcessing {
 				orderStatusBusiness.save(orderStatus);
 			}
 		} catch (Exception ex) {
-
 			result = false;
-			log.info("Giving order for broker " + broker.getId() + " error: " + ex.toString());
+			log.error("Giving order for broker " + broker.getId() + " error: " + ex.toString());
 		}
 
 		return result;
