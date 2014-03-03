@@ -1,7 +1,6 @@
 package tb2014.service.order;
 
 import java.util.ArrayDeque;
-import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,11 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tb2014.business.IOrderAcceptAlacrityBusiness;
-import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
-import tb2014.domain.order.OrderStatus;
-import tb2014.domain.order.OrderStatusType;
 
 @Service
 public class ChooseWinnerProcessing {
@@ -61,13 +57,7 @@ public class ChooseWinnerProcessing {
 				success = orderProcessing.giveOrder(order.getId(), winner.getId());
 			}
 
-			if (success) {
-				OrderStatus orderStatus = new OrderStatus();
-				orderStatus.setDate(new Date());
-				orderStatus.setOrder(order);
-				orderStatus.setStatus(OrderStatusType.Taked);
-				orderStatusBusiness.save(orderStatus);
-			} else {
+			if (!success) {
 				try {
 					Thread.sleep(5000);
 					synchronized (queue) {
@@ -86,14 +76,11 @@ public class ChooseWinnerProcessing {
 	private ExecutorService executor;
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;
-	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
-	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing,
-			IOrderStatusBusiness orderStatusBusiness) {
+	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing) {
 		this.alacrityBuiness = alacrityBuiness;
 		this.orderProcessing = orderProcessing;
-		this.orderStatusBusiness = orderStatusBusiness;
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
 	}

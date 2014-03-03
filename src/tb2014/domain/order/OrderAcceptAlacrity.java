@@ -7,7 +7,7 @@ import tb2014.domain.Broker;
 
 public class OrderAcceptAlacrity implements Serializable {
 
-	private static final long serialVersionUID = 1L;	
+	private static final long serialVersionUID = 1L;
 	private Broker broker;
 	private Order order;
 	private Date date;
