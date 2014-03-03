@@ -1,5 +1,8 @@
 package tb2014.service.serialize;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -155,11 +158,16 @@ public class OrderSerializer {
 			offer.appendChild(destinations);
 
 			Element bookingTime = doc.createElement("BookingTime");
+			DateFormat df = new SimpleDateFormat("yyyy.MM.dd");
 
 			bookingTime.setAttribute("urgent", order.getUrgent().toString());
 
-			bookingTime.appendChild(doc.createTextNode((order.getSupplyDate() == null ? "-" : order.getSupplyDate()
-					.toString()) + "T" + order.getSupplyHour() + ":" + order.getSupplyMin()));
+			bookingTime.appendChild(doc.createTextNode((order.getSupplyDate() == null ? "-" : df.format(order
+					.getSupplyDate()))
+					+ " "
+					+ String.format("%02d", order.getSupplyHour())
+					+ ":"
+					+ String.format("%02d", order.getSupplyMin())));
 
 			offer.appendChild(bookingTime);
 
