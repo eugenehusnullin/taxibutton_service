@@ -298,8 +298,9 @@ public class OrderController {
 					}
 
 					DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
+					byte[] bytes = statusJson.toString().getBytes("UTF-8");
 
-					outputStream.writeBytes(statusJson.toString());
+					outputStream.write(bytes);
 					outputStream.flush();
 					outputStream.close();
 				} else {
