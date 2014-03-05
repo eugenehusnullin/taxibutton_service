@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,10 +102,15 @@ public class ChooseWinnerProcessing {
 		mainThread.start();
 	}
 
+	@PreDestroy
 	public void stopProcessing() {
 		processing = false;
 		mainThread.interrupt();
 		executor.shutdown();
+		try {
+			mainThread.join();
+		} catch (InterruptedException e) {
+		}
 	}
 
 	public void addOrder(Order order) {

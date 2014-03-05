@@ -25,28 +25,25 @@ import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderAcceptAlacrity;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
+import tb2014.service.geo.GeoDataProcessing;
 
 @RequestMapping("/order")
 @Controller("apiBrokerOrderController")
 public class OrderController {
 	private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 
-	private IBrokerBusiness brokerBusiness;
-	private IOrderBusiness orderBusiness;
-	private IOrderAcceptAlacrityBusiness alacrityBuiness;
-	private IOrderStatusBusiness orderStatusBusiness;
-	private IGeoDataBusiness geoDataBusiness;
-
 	@Autowired
-	public OrderController(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
-			IOrderAcceptAlacrityBusiness alacrityBuiness, IOrderStatusBusiness orderStatusBusiness,
-			IGeoDataBusiness geoDataBusiness) {
-		this.orderBusiness = orderBusiness;
-		this.brokerBusiness = brokerBusiness;
-		this.alacrityBuiness = alacrityBuiness;
-		this.orderStatusBusiness = orderStatusBusiness;
-		this.geoDataBusiness = geoDataBusiness;
-	}
+	private IBrokerBusiness brokerBusiness;
+	@Autowired
+	private IOrderBusiness orderBusiness;
+	@Autowired
+	private IOrderAcceptAlacrityBusiness alacrityBuiness;
+	@Autowired
+	private IOrderStatusBusiness orderStatusBusiness;
+	@Autowired
+	private IGeoDataBusiness geoDataBusiness;
+	@Autowired
+	private GeoDataProcessing geoDataProcessing;
 
 	@RequestMapping(value = "/alacrity", method = RequestMethod.POST)
 	public void alacrity(HttpServletRequest request, HttpServletResponse response) {
@@ -121,9 +118,15 @@ public class OrderController {
 		OrderStatus status = new OrderStatus();
 		status.setOrder(order);
 		status.setDate(new Date());
-		status.setStatus(OrderStatusType.valueOf(request.getParameter("status")));
+		OrderStatusType orderStatusType = OrderStatusType.valueOf(request.getParameter("status"));
+		status.setStatus(orderStatusType);
 
 		orderStatusBusiness.save(status);
+
+		if (orderStatusType == OrderStatusType.Completed || orderStatusType == OrderStatusType.Cancelled
+				|| orderStatusType == OrderStatusType.Failed) {
+			geoDataProcessing.removeActual(status.getOrder().getId());
+		}
 
 		response.setStatus(200);
 	}
@@ -163,7 +166,7 @@ public class OrderController {
 				geoData.setSpeed(Double.parseDouble(request.getParameter("speed")));
 			}
 
-			geoDataBusiness.save(geoData);
+			geoDataProcessing.addGeoData(geoData);
 		} catch (Exception ex) {
 			log.warn("Parsing geo data error.", ex);
 			response.setStatus(403);

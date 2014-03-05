@@ -64,7 +64,7 @@ public class OrderController {
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@Transactional
-	public void createOrder(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void create(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		try {
 
@@ -235,7 +235,7 @@ public class OrderController {
 
 	// get status of order
 	@RequestMapping(value = "/status", method = RequestMethod.POST)
-	public void getstatus(HttpServletRequest request, HttpServletResponse response) {
+	public void status(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 
@@ -317,16 +317,16 @@ public class OrderController {
 
 	// get order geo data
 	@RequestMapping(value = "/geodata", method = RequestMethod.POST)
-	public void getGeoData(HttpServletRequest request, HttpServletResponse response) {
+	public void geodata(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			JSONObject getGeoObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			JSONObject jsonObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 			int statusCode = 0;
 			String apiId = null;
 
 			try {
-				apiId = getGeoObject.getString("apiId");
+				apiId = jsonObject.getString("apiId");
 			} catch (JSONException ex) {
 				statusCode = 403;
 				response.setStatus(statusCode);
@@ -338,7 +338,7 @@ public class OrderController {
 				String orderUuid = null;
 
 				try {
-					orderUuid = getGeoObject.getString("orderId");
+					orderUuid = jsonObject.getString("orderId");
 				} catch (JSONException ex) {
 					statusCode = 403;
 					response.setStatus(statusCode);
@@ -356,7 +356,7 @@ public class OrderController {
 				String lastDate = null;
 
 				try {
-					lastDate = getGeoObject.getString("lastDate");
+					lastDate = jsonObject.getString("lastDate");
 				} catch (JSONException ex) {
 					statusCode = 403;
 					response.setStatus(statusCode);
@@ -372,7 +372,7 @@ public class OrderController {
 
 					try {
 						date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-								.parse(getGeoObject.getString("lastDate"));
+								.parse(jsonObject.getString("lastDate"));
 					} catch (JSONException e) {
 						System.out.println(e.toString());
 					} catch (ParseException e) {
