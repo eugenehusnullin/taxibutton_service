@@ -74,6 +74,7 @@ public class OrderStatusDao implements IOrderStatusDao {
 
 		List<OrderStatus> statusList = sessionFactory.getCurrentSession()
 				.createCriteria(OrderStatus.class)
+				.add(Restrictions.eq("order", order))
 				.addOrder(org.hibernate.criterion.Order.desc("date"))
 				.setFetchMode("order", FetchMode.JOIN).list();
 

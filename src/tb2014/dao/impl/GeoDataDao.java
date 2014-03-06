@@ -64,7 +64,7 @@ public class GeoDataDao implements IGeoDataDao {
 	@Override
 	public List<GeoData> getAll(Order order, Date date) {
 		return sessionFactory.getCurrentSession().createCriteria(GeoData.class)
-				.add(Restrictions.gt("date", date)).list();
+				.add(Restrictions.ge("date", date)).list();
 	}
 
 }
