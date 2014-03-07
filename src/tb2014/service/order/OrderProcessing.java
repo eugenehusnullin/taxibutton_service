@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -192,6 +193,25 @@ public class OrderProcessing {
 
 			System.out.println("Error cancelling order: " + ex.toString());
 			return false;
+		}
+
+		return result;
+	}
+
+	// cancel order to prepared broker
+	public Boolean cancelPreparedOrder(Order order, String reason) {
+		Boolean result = true;
+		Set<Broker> brokerList = order.getOfferBrokerList();
+		String params = "orderId=" + order.getUuid() + "&reason=" + reason;
+
+		for (Broker currentBroker : brokerList) {
+			String url = currentBroker.getApiurl() + "/cancel";
+
+			int resultCode = sendHttpGet(url, params);
+
+			if (resultCode != 200) {
+				result = false;
+			}
 		}
 
 		return result;

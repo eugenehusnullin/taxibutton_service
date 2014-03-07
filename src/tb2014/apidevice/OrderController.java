@@ -33,6 +33,7 @@ import tb2014.domain.order.GeoData;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
+import tb2014.service.order.CancelOrderProcessing;
 import tb2014.service.order.OfferOrderProcessing;
 import tb2014.service.order.OrderProcessing;
 import tb2014.service.serialize.OrderJsonParser;
@@ -60,6 +61,8 @@ public class OrderController {
 	private OrderProcessing orderProcessing;
 	@Autowired
 	private OfferOrderProcessing offerOrderProcessing;
+	@Autowired
+	private CancelOrderProcessing cancelorderProcessing;
 
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -214,7 +217,7 @@ public class OrderController {
 				return resultCode;
 			}
 
-			if (status.getStatus() == OrderStatusType.Created || status.getStatus() == OrderStatusType.Taked) {
+			if (status.getStatus() == OrderStatusType.Created || status.getStatus() == OrderStatusType.Taked || status.getStatus() == OrderStatusType.Prepared) {
 
 				if (orderProcessing.cancelOrder(order, reason)) {
 					resultCode = 200;
