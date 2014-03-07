@@ -65,7 +65,7 @@ public class OfferOrderProcessing {
 			// do pause before offer, maybe client canceled order
 			Date currentDatetime = new Date();
 			if (order.getStartOffer().after(currentDatetime)) {
-				long diff = currentDatetime.getTime() - order.getStartOffer().getTime();
+				long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
 				try {
 					Thread.sleep(diff);
 				} catch (InterruptedException e) {
