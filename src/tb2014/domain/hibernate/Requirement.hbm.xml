@@ -5,13 +5,13 @@
 
 <hibernate-mapping package="tb2014.domain.order">
 	<class name="Requirement" table="requirement">
-		<id name="id" column="id">
+		<id name="id">
 			<generator class="identity" />
 		</id>
 		<many-to-one name="order" class="tb2014.domain.order.Order">
 			<column name="orderId" />
 		</many-to-one>
-		<property name="type" length="40" type="java.lang.String" />
-		<property name="options" length="100" type="java.lang.String" />
+		<property name="type" length="40" />
+		<property name="options" length="100" />
 	</class>
 </hibernate-mapping>

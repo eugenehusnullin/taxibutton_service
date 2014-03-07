@@ -4,8 +4,8 @@
 		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="tb2014.domain.order">
-	<class name="AddressPoint" table="orderaddresspoints">
-		<id name="id" column="pointId">
+	<class name="AddressPoint" table="addresspoints">
+		<id name="id">
 			<generator class="identity"/>
 		</id>
 		<many-to-one name="order" class="tb2014.domain.order.Order">

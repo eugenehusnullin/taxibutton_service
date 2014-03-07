@@ -5,17 +5,17 @@
 
 <hibernate-mapping package="tb2014.domain.order">
 	<class name="GeoData" table="geodata">
-		<id name="id" column="id">
+		<id name="id">
 			<generator class="identity" />
 		</id>
 		<many-to-one name="order" class="tb2014.domain.order.Order">
 			<column name="orderId" />
 		</many-to-one>
-		<property name="lat" type="double" />
-		<property name="lon" type="double" />
-		<property name="direction" type="integer" />
-		<property name="speed" type="double" />
-		<property name="category" type="java.lang.String" />
-		<property name="date" type="java.util.Date" />
+		<property name="lat" />
+		<property name="lon" />
+		<property name="direction" />
+		<property name="speed" />
+		<property name="category" />
+		<property name="date" />
 	</class>
 </hibernate-mapping>

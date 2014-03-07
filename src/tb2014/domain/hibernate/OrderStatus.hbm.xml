@@ -5,7 +5,7 @@
 
 <hibernate-mapping package="tb2014.domain.order">
 	<class name="OrderStatus" table="orderstatus">
-		<id name="id" column="id">
+		<id name="id">
 			<generator class="identity" />
 		</id>
 		<many-to-one name="order" class="tb2014.domain.order.Order">
@@ -16,6 +16,6 @@
 				<param name="enumClass">tb2014.domain.order.OrderStatusType</param>
 			</type>
 		</property>
-		<property name="date" type="java.util.Date" />
+		<property name="date" />
 	</class>
 </hibernate-mapping>

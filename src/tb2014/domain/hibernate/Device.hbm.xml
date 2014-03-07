@@ -8,7 +8,7 @@
 		<id name="id">
 			<generator class="identity" />
 		</id>
-		<property name="apiId" type="java.lang.String" unique-key="device_uk1" />
-		<property name="phone" type="java.lang.String" />
+		<property name="apiId" unique-key="device_uk1" />
+		<property name="phone" />
 	</class>
 </hibernate-mapping>

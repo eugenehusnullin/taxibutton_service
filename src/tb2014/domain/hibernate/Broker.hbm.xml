@@ -8,7 +8,7 @@
 		<id name="id">
 			<generator class="identity" />
 		</id>
-		<property name="uuid" type="java.lang.String" unique-key="broker_uk3" />
+		<property name="uuid" unique-key="broker_uk3" />
 		<property name="apiId" length="20" unique-key="broker_uk1" />
 		<property name="apiKey" length="20" unique-key="broker_uk2" />
 		<property name="name" length="100" />
