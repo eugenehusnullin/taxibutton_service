@@ -53,35 +53,28 @@ public class OrderStatusDao implements IOrderStatusDao {
 		sessionFactory.getCurrentSession().saveOrUpdate(orderStatus);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public OrderStatus getLast(Order order) {
 
-		List<OrderStatus> statusList = sessionFactory.getCurrentSession()
-				.createCriteria(OrderStatus.class)
-				.addOrder(org.hibernate.criterion.Order.desc("date")).list();
-
-		if (statusList.size() != 0) {
-			return statusList.get(0);
-		} else {
-			return null;
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public OrderStatus getLastWithChilds(Order order) {
-
-		List<OrderStatus> statusList = sessionFactory.getCurrentSession()
+		OrderStatus lastStatus = (OrderStatus) sessionFactory.getCurrentSession()
 				.createCriteria(OrderStatus.class)
 				.add(Restrictions.eq("order", order))
 				.addOrder(org.hibernate.criterion.Order.desc("date"))
-				.setFetchMode("order", FetchMode.JOIN).list();
+				.setMaxResults(1).uniqueResult();
 
-		if (statusList.size() != 0) {
-			return statusList.get(0);
-		} else {
-			return null;
-		}
+		return lastStatus;
+	}
+
+	@Override
+	public OrderStatus getLastWithChilds(Order order) {
+
+		OrderStatus lastStatus = (OrderStatus) sessionFactory.getCurrentSession()
+				.createCriteria(OrderStatus.class)
+				.add(Restrictions.eq("order", order))
+				.addOrder(org.hibernate.criterion.Order.desc("date"))
+				.setFetchMode("order", FetchMode.JOIN)
+				.setMaxResults(1).uniqueResult();
+
+		return lastStatus;
 	}
 }
