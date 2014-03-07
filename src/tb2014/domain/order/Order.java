@@ -8,7 +8,6 @@ import java.util.Set;
 
 import tb2014.domain.Broker;
 import tb2014.domain.Device;
-import tb2014.domain.order.AddressPoint;
 
 public class Order {
 
@@ -28,6 +27,9 @@ public class Order {
 	private Set<GeoData> geoData;
 	private Set<Broker> offerBrokerList;
 	private VehicleClass orderVehicleClass;
+	
+	// don't persistent fields
+	private Date startOffer;
 
 	public Long getId() {
 		return id;
@@ -184,5 +186,13 @@ public class Order {
 
 	public void setOfferBrokerList(Set<Broker> offerBrokerList) {
 		this.offerBrokerList = offerBrokerList;
+	}
+
+	public Date getStartOffer() {
+		return startOffer;
+	}
+
+	public void setStartOffer(Date startOffer) {
+		this.startOffer = startOffer;
 	}
 }

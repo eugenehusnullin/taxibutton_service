@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -113,16 +114,17 @@ public class OrderController {
 					responseJson.put("status", "ok");
 					responseJson.put("orderId", order.getUuid().toString());
 					response.setStatus(200);
+
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.MINUTE, 1);
+					order.setStartOffer(cal.getTime());
+					offerOrderProcessing.addOrder(order);
 				}
 
 				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 				outputStream.writeBytes(responseJson.toString());
 				outputStream.flush();
 				outputStream.close();
-
-				if (order != null) {
-					offerOrderProcessing.addOrder(order);
-				}
 			} else {
 				response.setStatus(403);
 			}
@@ -374,8 +376,7 @@ public class OrderController {
 					Date date = null;
 
 					try {
-						date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-								.parse(jsonObject.getString("lastDate"));
+						date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(jsonObject.getString("lastDate"));
 					} catch (JSONException e) {
 						System.out.println(e.toString());
 					} catch (ParseException e) {

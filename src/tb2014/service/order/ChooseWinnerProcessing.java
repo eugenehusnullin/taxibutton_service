@@ -8,42 +8,46 @@ import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tb2014.business.IOrderAcceptAlacrityBusiness;
+import tb2014.business.impl.OrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderStatus;
+import tb2014.domain.order.OrderStatusType;
+import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service
 public class ChooseWinnerProcessing {
+	private static final Logger log = LoggerFactory.getLogger(ChooseWinnerProcessing.class);
 
 	class RecieverOrderRunnable implements Runnable {
 		@Override
 		public void run() {
 			while (processing) {
-				Order order = null;
-				synchronized (queue) {
-					order = queue.poll();
-					if (order == null) {
-						try {
-							queue.wait();
-						} catch (InterruptedException e) {
-							break;
+				try {
+					Order order = null;
+					synchronized (queue) {
+						if (queue.isEmpty()) {
+							try {
+								queue.wait();
+							} catch (InterruptedException e) {
+								break;
+							}
 						}
-					}
-				}
-
-				if (order != null) {
-					boolean canceled = false;
-					synchronized (canceledQueue) {
-						canceled = canceledQueue.remove(order);
+						order = queue.poll();
 					}
 
-					if (!canceled) {
+					if (order != null) {
 						ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(order);
 						executor.execute(chooseWinnerRunnable);
 					}
+				} catch (Exception e) {
+					log.error("ChooseWinnerProcessing exception in RecieverOrderRunnable.", e);
 				}
 			}
 		}
@@ -58,9 +62,16 @@ public class ChooseWinnerProcessing {
 
 		@Override
 		public void run() {
-			boolean success = false;
-			Broker winner = alacrityBuiness.getWinner(order);
+			// check right status
+			OrderStatus orderStatus = orderStatusBusiness.getLast(order);
+			if (orderStatus.getStatus() == OrderStatusType.Cancelled
+					|| orderStatus.getStatus() == OrderStatusType.Failed) {
+				return;
+			}
 
+			
+			Broker winner = alacrityBuiness.getWinner(order);
+			boolean success = false;
 			if (winner != null) {
 				success = orderProcessing.giveOrder(order.getId(), winner.getId());
 			}
@@ -79,26 +90,29 @@ public class ChooseWinnerProcessing {
 	}
 
 	private Queue<Order> queue;
-	private Queue<Order> canceledQueue;
 	private Thread mainThread;
 	private boolean processing = true;
 	private ExecutorService executor;
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;
+	private OrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
-	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing) {
+	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing,
+			OrderStatusBusiness orderStatusBusiness) {
 		this.alacrityBuiness = alacrityBuiness;
 		this.orderProcessing = orderProcessing;
+		this.orderStatusBusiness = orderStatusBusiness;
+
 		queue = new ArrayDeque<Order>();
-		canceledQueue = new ArrayDeque<Order>();
-		executor = Executors.newFixedThreadPool(5);
+		executor = Executors.newFixedThreadPool(5, new ThreadFactorySecuenceNaming("ChooseWinnerProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct
 	public void startProcessing() {
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);
+		mainThread.setName("ChooseWinnerProcessing MAIN THREAD");
 		mainThread.start();
 	}
 
@@ -117,13 +131,6 @@ public class ChooseWinnerProcessing {
 		synchronized (queue) {
 			queue.add(order);
 			queue.notifyAll();
-		}
-	}
-
-	public void cancelOrder(Order order) {
-		synchronized (canceledQueue) {
-			canceledQueue.add(order);
-			canceledQueue.notifyAll();
 		}
 	}
 }
