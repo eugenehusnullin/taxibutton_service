@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tb2014.business.IOrderAcceptAlacrityBusiness;
-import tb2014.business.impl.OrderStatusBusiness;
+import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
@@ -95,11 +95,11 @@ public class ChooseWinnerProcessing {
 	private ExecutorService executor;
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;
-	private OrderStatusBusiness orderStatusBusiness;
+	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
 	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing,
-			OrderStatusBusiness orderStatusBusiness) {
+			IOrderStatusBusiness orderStatusBusiness) {
 		this.alacrityBuiness = alacrityBuiness;
 		this.orderProcessing = orderProcessing;
 		this.orderStatusBusiness = orderStatusBusiness;
