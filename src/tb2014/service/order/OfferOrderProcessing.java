@@ -1,6 +1,7 @@
 package tb2014.service.order;
 
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,7 +12,10 @@ import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tb2014.business.impl.OrderStatusBusiness;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderStatus;
+import tb2014.domain.order.OrderStatusType;
 
 @Service()
 public class OfferOrderProcessing {
@@ -49,6 +53,21 @@ public class OfferOrderProcessing {
 
 		@Override
 		public void run() {
+			Date currentDatetime = new Date();
+			if (order.getStartOffer().after(currentDatetime)) {
+				long diff = currentDatetime.getTime() - order.getStartOffer().getTime();
+				try {
+					Thread.sleep(diff);
+				} catch (InterruptedException e) {
+					return;
+				}
+			}
+
+			OrderStatus orderStatus = orderStatusBusiness.getLast(order);
+			if (orderStatus.getStatus() != OrderStatusType.Created) {
+				return;
+			}
+
 			boolean offered = orderProcessing.offerOrder(order);
 
 			if (offered) {
@@ -72,11 +91,14 @@ public class OfferOrderProcessing {
 	private ExecutorService executor;
 	private OrderProcessing orderProcessing;
 	private ChooseWinnerProcessing chooseWinnerProcessing;
+	private OrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
-	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing) {
+	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing,
+			OrderStatusBusiness orderStatusBusiness) {
 		this.orderProcessing = orderProcessing;
 		this.chooseWinnerProcessing = chooseWinnerProcessing;
+		this.orderStatusBusiness = orderStatusBusiness;
 
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(5);
