@@ -113,7 +113,7 @@ public class OfferOrderProcessing {
 		this.orderStatusBusiness = orderStatusBusiness;
 
 		queue = new ArrayDeque<Order>();
-		executor = Executors.newFixedThreadPool(5, new ThreadFactorySecuenceNaming("OfferOrderProcessing EXECUTOR #"));
+		executor = Executors.newFixedThreadPool(30, new ThreadFactorySecuenceNaming("OfferOrderProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct

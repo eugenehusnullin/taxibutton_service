@@ -1,6 +1,8 @@
 package tb2014.service.order;
 
 import java.util.ArrayDeque;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,7 +71,6 @@ public class ChooseWinnerProcessing {
 				return;
 			}
 
-			
 			Broker winner = alacrityBuiness.getWinner(order);
 			boolean success = false;
 			if (winner != null) {
@@ -77,13 +78,26 @@ public class ChooseWinnerProcessing {
 			}
 
 			if (!success) {
-				try {
-					Thread.sleep(5000);
-					synchronized (queue) {
-						queue.add(order);
-						queue.notifyAll();
+				// check date supply for obsolete order
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(order.getSupplyDate());
+				cal.add(Calendar.MINUTE, 15);
+				if ((new Date()).after(cal.getTime())) {
+					OrderStatus failedStatus = new OrderStatus();
+					failedStatus.setDate(new Date());
+					failedStatus.setOrder(order);
+					failedStatus.setStatus(OrderStatusType.Failed);
+
+					orderStatusBusiness.save(failedStatus);
+				} else {
+					try {
+						Thread.sleep(5000);
+						synchronized (queue) {
+							queue.add(order);
+							queue.notifyAll();
+						}
+					} catch (InterruptedException e) {
 					}
-				} catch (InterruptedException e) {
 				}
 			}
 		}
@@ -105,7 +119,8 @@ public class ChooseWinnerProcessing {
 		this.orderStatusBusiness = orderStatusBusiness;
 
 		queue = new ArrayDeque<Order>();
-		executor = Executors.newFixedThreadPool(5, new ThreadFactorySecuenceNaming("ChooseWinnerProcessing EXECUTOR #"));
+		executor = Executors.newFixedThreadPool(30,
+				new ThreadFactorySecuenceNaming("ChooseWinnerProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct
