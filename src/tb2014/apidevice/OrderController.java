@@ -284,7 +284,7 @@ public class OrderController {
 
 						// no alacrities
 						if (orderAcceptAlacrityBusiness.getAll(order).size() == 0) {
-							statusJson.put("status", "Created");
+							statusJson.put("status", status.getStatus().toString());
 						} else {// there are any alacrities
 							statusJson.put("status", "Prepared");
 						}
