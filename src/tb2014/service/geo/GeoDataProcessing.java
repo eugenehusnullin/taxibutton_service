@@ -62,7 +62,7 @@ public class GeoDataProcessing {
 						}
 					}
 				} catch (Exception e) {
-					log.error(e.toString());
+					log.error("GeoDataProcessing exception in ProcessingRunnable.", e);
 				}
 			}
 		}
@@ -85,6 +85,7 @@ public class GeoDataProcessing {
 	public void startProcessing() {
 		Runnable processRunnable = new ProcessingRunnable();
 		mainThread = new Thread(processRunnable);
+		mainThread.setName("GeoDataProcessing THREAD");
 		mainThread.start();
 	}
 

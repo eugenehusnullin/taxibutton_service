@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,29 +18,35 @@ import tb2014.business.impl.OrderStatusBusiness;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
+import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service()
 public class OfferOrderProcessing {
+	private static final Logger log = LoggerFactory.getLogger(OfferOrderProcessing.class);
 
 	class RecieverOrderRunnable implements Runnable {
 		@Override
 		public void run() {
 			while (processing) {
-				Order order = null;
-				synchronized (queue) {
-					order = queue.poll();
-					if (order == null) {
-						try {
-							queue.wait();
-						} catch (InterruptedException e) {
-							break;
+				try {
+					Order order = null;
+					synchronized (queue) {
+						if (queue.isEmpty()) {
+							try {
+								queue.wait();
+							} catch (InterruptedException e) {
+								break;
+							}
 						}
+						order = queue.poll();
 					}
-				}
 
-				if (order != null) {
-					OfferOrderRunnable offerOrderRunnable = new OfferOrderRunnable(order);
-					executor.execute(offerOrderRunnable);
+					if (order != null) {
+						OfferOrderRunnable offerOrderRunnable = new OfferOrderRunnable(order);
+						executor.execute(offerOrderRunnable);
+					}
+				} catch (Exception e) {
+					log.error("OfferOrderProcessing exception in RecieverOrderRunnable.", e);
 				}
 			}
 		}
@@ -53,6 +61,8 @@ public class OfferOrderProcessing {
 
 		@Override
 		public void run() {
+
+			// do pause before offer, maybe client canceled order
 			Date currentDatetime = new Date();
 			if (order.getStartOffer().after(currentDatetime)) {
 				long diff = currentDatetime.getTime() - order.getStartOffer().getTime();
@@ -63,11 +73,13 @@ public class OfferOrderProcessing {
 				}
 			}
 
+			// check right status
 			OrderStatus orderStatus = orderStatusBusiness.getLast(order);
 			if (orderStatus.getStatus() != OrderStatusType.Created) {
 				return;
 			}
 
+			// do offer
 			boolean offered = orderProcessing.offerOrder(order);
 
 			if (offered) {
@@ -101,13 +113,14 @@ public class OfferOrderProcessing {
 		this.orderStatusBusiness = orderStatusBusiness;
 
 		queue = new ArrayDeque<Order>();
-		executor = Executors.newFixedThreadPool(5);
+		executor = Executors.newFixedThreadPool(5, new ThreadFactorySecuenceNaming("OfferOrderProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct
 	public void startProcessing() {
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);
+		mainThread.setName("OfferOrderProcessing MAIN THREAD");
 		mainThread.start();
 	}
 
