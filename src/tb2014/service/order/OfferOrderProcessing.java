@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import tb2014.business.impl.OrderStatusBusiness;
+import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
@@ -103,11 +103,11 @@ public class OfferOrderProcessing {
 	private ExecutorService executor;
 	private OrderProcessing orderProcessing;
 	private ChooseWinnerProcessing chooseWinnerProcessing;
-	private OrderStatusBusiness orderStatusBusiness;
+	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
 	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing,
-			OrderStatusBusiness orderStatusBusiness) {
+			IOrderStatusBusiness orderStatusBusiness) {
 		this.orderProcessing = orderProcessing;
 		this.chooseWinnerProcessing = chooseWinnerProcessing;
 		this.orderStatusBusiness = orderStatusBusiness;
