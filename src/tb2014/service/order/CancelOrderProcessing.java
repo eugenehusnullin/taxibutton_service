@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tb2014.domain.order.OrderCancel;
+import tb2014.service.order.OfferOrderProcessing.OfferOrderRunnable;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service
@@ -24,22 +25,48 @@ public class CancelOrderProcessing {
 
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
-			
+			while (processing) {
+				try {
+					OrderCancel cancelOrder = null;
+					synchronized (queue) {
+						if (queue.isEmpty()) {
+							try {
+								queue.wait();
+							} catch (InterruptedException ex) {
+								break;
+							}
+						}
+						cancelOrder = queue.poll();
+					}
+
+					if (cancelOrder != null) {
+						CancelOrderRunnable offerOrderRunnable = new CancelOrderRunnable(cancelOrder);
+						executor.execute(offerOrderRunnable);
+					}
+				} catch (Exception ex) {
+					log.error("CancelOrderProcessing exception in RecieverOrderRunnable.", ex);
+				}
+			}
+
+		}
+
+	}
+
+	class CancelOrderRunnable implements Runnable {
+		private OrderCancel orderCancel;
+		
+		public CancelOrderRunnable(OrderCancel orderCancel) {
+			this.orderCancel = orderCancel;
 		}
 		
-	}
-	
-	class CancelOrderRunnable implements Runnable {
-
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	}
-	
+
 	class ProcessingRunnable implements Runnable {
 		@Override
 		public void run() {

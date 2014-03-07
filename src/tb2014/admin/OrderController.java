@@ -492,7 +492,7 @@ public class OrderController {
 
 		String[] brokers = request.getParameterValues("brokers");
 
-		orderJson.put("vehicleClass", "Standard");
+		orderJson.put("vehicleClass", request.getParameter("vehicleClass"));
 		orderJson.put("brokers", brokers);
 
 		createOrderJson.put("order", orderJson);
