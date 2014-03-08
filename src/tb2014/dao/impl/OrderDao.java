@@ -96,34 +96,16 @@ public class OrderDao implements IOrderDao {
 	@Override
 	public List<Order> getAllWithParams(String orderField, String orderDirection, int start, int count) {
 
+		org.hibernate.criterion.Order orderBy;
 		if (orderDirection.equals("asc")) {
-
-			if (orderField.equals("supplyDate")) {
-				return sessionFactory.getCurrentSession().createCriteria(Order.class)
-						.addOrder(org.hibernate.criterion.Order.asc(orderField))
-						.addOrder(org.hibernate.criterion.Order.asc("supplyHour"))
-						.addOrder(org.hibernate.criterion.Order.asc("supplyMin")).setFirstResult(start)
-						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
-			} else {
-				return sessionFactory.getCurrentSession().createCriteria(Order.class)
-						.addOrder(org.hibernate.criterion.Order.asc(orderField)).setFirstResult(start)
-						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
-			}
+			orderBy = org.hibernate.criterion.Order.asc(orderField);
 		} else {
-
-			if (orderField.equals("supplyDate")) {
-
-				return sessionFactory.getCurrentSession().createCriteria(Order.class)
-						.addOrder(org.hibernate.criterion.Order.desc(orderField))
-						.addOrder(org.hibernate.criterion.Order.desc("supplyHour"))
-						.addOrder(org.hibernate.criterion.Order.desc("supplyMin")).setFirstResult(start)
-						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
-			} else {
-				return sessionFactory.getCurrentSession().createCriteria(Order.class)
-						.addOrder(org.hibernate.criterion.Order.desc(orderField)).setFirstResult(start)
-						.setMaxResults(count).setFetchMode("broker", FetchMode.JOIN).list();
-			}
+			orderBy = org.hibernate.criterion.Order.desc(orderField);
 		}
+
+		return sessionFactory.getCurrentSession().createCriteria(Order.class)
+				.addOrder(orderBy).setFirstResult(start).setMaxResults(count)
+				.setFetchMode("broker", FetchMode.JOIN).list();
 	}
 
 	@Override

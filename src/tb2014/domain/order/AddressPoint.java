@@ -1,7 +1,7 @@
 package tb2014.domain.order;
 
-public class AddressPoint {
-	
+public class AddressPoint implements Comparable<AddressPoint> {
+
 	private Long id;
 	private Order order;
 	private double lon;
@@ -14,19 +14,19 @@ public class AddressPoint {
 	private String locality;
 	private String street;
 	private String housing;
-	
+
 	public Long getId() {
 		return id;
 	}
-	
+
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public Order getOrder() {
 		return order;
 	}
-	
+
 	public void setOrder(Order order) {
 		this.order = order;
 	}
@@ -109,5 +109,16 @@ public class AddressPoint {
 
 	public void setIndexNumber(int indexNumber) {
 		this.indexNumber = indexNumber;
+	}
+
+	@Override
+	public int compareTo(AddressPoint ap) {
+		if (indexNumber < ap.indexNumber) {
+			return -1;
+		} else if (indexNumber == ap.indexNumber) {
+			return 0;
+		} else {
+			return 1;
+		}
 	}
 }

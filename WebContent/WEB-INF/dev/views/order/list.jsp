@@ -114,7 +114,7 @@
 			<thead>
 				<tr class="sortableHead">
 					<th><a href="#" id="id">#</a></th>
-					<th><a href="#" id="supplyDate">Time</a></th>
+					<th><a href="#" id="bookingDate">Time</a></th>
 					<th><a href="#" class="notSorted">Source</a></th>
 					<th><a href="#" id="urgent">Urgent</a></th>
 					<th><a href="#" class="notSorted">Broker</a></th>
@@ -127,7 +127,7 @@
 				<c:forEach items="${orders}" var="order">
 					<tr class="infoTr">
 						<td>${order.getId()}</td>
-						<td>${order.getSupplyTime("yyyy-MM-dd HH:mm")}</td>
+						<td>${order.getBookingDate()}</td>
 						<td>${order.getSource().getShortAddress()}</td>
 						<td>${order.getUrgent()}</td>
 						<td>${order.getBroker().getName()}</td>

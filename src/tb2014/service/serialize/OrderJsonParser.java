@@ -2,22 +2,23 @@ package tb2014.service.serialize;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import tb2014.business.IBrokerBusiness;
-import tb2014.domain.Broker;
-import tb2014.domain.order.AddressPoint;
-import tb2014.domain.order.Requirement;
-import tb2014.domain.order.Order;
-import tb2014.domain.order.VehicleClass;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import tb2014.business.IBrokerBusiness;
+import tb2014.domain.Broker;
+import tb2014.domain.order.AddressPoint;
+import tb2014.domain.order.Order;
+import tb2014.domain.order.Requirement;
+import tb2014.domain.order.VehicleClass;
 
 public class OrderJsonParser {
 
@@ -27,7 +28,7 @@ public class OrderJsonParser {
 
 		Boolean urgent = null;
 		String recipientPhone = null;
-		Date supplyDate = null;
+		Date bookingDate = null;
 		int bookingHour = 0;
 		int bookingMinute = 0;
 
@@ -40,9 +41,9 @@ public class OrderJsonParser {
 
 		try {
 
-			String bookingDate = jsonObject.getString("bookingDate");
+			String bookingDateStr = jsonObject.getString("bookingDate");
 			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
-			supplyDate = dateFormatter.parse(bookingDate);
+			bookingDate = dateFormatter.parse(bookingDateStr);
 		} catch (JSONException ex) {
 			return null;
 		} catch (ParseException ex) {
@@ -56,7 +57,15 @@ public class OrderJsonParser {
 			return null;
 		}
 
-		List<AddressPoint> addressPoints = new ArrayList<AddressPoint>();
+		// TODO: need time zone from device
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(bookingDate);
+		cal.set(Calendar.HOUR_OF_DAY, bookingHour);
+		cal.set(Calendar.MINUTE, bookingMinute);
+		cal.set(Calendar.SECOND, 0);
+		bookingDate = cal.getTime();
+
+		SortedSet<AddressPoint> addressPoints = new TreeSet<AddressPoint>();
 		AddressPoint source = new AddressPoint();
 		JSONObject sourceJson = null;
 		Double lon = null;
@@ -214,9 +223,7 @@ public class OrderJsonParser {
 
 		order.setUrgent(urgent);
 		order.setPhone(recipientPhone);
-		order.setSupplyDate(supplyDate);
-		order.setSupplyHour(bookingHour);
-		order.setSupplyMin(bookingMinute);
+		order.setBookingDate(bookingDate);
 		order.setDestinations(addressPoints);
 		order.setRequirements(requirements);
 		order.setOfferBrokerList(offerBrokerList);

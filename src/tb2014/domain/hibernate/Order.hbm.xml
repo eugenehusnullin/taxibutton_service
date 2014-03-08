@@ -13,22 +13,17 @@
 		<property name="uuid" unique-key="order_uk2" />
 		<property name="urgent" />
 		<property name="phone" length="20" />
-		<property name="supplyDate" />
-		<property name="supplyMin" />
-		<property name="supplyHour" />
+		<property name="bookingDate" />
 		<set name="requirements" cascade="all">
 			<key>
 				<column name="orderId" />
 			</key>
 			<one-to-many class="tb2014.domain.order.Requirement" />
 		</set>
-		<list name="destinations" cascade="all" lazy="false">
-			<key>
-				<column name="orderId" />
-			</key>
-			<index column="id" />
+		<set name="destinations" cascade="all" lazy="false" sort="natural">
+			<key column="orderId" />			
 			<one-to-many class="tb2014.domain.order.AddressPoint" />
-		</list>
+		</set>
 		<set name="statuses" cascade="all" lazy="false" order-by="date desc">
 			<key>
 				<column name="orderId" />

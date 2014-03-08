@@ -99,7 +99,7 @@ public class OfferOrderProcessing {
 
 	private Queue<Order> queue;
 	private Thread mainThread;
-	private boolean processing = true;
+	private volatile boolean processing = true;
 	private ExecutorService executor;
 	private OrderProcessing orderProcessing;
 	private ChooseWinnerProcessing chooseWinnerProcessing;

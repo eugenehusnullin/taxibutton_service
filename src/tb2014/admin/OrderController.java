@@ -70,7 +70,7 @@ public class OrderController {
 		int count = 0;
 
 		if (request.getParameter("orderField") == null) {
-			orderField = "supplyDate";
+			orderField = "bookingDate";
 		} else {
 			orderField = request.getParameter("orderField");
 		}

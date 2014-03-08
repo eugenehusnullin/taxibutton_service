@@ -15,9 +15,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import tb2014.business.IDeviceBusiness;
 import tb2014.business.ISimpleTariffBusiness;
+import tb2014.domain.Device;
 import tb2014.domain.tariff.SimpleTariff;
-import tb2014.utils.DeviceUtil;
 import tb2014.utils.NetStreamUtils;
 
 @RequestMapping("/tariff")
@@ -25,13 +26,13 @@ import tb2014.utils.NetStreamUtils;
 public class TariffController {
 
 	private ISimpleTariffBusiness simpleTariffBusiness;
-	private DeviceUtil deviceUtil;
+	private IDeviceBusiness deviceBusiness;
 
 	@Autowired
-	public TariffController(ISimpleTariffBusiness simpleTariffBusiness, DeviceUtil deviceUtil) {
+	public TariffController(ISimpleTariffBusiness simpleTariffBusiness, IDeviceBusiness deviceBusiness) {
 
 		this.simpleTariffBusiness = simpleTariffBusiness;
-		this.deviceUtil = deviceUtil;
+		this.deviceBusiness = deviceBusiness;
 	}
 
 	@RequestMapping(value = "/get", method = RequestMethod.POST)
@@ -52,7 +53,8 @@ public class TariffController {
 				return;
 			}
 
-			if (deviceUtil.checkDevice(apiId)) {
+			Device device = deviceBusiness.get(apiId);
+			if (device != null) {
 
 				List<SimpleTariff> tariffs = simpleTariffBusiness.getAllWithChilds();
 				JSONArray responseJson = new JSONArray();
