@@ -85,6 +85,7 @@ public class CancelOrderProcessing {
 	public void stopProcessing() {
 		processing = false;
 		mainThread.interrupt();
+		executor.shutdown();
 		try {
 			mainThread.join();
 		} catch (InterruptedException e) {
