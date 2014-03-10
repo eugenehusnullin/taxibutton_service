@@ -27,11 +27,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IGeoDataBusiness;
+import tb2014.business.IOfferedOrderBrokerBusiness;
 import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
+import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.order.GeoData;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderCancel;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.order.CancelOrderProcessing;
@@ -56,6 +59,10 @@ public class OrderController {
 	private IOrderAcceptAlacrityBusiness orderAcceptAlacrityBusiness;
 	@Autowired
 	private IGeoDataBusiness geoDataBusiness;
+	@Autowired
+	private IOrderCancelBusiness orderCancelBusiness;
+	@Autowired
+	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 	@Autowired
 	private DeviceUtil deviceUtil;
 	@Autowired
@@ -158,7 +165,6 @@ public class OrderController {
 			String reason = null;
 
 			try {
-
 				orderUuid = cancelOrderJson.getString("orderId");
 				reason = cancelOrderJson.getString("reason");
 			} catch (JSONException ex) {
@@ -219,15 +225,29 @@ public class OrderController {
 				return resultCode;
 			}
 
-			if (status.getStatus() == OrderStatusType.Created || status.getStatus() == OrderStatusType.Taked || status.getStatus() == OrderStatusType.Prepared) {
+			if (status.getStatus() == OrderStatusType.Created || status.getStatus() == OrderStatusType.Taked
+					|| status.getStatus() == OrderStatusType.Prepared) {
 
-				if (orderProcessing.cancelOrder(order, reason)) {
-					resultCode = 200;
-					return resultCode;
-				} else {
-					resultCode = 500;
-					return resultCode;
+				OrderCancel orderCancel = new OrderCancel();
+				orderCancel.setOrder(order);
+				orderCancel.setReason(reason);
+
+				if (offeredOrderBrokerBusiness.size(order) != 0) {
+					cancelorderProcessing.addOrderCancel(orderCancel);
 				}
+
+				orderCancelBusiness.save(orderCancel);
+
+				OrderStatus orderStatus = new OrderStatus();
+
+				orderStatus.setOrder(order);
+				orderStatus.setStatus(OrderStatusType.Cancelled);
+				orderStatus.setDate(new Date());
+
+				orderStatusBusiness.save(orderStatus);
+
+				resultCode = 200;
+				return resultCode;
 			} else {
 				resultCode = 500;
 				return resultCode;

@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -199,14 +198,13 @@ public class OrderProcessing {
 	}
 
 	// cancel order to prepared broker
-	public Boolean cancelPreparedOrder(Order order, String reason) {
+	public Boolean cancelOfferedOrder(Order order, String reason) {
 		Boolean result = true;
-		Set<Broker> brokerList = order.getOfferBrokerList();
+		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerBusiness.get(order);
 		String params = "orderId=" + order.getUuid() + "&reason=" + reason;
 
-		for (Broker currentBroker : brokerList) {
-			String url = currentBroker.getApiurl() + "/cancel";
-
+		for (OfferedOrderBroker currentOffer : offeredBrokerList) {
+			String url = currentOffer.getBroker().getApiurl() + "/cancel";
 			int resultCode = sendHttpGet(url, params);
 
 			if (resultCode != 200) {

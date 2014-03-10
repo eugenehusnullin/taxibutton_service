@@ -3,6 +3,7 @@ package tb2014.dao.impl;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,9 +14,9 @@ import tb2014.domain.order.Order;
 
 @Repository("OfferedOrderBrokerDao")
 public class OfferedOrderBrokerDao implements IOfferedOrderBrokerDao {
-	
+
 	private SessionFactory sessionFactory;
-	
+
 	@Autowired
 	public OfferedOrderBrokerDao(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
@@ -30,8 +31,13 @@ public class OfferedOrderBrokerDao implements IOfferedOrderBrokerDao {
 	@Override
 	public List<OfferedOrderBroker> get(Order order) {
 		return sessionFactory.getCurrentSession().createCriteria(OfferedOrderBroker.class)
-			.add(Restrictions.eq("order", order))
-			.list();
+				.add(Restrictions.eq("order", order)).list();
+	}
+
+	@Override
+	public Long size(Order order) {
+		return (Long) sessionFactory.getCurrentSession().createCriteria(OfferedOrderBroker.class)
+				.add(Restrictions.eq("order", order)).setProjection(Projections.rowCount()).uniqueResult();
 	}
 
 }

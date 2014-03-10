@@ -13,9 +13,9 @@ import tb2014.domain.order.Order;
 
 @Service("OfferedOrderBrokerBusiness")
 public class OfferedOrderBrokerBusiness implements IOfferedOrderBrokerBusiness {
-	
+
 	private IOfferedOrderBrokerDao offeredOrderBrokerDao;
-	
+
 	@Autowired
 	public OfferedOrderBrokerBusiness(IOfferedOrderBrokerDao offeredOrderBrokerDao) {
 		this.offeredOrderBrokerDao = offeredOrderBrokerDao;
@@ -27,10 +27,16 @@ public class OfferedOrderBrokerBusiness implements IOfferedOrderBrokerBusiness {
 		offeredOrderBrokerDao.save(offeredOrderBroker);
 	}
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	@Override
 	public List<OfferedOrderBroker> get(Order order) {
 		return offeredOrderBrokerDao.get(order);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public Long size(Order order) {
+		return offeredOrderBrokerDao.size(order);
 	}
 
 }
