@@ -448,20 +448,23 @@ public class OrderController {
 		orderJson.put("source", sourceJson);
 
 		JSONArray destinationsJson = new JSONArray();
-		JSONObject destinationJson = new JSONObject();
+		JSONObject destinationJson = null;
 
-		destinationJson.put("index", "1");
-		destinationJson.put("lon", request.getParameter("destinationLon"));
-		destinationJson.put("lat", request.getParameter("destinationLat"));
-		destinationJson.put("fullAddress", request.getParameter("dFullAddress"));
-		destinationJson.put("shortAddress", request.getParameter("dShortAddress"));
-		destinationJson.put("closestStation", request.getParameter("dClosestStation"));
-		destinationJson.put("country", request.getParameter("dCountry"));
-		destinationJson.put("locality", request.getParameter("dLocality"));
-		destinationJson.put("street", request.getParameter("dStreet"));
-		destinationJson.put("housing", request.getParameter("dHousing"));
+		if (!request.getParameter("dFullAddress").isEmpty()) {
+			destinationJson = new JSONObject();
 
-		destinationsJson.put(destinationJson);
+			destinationJson.put("index", "1");
+			destinationJson.put("lon", request.getParameter("destinationLon"));
+			destinationJson.put("lat", request.getParameter("destinationLat"));
+			destinationJson.put("fullAddress", request.getParameter("dFullAddress"));
+			destinationJson.put("shortAddress", request.getParameter("dShortAddress"));
+			destinationJson.put("closestStation", request.getParameter("dClosestStation"));
+			destinationJson.put("country", request.getParameter("dCountry"));
+			destinationJson.put("locality", request.getParameter("dLocality"));
+			destinationJson.put("street", request.getParameter("dStreet"));
+			destinationJson.put("housing", request.getParameter("dHousing"));
+			destinationsJson.put(destinationJson);
+		}
 
 		orderJson.put("destinations", destinationsJson);
 		orderJson.put("urgent", request.getParameter("orderType"));

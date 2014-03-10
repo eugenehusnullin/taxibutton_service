@@ -1,6 +1,7 @@
 package tb2014.apidevice;
 
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -453,7 +454,7 @@ public class OrderController {
 		String line = null;
 
 		try {
-			BufferedReader bufferedReader = request.getReader();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
 
 			while ((line = bufferedReader.readLine()) != null) {
 				stringBuffer.append(line);
