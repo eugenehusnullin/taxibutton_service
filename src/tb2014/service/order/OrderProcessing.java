@@ -198,6 +198,7 @@ public class OrderProcessing {
 	}
 
 	// cancel order to prepared broker
+	@Transactional
 	public Boolean cancelOfferedOrder(Order order, String reason) {
 		Boolean result = true;
 		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerBusiness.get(order);
