@@ -80,7 +80,7 @@ public class ChooseWinnerProcessing {
 			if (!success) {
 				// check date supply for obsolete order
 				Calendar cal = Calendar.getInstance();
-				cal.setTime(order.getSupplyDate());
+				cal.setTime(order.getBookingDate());
 				cal.add(Calendar.MINUTE, 15);
 				if ((new Date()).after(cal.getTime())) {
 					OrderStatus failedStatus = new OrderStatus();
@@ -105,7 +105,7 @@ public class ChooseWinnerProcessing {
 
 	private Queue<Order> queue;
 	private Thread mainThread;
-	private boolean processing = true;
+	private volatile boolean processing = true;
 	private ExecutorService executor;
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;

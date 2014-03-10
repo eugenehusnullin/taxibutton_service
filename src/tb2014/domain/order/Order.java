@@ -1,10 +1,8 @@
 package tb2014.domain.order;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import tb2014.domain.Broker;
 import tb2014.domain.Device;
@@ -16,18 +14,16 @@ public class Order {
 	private Device device;
 	private Boolean urgent;
 	private String phone;
-	private Date supplyDate;
-	private int supplyHour;
-	private int supplyMin;
+	private Date bookingDate;
 	private Broker broker;
-	private List<AddressPoint> destinations;
+	private SortedSet<AddressPoint> destinations;
 	private Set<Requirement> requirements;
 	private Set<OrderStatus> statuses;
 	private Set<OrderCancel> orderCancel;
 	private Set<GeoData> geoData;
 	private Set<Broker> offerBrokerList;
 	private VehicleClass orderVehicleClass;
-	
+
 	// don't persistent fields
 	private Date startOffer;
 
@@ -47,46 +43,6 @@ public class Order {
 		this.phone = phone;
 	}
 
-	public Date getSupplyDate() {
-		return supplyDate;
-	}
-
-	public void setSupplyDate(Date supplyDate) {
-		this.supplyDate = supplyDate;
-	}
-
-	public int getSupplyHour() {
-		return supplyHour;
-	}
-
-	public void setSupplyHour(int supplyHour) {
-		this.supplyHour = supplyHour;
-	}
-
-	public int getSupplyMin() {
-		return supplyMin;
-	}
-
-	public void setSupplyMin(int supplyMin) {
-		this.supplyMin = supplyMin;
-	}
-
-	public Date getSupplyTime() {
-
-		Date result = new Date();
-		result.setTime(this.supplyDate.getTime() + this.supplyHour * 3600000 + this.supplyMin * 60000);
-
-		return result;
-	}
-
-	public String getSupplyTime(String format) {
-
-		DateFormat df = new SimpleDateFormat(format);
-		String result = df.format(this.getSupplyTime());
-
-		return result;
-	}
-
 	public Broker getBroker() {
 		return broker;
 	}
@@ -95,11 +51,11 @@ public class Order {
 		this.broker = broker;
 	}
 
-	public List<AddressPoint> getDestinations() {
+	public SortedSet<AddressPoint> getDestinations() {
 		return destinations;
 	}
 
-	public void setDestinations(List<AddressPoint> destinations) {
+	public void setDestinations(SortedSet<AddressPoint> destinations) {
 		this.destinations = destinations;
 	}
 
@@ -194,5 +150,13 @@ public class Order {
 
 	public void setStartOffer(Date startOffer) {
 		this.startOffer = startOffer;
+	}
+
+	public Date getBookingDate() {
+		return bookingDate;
+	}
+
+	public void setBookingDate(Date bookingDate) {
+		this.bookingDate = bookingDate;
 	}
 }

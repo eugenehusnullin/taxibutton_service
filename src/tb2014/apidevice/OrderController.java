@@ -26,12 +26,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import tb2014.business.IBrokerBusiness;
+import tb2014.business.IDeviceBusiness;
 import tb2014.business.IGeoDataBusiness;
 import tb2014.business.IOfferedOrderBrokerBusiness;
 import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
+import tb2014.domain.Device;
 import tb2014.domain.order.GeoData;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderCancel;
@@ -41,7 +43,6 @@ import tb2014.service.order.CancelOrderProcessing;
 import tb2014.service.order.OfferOrderProcessing;
 import tb2014.service.order.OrderProcessing;
 import tb2014.service.serialize.OrderJsonParser;
-import tb2014.utils.DeviceUtil;
 
 @RequestMapping("/order")
 @Controller("apiDeviceOrderController")
@@ -58,19 +59,19 @@ public class OrderController {
 	@Autowired
 	private IOrderAcceptAlacrityBusiness orderAcceptAlacrityBusiness;
 	@Autowired
-	private IGeoDataBusiness geoDataBusiness;
+	private IGeoDataBusiness geoDataBusiness;	
 	@Autowired
 	private IOrderCancelBusiness orderCancelBusiness;
 	@Autowired
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
-	@Autowired
-	private DeviceUtil deviceUtil;
 	@Autowired
 	private OrderProcessing orderProcessing;
 	@Autowired
 	private OfferOrderProcessing offerOrderProcessing;
 	@Autowired
 	private CancelOrderProcessing cancelorderProcessing;
+	@Autowired
+	private IDeviceBusiness deviceBusiness;
 
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -94,7 +95,8 @@ public class OrderController {
 				return;
 			}
 
-			if (deviceUtil.checkDevice(apiId)) {
+			Device device = deviceBusiness.get(apiId);
+			if (device != null) {
 
 				JSONObject orderObject = createOrderObject.getJSONObject("order");
 				JSONObject responseJson = new JSONObject();
@@ -107,7 +109,7 @@ public class OrderController {
 					response.setStatus(403);
 				} else {
 
-					deviceUtil.assignDevice(apiId, order);
+					order.setDevice(device);
 					order.setUuid(UUID.randomUUID().toString());
 					orderBusiness.saveNewOrder(order);
 
@@ -205,8 +207,8 @@ public class OrderController {
 	private int cancelAction(Order order, String reason, String apiId) {
 
 		int resultCode = 0;
-
-		if (deviceUtil.checkDevice(apiId)) {
+		Device device = deviceBusiness.get(apiId);
+		if (device != null) {
 
 			if (order == null) {
 				resultCode = 404;
@@ -277,7 +279,8 @@ public class OrderController {
 				return;
 			}
 
-			if (deviceUtil.checkDevice(apiId)) {
+			Device device = deviceBusiness.get(apiId);
+			if (device != null) {
 
 				String orderUuid = null;
 
@@ -358,7 +361,8 @@ public class OrderController {
 				return;
 			}
 
-			if (deviceUtil.checkDevice(apiId)) {
+			Device device = deviceBusiness.get(apiId);
+			if (device != null) {
 
 				String orderUuid = null;
 
