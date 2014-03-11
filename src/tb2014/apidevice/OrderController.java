@@ -38,6 +38,7 @@ import tb2014.domain.Device;
 import tb2014.domain.order.GeoData;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderCancel;
+import tb2014.domain.order.OrderCancelType;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.order.CancelOrderProcessing;
@@ -60,7 +61,7 @@ public class OrderController {
 	@Autowired
 	private IOrderAcceptAlacrityBusiness orderAcceptAlacrityBusiness;
 	@Autowired
-	private IGeoDataBusiness geoDataBusiness;	
+	private IGeoDataBusiness geoDataBusiness;
 	@Autowired
 	private IOrderCancelBusiness orderCancelBusiness;
 	@Autowired
@@ -235,12 +236,14 @@ public class OrderController {
 				OrderCancel orderCancel = new OrderCancel();
 				orderCancel.setOrder(order);
 				orderCancel.setReason(reason);
+				orderCancelBusiness.save(orderCancel);
 
 				if (offeredOrderBrokerBusiness.count(order) != 0) {
-					cancelorderProcessing.addOrderCancel(orderCancel);
+					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+					orderCancelHolder.setOrder(order);
+					orderCancelHolder.setOrderCancelType(OrderCancelType.User);
+					cancelorderProcessing.addOrderCancel(orderCancelHolder);
 				}
-
-				orderCancelBusiness.save(orderCancel);
 
 				OrderStatus orderStatus = new OrderStatus();
 

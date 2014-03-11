@@ -32,7 +32,7 @@ import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.OfferedOrderBroker;
 import tb2014.domain.order.Order;
-import tb2014.domain.order.OrderCancel;
+import tb2014.domain.order.OrderCancelType;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
@@ -154,57 +154,21 @@ public class OrderProcessing {
 		return result;
 	}
 
-	// cancelling order
-	public Boolean cancelOrder(Order order, String reason) {
-
-		Boolean result = true;
-		Broker broker = order.getBroker();
-
-		// if order is taked by broker
-		if (broker != null) {
-
-			String url = broker.getApiurl() + "/cancel";
-			String params = "orderId=" + order.getUuid() + "&reason=" + reason;
-
-			int resultCode = sendHttpGet(url, params);
-
-			if (resultCode != 200) {
-				result = false;
-				return result;
-			}
-		}
-
-		try {
-			OrderCancel orderCancel = new OrderCancel();
-			orderCancel.setOrder(order);
-			orderCancel.setReason(reason);
-
-			orderCancelBusiness.save(orderCancel);
-
-			OrderStatus orderStatus = new OrderStatus();
-
-			orderStatus.setOrder(order);
-			orderStatus.setStatus(OrderStatusType.Cancelled);
-			orderStatus.setDate(new Date());
-
-			orderStatusBusiness.save(orderStatus);
-		} catch (Exception ex) {
-
-			System.out.println("Error cancelling order: " + ex.toString());
-			return false;
-		}
-
-		return result;
-	}
-
 	// cancel order to prepared broker
 	@Transactional
-	public Boolean cancelOfferedOrder(Order order, String reason) {
+	public Boolean cancelOfferedOrder(CancelOrderProcessing.OrderCancelHolder orderCancelHolder) {
 		Boolean result = true;
-		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerBusiness.get(order);
-		String params = "orderId=" + order.getUuid() + "&reason=" + reason;
+		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerBusiness.get(orderCancelHolder.getOrder());
+		String reason = orderCancelHolder.getOrderCancelType().toString();
+		
+		String params = "orderId=" + orderCancelHolder.getOrder().getUuid() + "&reason=" + reason;
 
 		for (OfferedOrderBroker currentOffer : offeredBrokerList) {
+			if (orderCancelHolder.getOrderCancelType() == OrderCancelType.Assigned && 
+					orderCancelHolder.getOrder().getBroker().getId().equals(currentOffer.getBroker().getId()))
+			{
+				continue;
+			}
 			String url = currentOffer.getBroker().getApiurl() + "/cancel";
 			int resultCode = sendHttpGet(url, params);
 

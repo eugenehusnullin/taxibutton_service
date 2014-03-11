@@ -17,7 +17,7 @@ hibernate.hbm2ddl.auto=create-drop
 
 ; HSQLDB on disk
 jdbc.driverClassName=org.hsqldb.jdbcDriver
-jdbc.url=jdbc:hsqldb:file:D:/hsqldb/tb2014
+jdbc.url=jdbc:hsqldb:file:D:/db_data/hsqldb/tb2014/tb2014
 jdbc.username=sa
 jdbc.password=
 hibernate.dialect=org.hibernate.dialect.HSQLDialect

@@ -19,6 +19,7 @@ import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderCancelType;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.utils.ThreadFactorySecuenceNaming;
@@ -87,8 +88,12 @@ public class ChooseWinnerProcessing {
 					failedStatus.setDate(new Date());
 					failedStatus.setOrder(order);
 					failedStatus.setStatus(OrderStatusType.Failed);
-
 					orderStatusBusiness.save(failedStatus);
+					
+					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+					orderCancelHolder.setOrder(order);
+					orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
+					cancelOrderProcessing.addOrderCancel(orderCancelHolder);
 				} else {
 					try {
 						Thread.sleep(5000);
@@ -99,6 +104,11 @@ public class ChooseWinnerProcessing {
 					} catch (InterruptedException e) {
 					}
 				}
+			} else {
+				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+				orderCancelHolder.setOrder(order);
+				orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
+				cancelOrderProcessing.addOrderCancel(orderCancelHolder);
 			}
 		}
 	}
@@ -110,13 +120,15 @@ public class ChooseWinnerProcessing {
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;
 	private IOrderStatusBusiness orderStatusBusiness;
+	private CancelOrderProcessing cancelOrderProcessing;
 
 	@Autowired
 	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing,
-			IOrderStatusBusiness orderStatusBusiness) {
+			IOrderStatusBusiness orderStatusBusiness, CancelOrderProcessing cancelOrderProcessing) {
 		this.alacrityBuiness = alacrityBuiness;
 		this.orderProcessing = orderProcessing;
 		this.orderStatusBusiness = orderStatusBusiness;
+		this.cancelOrderProcessing = cancelOrderProcessing;
 
 		queue = new ArrayDeque<Order>();
 		executor = Executors.newFixedThreadPool(30,

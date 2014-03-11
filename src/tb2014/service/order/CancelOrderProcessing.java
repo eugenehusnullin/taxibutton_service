@@ -13,19 +13,41 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import tb2014.domain.order.OrderCancel;
+import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderCancelType;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service
 public class CancelOrderProcessing {
 	private static final Logger log = LoggerFactory.getLogger(CancelOrderProcessing.class);
 
+	public static class OrderCancelHolder {
+		private Order order;
+		private OrderCancelType orderCancelType;
+
+		public Order getOrder() {
+			return order;
+		}
+
+		public void setOrder(Order order) {
+			this.order = order;
+		}
+
+		public OrderCancelType getOrderCancelType() {
+			return orderCancelType;
+		}
+
+		public void setOrderCancelType(OrderCancelType orderCancelType) {
+			this.orderCancelType = orderCancelType;
+		}
+	}
+
 	class ReceiverOrderCancelRunnable implements Runnable {
 		@Override
 		public void run() {
 			while (processing) {
 				try {
-					OrderCancel cancelOrder = null;
+					OrderCancelHolder orderCancelHolder = null;
 					synchronized (queue) {
 						if (queue.isEmpty()) {
 							try {
@@ -34,11 +56,11 @@ public class CancelOrderProcessing {
 								break;
 							}
 						}
-						cancelOrder = queue.poll();
+						orderCancelHolder = queue.poll();
 					}
 
-					if (cancelOrder != null) {
-						CancelOrderRunnable offerOrderRunnable = new CancelOrderRunnable(cancelOrder);
+					if (orderCancelHolder != null) {
+						CancelOrderRunnable offerOrderRunnable = new CancelOrderRunnable(orderCancelHolder);
 						executor.execute(offerOrderRunnable);
 					}
 				} catch (Exception ex) {
@@ -49,21 +71,21 @@ public class CancelOrderProcessing {
 	}
 
 	class CancelOrderRunnable implements Runnable {
-		private OrderCancel orderCancel;
+		private OrderCancelHolder orderCancelHolder;
 
-		public CancelOrderRunnable(OrderCancel orderCancel) {
-			this.orderCancel = orderCancel;
+		public CancelOrderRunnable(OrderCancelHolder orderCancelHolder) {
+			this.orderCancelHolder = orderCancelHolder;
 		}
 
 		@Override
 		public void run() {
-			orderProcessing.cancelOfferedOrder(orderCancel.getOrder(), orderCancel.getReason());
+			orderProcessing.cancelOfferedOrder(orderCancelHolder);
 		}
 	}
 
 	@Autowired
 	private OrderProcessing orderProcessing;
-	private Queue<OrderCancel> queue;
+	private Queue<OrderCancelHolder> queue;
 	private Thread mainThread;
 	private ExecutorService executor;
 	private volatile boolean processing;
@@ -71,13 +93,14 @@ public class CancelOrderProcessing {
 	public CancelOrderProcessing() {
 		processing = true;
 		queue = new LinkedList<>();
-		executor = Executors.newFixedThreadPool(5, new ThreadFactorySecuenceNaming("OfferOrderProcessing EXECUTOR #"));
+		executor = Executors.newFixedThreadPool(5, new ThreadFactorySecuenceNaming("CancelOrderProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct
 	public void startProcessing() {
 		Runnable processRunnable = new ReceiverOrderCancelRunnable();
 		mainThread = new Thread(processRunnable);
+		mainThread.setName("CancelOrderProcessing MAIN THREAD");
 		mainThread.start();
 	}
 
@@ -92,9 +115,9 @@ public class CancelOrderProcessing {
 		}
 	}
 
-	public void addOrderCancel(OrderCancel orderCancel) {
+	public void addOrderCancel(OrderCancelHolder orderCancelHolder) {
 		synchronized (queue) {
-			queue.offer(orderCancel);
+			queue.offer(orderCancelHolder);
 			queue.notify();
 		}
 	}
