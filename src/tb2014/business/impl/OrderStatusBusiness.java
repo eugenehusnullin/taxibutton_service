@@ -23,20 +23,8 @@ public class OrderStatusBusiness implements IOrderStatusBusiness {
 
 	@Transactional(readOnly = true)
 	@Override
-	public OrderStatus get(Long id) {
-		return orderStatusDao.get(id);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
 	public List<OrderStatus> get(Order order) {
 		return orderStatusDao.get(order);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<OrderStatus> getAll() {
-		return orderStatusDao.getAll();
 	}
 
 	@Transactional
@@ -45,21 +33,9 @@ public class OrderStatusBusiness implements IOrderStatusBusiness {
 		orderStatusDao.save(orderStatus);
 	}
 
-	@Transactional
-	@Override
-	public void saveOrUpdate(OrderStatus orderStatus) {
-		orderStatusDao.saveOrUpdate(orderStatus);
-	}
-
 	@Transactional(readOnly = true)
 	@Override
 	public OrderStatus getLast(Order order) {
 		return orderStatusDao.getLast(order);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public OrderStatus getLastWithChilds(Order order) {
-		return orderStatusDao.getLastWithChilds(order);
 	}
 }

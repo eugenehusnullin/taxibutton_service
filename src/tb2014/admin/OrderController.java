@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,25 +43,20 @@ import tb2014.domain.order.OrderStatus;
 @Controller("devTestOrderController")
 public class OrderController {
 
+	@Autowired
 	private OrderProcessing orderProcessing;
+	@Autowired
 	private IOrderBusiness orderBusiness;
+	@Autowired
 	private IBrokerBusiness brokerBusiness;
+	@Autowired
 	private IOrderStatusBusiness orderStatusBusiness;
+	@Autowired
 	private IOrderAcceptAlacrityBusiness orderAlacrityBusiness;
+	@Autowired
 	private IGeoDataBusiness geoDataBusiness;
 
-	@Autowired
-	public OrderController(IOrderBusiness orderBusiness, IBrokerBusiness brokerBusiness,
-			IOrderStatusBusiness orderStatusBusiness, IOrderAcceptAlacrityBusiness orderAlacrityBusiness,
-			IGeoDataBusiness geoDataBusiness, OrderProcessing orderProcessing) {
-		this.orderBusiness = orderBusiness;
-		this.brokerBusiness = brokerBusiness;
-		this.orderStatusBusiness = orderStatusBusiness;
-		this.orderProcessing = orderProcessing;
-		this.orderAlacrityBusiness = orderAlacrityBusiness;
-		this.geoDataBusiness = geoDataBusiness;
-	}
-
+	@Transactional
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(HttpServletRequest request, Model model) {
 
@@ -93,7 +89,7 @@ public class OrderController {
 			count = Integer.parseInt(request.getParameter("count"));
 		}
 
-		List<Order> orderList = orderBusiness.getAllWithParams(orderField, orderDirection, start, count);
+		List<Order> orderList = orderBusiness.getPagination(orderField, orderDirection, start, count);
 		Long allOrdersCount = orderBusiness.getAllOrdersCount();
 
 		model.addAttribute("orders", orderList);
@@ -550,10 +546,11 @@ public class OrderController {
 		return "redirect:list";
 	}
 
+	@Transactional
 	@RequestMapping(value = "/send", method = RequestMethod.GET)
 	public String send(@RequestParam("id") Long orderId, Model model) {
 
-		orderProcessing.offerOrder(orderBusiness.getWithChilds(orderId));
+		orderProcessing.offerOrder(orderBusiness.get(orderId));
 
 		return "redirect:list";
 	}

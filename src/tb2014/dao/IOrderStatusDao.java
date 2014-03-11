@@ -7,17 +7,9 @@ import tb2014.domain.order.OrderStatus;
 
 public interface IOrderStatusDao {
 
-	OrderStatus get(Long id);
-
 	List<OrderStatus> get(Order order);
 
 	OrderStatus getLast(Order order);
-	
-	OrderStatus getLastWithChilds(Order order);
-
-	List<OrderStatus> getAll();
 
 	void save(OrderStatus orderStatus);
-
-	void saveOrUpdate(OrderStatus orderStatus);
 }

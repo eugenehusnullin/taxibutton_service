@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.business.IOrderBusiness;
 import tb2014.dao.IOrderDao;
-import tb2014.domain.Device;
-import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
 
 @Service("OrderBusiness")
@@ -26,18 +24,6 @@ public class OrderBusiness implements IOrderBusiness {
 	@Override
 	public Order get(Long id) {
 		return orderDao.get(id);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public Order getWithChilds(Long id) {
-		return orderDao.getWithChilds(id);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<Order> getAll() {
-		return orderDao.getAll();
 	}
 
 	@Transactional
@@ -60,40 +46,14 @@ public class OrderBusiness implements IOrderBusiness {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Order> getAll(Device device) {
-		return orderDao.getAll(device);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public Order get(String uuid) {
+	public Order getByUuid(String uuid) {
 		return orderDao.get(uuid);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public Order getWithChilds(String uuid) {
-		return orderDao.getWithChilds(uuid);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public AddressPoint getSourcePoint(Order order) {
-		return orderDao.getSourcePoint(order);
-	}
-
-	@Transactional
-	@Override
-	public List<Order> getAllWithChilds() {
-		return orderDao.getAllWithChilds();
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<Order> getAllWithParams(String orderField,
-			String orderDirection, int start, int count) {
-		return orderDao.getAllWithParams(orderField, orderDirection, start,
-				count);
+	public List<Order> getPagination(String orderField, String orderDirection, int start, int count) {
+		return orderDao.getPagination(orderField, orderDirection, start, count);
 	}
 
 	@Transactional(readOnly = true)

@@ -41,18 +41,7 @@ public class DeviceDao implements IDeviceDao {
 	}
 
 	@Override
-	public void delete(Device device) {
-		sessionFactory.getCurrentSession().delete(device);
-	}
-
-	@Override
 	public void save(Device device) {
 		sessionFactory.getCurrentSession().save(device);
 	}
-
-	@Override
-	public void saveOrUpdate(Device device) {
-		sessionFactory.getCurrentSession().saveOrUpdate(device);
-	}
-
 }

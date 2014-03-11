@@ -145,6 +145,7 @@ public class OrderController {
 	}
 
 	// cancel order
+	@Transactional
 	@RequestMapping(value = "/cancel", method = RequestMethod.POST)
 	public void cancel(HttpServletRequest request, HttpServletResponse response) {
 
@@ -176,7 +177,7 @@ public class OrderController {
 				return;
 			}
 
-			Order order = orderBusiness.getWithChilds(orderUuid);
+			Order order = orderBusiness.getByUuid(orderUuid);
 
 			if (order == null) {
 				statusCode = 404;
@@ -221,7 +222,7 @@ public class OrderController {
 				return resultCode;
 			}
 
-			OrderStatus status = orderStatusBusiness.getLastWithChilds(order);
+			OrderStatus status = orderStatusBusiness.getLast(order);
 
 			if (status == null) {
 				resultCode = 404;
@@ -235,7 +236,7 @@ public class OrderController {
 				orderCancel.setOrder(order);
 				orderCancel.setReason(reason);
 
-				if (offeredOrderBrokerBusiness.size(order) != 0) {
+				if (offeredOrderBrokerBusiness.count(order) != 0) {
 					cancelorderProcessing.addOrderCancel(orderCancel);
 				}
 
@@ -262,6 +263,7 @@ public class OrderController {
 	}
 
 	// get status of order
+	@Transactional
 	@RequestMapping(value = "/status", method = RequestMethod.POST)
 	public void status(HttpServletRequest request, HttpServletResponse response) {
 
@@ -293,14 +295,14 @@ public class OrderController {
 					return;
 				}
 
-				Order order = orderBusiness.getWithChilds(orderUuid);
+				Order order = orderBusiness.getByUuid(orderUuid);
 
 				if (order == null) {
 					response.setStatus(404);
 					return;
 				}
 
-				OrderStatus status = orderStatusBusiness.getLastWithChilds(order);
+				OrderStatus status = orderStatusBusiness.getLast(order);
 
 				if (status != null) {
 
@@ -345,6 +347,7 @@ public class OrderController {
 	}
 
 	// get order geo data
+	@Transactional
 	@RequestMapping(value = "/geodata", method = RequestMethod.POST)
 	public void geodata(HttpServletRequest request, HttpServletResponse response) {
 
@@ -375,7 +378,7 @@ public class OrderController {
 					return;
 				}
 
-				Order order = orderBusiness.get(orderUuid);
+				Order order = orderBusiness.getByUuid(orderUuid);
 
 				if (order == null) {
 					response.setStatus(404);

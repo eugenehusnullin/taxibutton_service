@@ -24,38 +24,14 @@ public class GeoDataBusiness implements IGeoDataBusiness {
 
 	@Transactional(readOnly = true)
 	@Override
-	public GeoData get(Long id) {
-		return geoDataDao.get(id);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<GeoData> getAll() {
-		return geoDataDao.getAll();
-	}
-
-	@Transactional(readOnly = true)
-	@Override
 	public List<GeoData> getAll(Order order) {
 		return geoDataDao.getAll(order);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public GeoData getLast(Order order) {
-		return geoDataDao.getLast(order);
 	}
 
 	@Transactional
 	@Override
 	public void save(GeoData geoData) {
 		geoDataDao.save(geoData);
-	}
-
-	@Transactional
-	@Override
-	public void saveOrUpdate(GeoData geoData) {
-		geoDataDao.saveOrUpdate(geoData);
 	}
 
 	@Transactional(readOnly = true)

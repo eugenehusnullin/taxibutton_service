@@ -8,5 +8,5 @@ import tb2014.domain.order.Order;
 public interface IOfferedOrderBrokerDao {
 	void save(OfferedOrderBroker offeredOrderBroker);
 	List<OfferedOrderBroker> get(Order order);
-	Long size(Order order);
+	Long count(Order order);
 }

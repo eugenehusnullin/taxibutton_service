@@ -40,19 +40,7 @@ public class DeviceBusiness implements IDeviceBusiness {
 
 	@Transactional
 	@Override
-	public void delete(Device device) {
-		deviceDao.delete(device);
-	}
-
-	@Transactional
-	@Override
 	public void save(Device device) {
-		deviceDao.save(device);
-	}
-
-	@Transactional
-	@Override
-	public void saveOrUpdate(Device device) {
 		deviceDao.save(device);
 	}
 }

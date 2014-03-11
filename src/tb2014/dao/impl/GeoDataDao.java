@@ -22,19 +22,6 @@ public class GeoDataDao implements IGeoDataDao {
 		this.sessionFactory = sessionFactory;
 	}
 
-	@Override
-	public GeoData get(Long id) {
-		return (GeoData) sessionFactory.getCurrentSession().get(GeoData.class,
-				id);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<GeoData> getAll() {
-		return sessionFactory.getCurrentSession().createCriteria(GeoData.class)
-				.list();
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<GeoData> getAll(Order order) {
@@ -43,21 +30,8 @@ public class GeoDataDao implements IGeoDataDao {
 	}
 
 	@Override
-	public GeoData getLast(Order order) {
-		return (GeoData) sessionFactory.getCurrentSession()
-				.createCriteria(GeoData.class)
-				.addOrder(org.hibernate.criterion.Order.desc("data")).list()
-				.get(0);
-	}
-
-	@Override
 	public void save(GeoData geoData) {
 		sessionFactory.getCurrentSession().save(geoData);
-	}
-
-	@Override
-	public void saveOrUpdate(GeoData geoData) {
-		sessionFactory.getCurrentSession().saveOrUpdate(geoData);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -24,32 +24,14 @@ public class OrderAcceptAlacrityBusiness implements IOrderAcceptAlacrityBusiness
 
 	@Transactional(readOnly = true)
 	@Override
-	public OrderAcceptAlacrity get(Long id) {
-		return alacrityDao.get(id);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
 	public OrderAcceptAlacrity get(Order order, Broker broker) {
 		return alacrityDao.get(order, broker);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<OrderAcceptAlacrity> getAll() {
-		return alacrityDao.getAll();
 	}
 
 	@Transactional
 	@Override
 	public void save(OrderAcceptAlacrity alacrity) {
 		alacrityDao.save(alacrity);
-	}
-
-	@Transactional
-	@Override
-	public void saveOrUpdate(OrderAcceptAlacrity alacrity) {
-		alacrityDao.saveOrUpdate(alacrity);
 	}
 
 	@Transactional(readOnly = true)

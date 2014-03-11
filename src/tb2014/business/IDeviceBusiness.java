@@ -12,9 +12,5 @@ public interface IDeviceBusiness {
 
 	public List<Device> getAll();
 
-	public void delete(Device device);
-
 	public void save(Device device);
-
-	public void saveOrUpdate(Device device);
 }

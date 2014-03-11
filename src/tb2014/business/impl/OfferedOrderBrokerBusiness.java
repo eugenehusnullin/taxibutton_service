@@ -35,8 +35,8 @@ public class OfferedOrderBrokerBusiness implements IOfferedOrderBrokerBusiness {
 
 	@Transactional(readOnly = true)
 	@Override
-	public Long size(Order order) {
-		return offeredOrderBrokerDao.size(order);
+	public Long count(Order order) {
+		return offeredOrderBrokerDao.count(order);
 	}
 
 }

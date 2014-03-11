@@ -8,17 +8,11 @@ import tb2014.domain.order.OrderAcceptAlacrity;
 
 public interface IOrderAcceptAlacrityDao {
 
-	OrderAcceptAlacrity get(Long id);
-	
 	OrderAcceptAlacrity get(Order order, Broker broker);
-
-	List<OrderAcceptAlacrity> getAll();
 
 	List<OrderAcceptAlacrity> getAll(Order order);
 
 	void save(OrderAcceptAlacrity alacrity);
-
-	void saveOrUpdate(OrderAcceptAlacrity alacrity);
 
 	Broker getWinner(Order order);
 }

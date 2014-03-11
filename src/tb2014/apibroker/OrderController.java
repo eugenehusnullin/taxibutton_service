@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -45,6 +46,7 @@ public class OrderController {
 	@Autowired
 	private GeoDataProcessing geoDataProcessing;
 
+	@Transactional
 	@RequestMapping(value = "/alacrity", method = RequestMethod.POST)
 	public void alacrity(HttpServletRequest request, HttpServletResponse response) {
 
@@ -59,7 +61,7 @@ public class OrderController {
 			return;
 		}
 
-		Order order = orderBusiness.get(request.getParameter("orderId"));
+		Order order = orderBusiness.getByUuid(request.getParameter("orderId"));
 		if (order == null) {
 			response.setStatus(404);
 			return;
@@ -95,6 +97,7 @@ public class OrderController {
 		response.setStatus(200);
 	}
 
+	@Transactional
 	@RequestMapping(value = "/setStatus", method = RequestMethod.POST)
 	public void setStatus(HttpServletRequest request, HttpServletResponse response) {
 
@@ -104,7 +107,7 @@ public class OrderController {
 			return;
 		}
 
-		Order order = orderBusiness.get(request.getParameter("orderId"));
+		Order order = orderBusiness.getByUuid(request.getParameter("orderId"));
 		if (this.checkOrder(request.getParameter("apiId"), order, broker) == false) {
 			response.setStatus(403);
 			return;
@@ -131,6 +134,7 @@ public class OrderController {
 		response.setStatus(200);
 	}
 
+	@Transactional
 	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
 	public void setGeoData(HttpServletRequest request, HttpServletResponse response) {
 
@@ -140,7 +144,7 @@ public class OrderController {
 			return;
 		}
 
-		Order order = orderBusiness.get(request.getParameter("orderId"));
+		Order order = orderBusiness.getByUuid(request.getParameter("orderId"));
 		if (this.checkOrder(request.getParameter("apiId"), order, broker) == false) {
 			response.setStatus(403);
 			return;

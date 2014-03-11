@@ -2,7 +2,6 @@ package tb2014.dao.impl;
 
 import java.util.List;
 
-import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,6 @@ public class SimpleTariffDao implements ISimpleTariffDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<SimpleTariff> getAllWithChilds() {
-		return sessionFactory.getCurrentSession().createCriteria(SimpleTariff.class)
-				.setFetchMode("broker", FetchMode.JOIN).list();
+		return sessionFactory.getCurrentSession().createCriteria(SimpleTariff.class).list();
 	}
 }

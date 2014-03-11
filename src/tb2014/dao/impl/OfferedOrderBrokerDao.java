@@ -35,7 +35,7 @@ public class OfferedOrderBrokerDao implements IOfferedOrderBrokerDao {
 	}
 
 	@Override
-	public Long size(Order order) {
+	public Long count(Order order) {
 		return (Long) sessionFactory.getCurrentSession().createCriteria(OfferedOrderBroker.class)
 				.add(Restrictions.eq("order", order)).setProjection(Projections.rowCount()).uniqueResult();
 	}

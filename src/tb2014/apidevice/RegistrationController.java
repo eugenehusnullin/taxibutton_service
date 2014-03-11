@@ -22,12 +22,8 @@ import tb2014.utils.NetStreamUtils;
 @Controller("apiDeviceRegistrationController")
 public class RegistrationController {
 
-	private IDeviceBusiness deviceBusiness;
-
 	@Autowired
-	public RegistrationController(IDeviceBusiness deviceBusiness) {
-		this.deviceBusiness = deviceBusiness;
-	}
+	private IDeviceBusiness deviceBusiness;
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public void register(HttpServletRequest request, HttpServletResponse response) {

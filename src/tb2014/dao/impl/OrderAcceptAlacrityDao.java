@@ -23,30 +23,14 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 	}
 
 	@Override
-	public OrderAcceptAlacrity get(Long id) {
-		return (OrderAcceptAlacrity) sessionFactory.getCurrentSession().get(OrderAcceptAlacrity.class, id);
-	}
-
-	@Override
 	public OrderAcceptAlacrity get(Order order, Broker broker) {
 		return (OrderAcceptAlacrity) sessionFactory.getCurrentSession().createCriteria(OrderAcceptAlacrity.class)
 				.add(Restrictions.eq("order", order)).add(Restrictions.eq("broker", broker)).uniqueResult();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<OrderAcceptAlacrity> getAll() {
-		return sessionFactory.getCurrentSession().createCriteria(OrderAcceptAlacrity.class).list();
-	}
-
 	@Override
 	public void save(OrderAcceptAlacrity alacrity) {
 		sessionFactory.getCurrentSession().save(alacrity);
-	}
-
-	@Override
-	public void saveOrUpdate(OrderAcceptAlacrity alacrity) {
-		sessionFactory.getCurrentSession().saveOrUpdate(alacrity);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -25,16 +26,12 @@ import tb2014.utils.NetStreamUtils;
 @Controller("apiDeviceTariffController")
 public class TariffController {
 
+	@Autowired
 	private ISimpleTariffBusiness simpleTariffBusiness;
+	@Autowired
 	private IDeviceBusiness deviceBusiness;
 
-	@Autowired
-	public TariffController(ISimpleTariffBusiness simpleTariffBusiness, IDeviceBusiness deviceBusiness) {
-
-		this.simpleTariffBusiness = simpleTariffBusiness;
-		this.deviceBusiness = deviceBusiness;
-	}
-
+	@Transactional
 	@RequestMapping(value = "/get", method = RequestMethod.POST)
 	public void getAll(HttpServletRequest request, HttpServletResponse response) {
 
