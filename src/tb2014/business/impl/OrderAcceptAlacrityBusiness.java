@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.dao.IOrderAcceptAlacrityDao;
@@ -22,25 +21,21 @@ public class OrderAcceptAlacrityBusiness implements IOrderAcceptAlacrityBusiness
 		this.alacrityDao = alacrityDao;
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public OrderAcceptAlacrity get(Order order, Broker broker) {
 		return alacrityDao.get(order, broker);
 	}
 
-	@Transactional
 	@Override
 	public void save(OrderAcceptAlacrity alacrity) {
 		alacrityDao.save(alacrity);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public List<OrderAcceptAlacrity> getAll(Order order) {
 		return alacrityDao.getAll(order);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public Broker getWinner(Order order) {
 		return alacrityDao.getWinner(order);

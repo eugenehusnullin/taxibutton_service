@@ -94,11 +94,7 @@ public class ChooseWinnerProcessing {
 				cal.setTime(order.getBookingDate());
 				cal.add(Calendar.MINUTE, cancelorderTimeout);
 				if ((new Date()).after(cal.getTime())) {
-					OrderStatus failedStatus = new OrderStatus();
-					failedStatus.setDate(new Date());
-					failedStatus.setOrder(order);
-					failedStatus.setStatus(OrderStatusType.Failed);
-					orderStatusBusiness.save(failedStatus);
+					orderProcessing.OrderTimeout(order);
 
 					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
 					orderCancelHolder.setOrder(order);

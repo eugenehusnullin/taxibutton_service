@@ -218,7 +218,7 @@ public class OrderController {
 		if (device != null) {
 
 			if (order == null) {
-				resultCode = 404;
+				resultCode = 404;	
 				return resultCode;
 			}
 

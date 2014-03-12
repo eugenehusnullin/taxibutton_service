@@ -55,7 +55,13 @@ public class OrderProcessing {
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
+	@Transactional
 	public boolean offerOrder(Order order) {
+		// check right status
+		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
+		if (orderStatus.getStatus() != OrderStatusType.Created) {
+			return false;
+		}
 
 		List<Broker> brokers = brokerBusiness.getAll();
 		Document orderXml = OrderSerializer.OrderToXml(order);
@@ -160,13 +166,12 @@ public class OrderProcessing {
 		Boolean result = true;
 		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerBusiness.get(orderCancelHolder.getOrder());
 		String reason = orderCancelHolder.getOrderCancelType().toString();
-		
+
 		String params = "orderId=" + orderCancelHolder.getOrder().getUuid() + "&reason=" + reason;
 
 		for (OfferedOrderBroker currentOffer : offeredBrokerList) {
-			if (orderCancelHolder.getOrderCancelType() == OrderCancelType.Assigned && 
-					orderCancelHolder.getOrder().getBroker().getId().equals(currentOffer.getBroker().getId()))
-			{
+			if (orderCancelHolder.getOrderCancelType() == OrderCancelType.Assigned
+					&& orderCancelHolder.getOrder().getBroker().getId().equals(currentOffer.getBroker().getId())) {
 				continue;
 			}
 			String url = currentOffer.getBroker().getApiurl() + "/cancel";
@@ -208,7 +213,18 @@ public class OrderProcessing {
 		return responseCode;
 	}
 
+	// set failed status to timeout order
+	@Transactional
+	public void OrderTimeout(Order order) {
+		OrderStatus failedStatus = new OrderStatus();
+		failedStatus.setDate(new Date());
+		failedStatus.setOrder(order);
+		failedStatus.setStatus(OrderStatusType.Failed);
+		orderStatusBusiness.save(failedStatus);
+	}
+	
 	// deleting order with all childs
+	@Transactional
 	public void deleteOrder(Long orderId) {
 
 		Order order = orderBusiness.get(orderId);

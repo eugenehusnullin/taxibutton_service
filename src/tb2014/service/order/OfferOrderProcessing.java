@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.order.Order;
-import tb2014.domain.order.OrderStatus;
-import tb2014.domain.order.OrderStatusType;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service()
@@ -80,12 +77,6 @@ public class OfferOrderProcessing {
 				}
 			}
 
-			// check right status
-			OrderStatus orderStatus = orderStatusBusiness.getLast(order);
-			if (orderStatus.getStatus() != OrderStatusType.Created) {
-				return;
-			}
-
 			// do offer
 			boolean offered = orderProcessing.offerOrder(order);
 
@@ -110,14 +101,11 @@ public class OfferOrderProcessing {
 	private ExecutorService executor;
 	private OrderProcessing orderProcessing;
 	private ChooseWinnerProcessing chooseWinnerProcessing;
-	private IOrderStatusBusiness orderStatusBusiness;
 
 	@Autowired
-	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing,
-			IOrderStatusBusiness orderStatusBusiness) {
+	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing) {
 		this.orderProcessing = orderProcessing;
 		this.chooseWinnerProcessing = chooseWinnerProcessing;
-		this.orderStatusBusiness = orderStatusBusiness;
 
 		queue = new ArrayDeque<Order>();
 	}

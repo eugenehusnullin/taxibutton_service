@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.business.IGeoDataBusiness;
 import tb2014.dao.IGeoDataDao;
@@ -22,19 +21,16 @@ public class GeoDataBusiness implements IGeoDataBusiness {
 		this.geoDataDao = geoDataDao;
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public List<GeoData> getAll(Order order) {
 		return geoDataDao.getAll(order);
 	}
 
-	@Transactional
 	@Override
 	public void save(GeoData geoData) {
 		geoDataDao.save(geoData);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public List<GeoData> getAll(Order order, Date date) {
 		return geoDataDao.getAll(order, date);

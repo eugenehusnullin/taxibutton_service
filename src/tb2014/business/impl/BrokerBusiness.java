@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.business.IBrokerBusiness;
 import tb2014.dao.IBrokerDao;
@@ -20,43 +19,36 @@ public class BrokerBusiness implements IBrokerBusiness {
 		this.brokerDao = brokerDao;
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public Broker getById(Long id) {
 		return brokerDao.get(id);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public List<Broker> getAll() {
 		return brokerDao.getAll();
 	}
 
-	@Transactional
 	@Override
 	public void add(Broker broker) {
 		brokerDao.save(broker);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public Broker getByApiId(String id) {
 		return brokerDao.getByApiId(id);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public Broker get(String uuid) {
 		return brokerDao.get(uuid);
 	}
 
-	@Transactional
 	@Override
 	public void delete(Broker broker) {
 		brokerDao.delete(broker);
 	}
 
-	@Transactional
 	@Override
 	public void saveOrUpdate(Broker broker) {
 		brokerDao.saveOrUpdate(broker);

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.business.IOfferedOrderBrokerBusiness;
 import tb2014.dao.IOfferedOrderBrokerDao;
@@ -21,19 +20,16 @@ public class OfferedOrderBrokerBusiness implements IOfferedOrderBrokerBusiness {
 		this.offeredOrderBrokerDao = offeredOrderBrokerDao;
 	}
 
-	@Transactional
 	@Override
 	public void save(OfferedOrderBroker offeredOrderBroker) {
 		offeredOrderBrokerDao.save(offeredOrderBroker);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public List<OfferedOrderBroker> get(Order order) {
 		return offeredOrderBrokerDao.get(order);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public Long count(Order order) {
 		return offeredOrderBrokerDao.count(order);
