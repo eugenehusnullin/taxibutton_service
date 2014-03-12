@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.business.IOrderStatusBusiness;
 import tb2014.dao.IOrderStatusDao;
@@ -21,19 +20,16 @@ public class OrderStatusBusiness implements IOrderStatusBusiness {
 		this.orderStatusDao = orderStatusDao;
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public List<OrderStatus> get(Order order) {
 		return orderStatusDao.get(order);
 	}
 
-	@Transactional
 	@Override
 	public void save(OrderStatus orderStatus) {
 		orderStatusDao.save(orderStatus);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public OrderStatus getLast(Order order) {
 		return orderStatusDao.getLast(order);

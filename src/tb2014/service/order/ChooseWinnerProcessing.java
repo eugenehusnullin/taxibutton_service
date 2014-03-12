@@ -1,8 +1,6 @@
 package tb2014.service.order;
 
 import java.util.ArrayDeque;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,13 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import tb2014.business.IOrderAcceptAlacrityBusiness;
-import tb2014.business.IOrderStatusBusiness;
-import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
-import tb2014.domain.order.OrderCancelType;
-import tb2014.domain.order.OrderStatus;
-import tb2014.domain.order.OrderStatusType;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service
@@ -75,47 +67,7 @@ public class ChooseWinnerProcessing {
 
 		@Override
 		public void run() {
-			// check right status
-			OrderStatus orderStatus = orderStatusBusiness.getLast(order);
-			if (orderStatus.getStatus() == OrderStatusType.Cancelled
-					|| orderStatus.getStatus() == OrderStatusType.Failed) {
-				return;
-			}
-
-			Broker winner = alacrityBuiness.getWinner(order);
-			boolean success = false;
-			if (winner != null) {
-				success = orderProcessing.giveOrder(order.getId(), winner.getId());
-			}
-
-			if (!success) {
-				// check date supply for obsolete order
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(order.getBookingDate());
-				cal.add(Calendar.MINUTE, cancelorderTimeout);
-				if ((new Date()).after(cal.getTime())) {
-					orderProcessing.OrderTimeout(order);
-
-					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
-					orderCancelHolder.setOrder(order);
-					orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
-					cancelOrderProcessing.addOrderCancel(orderCancelHolder);
-				} else {
-					try {
-						Thread.sleep(repeatPause);
-						synchronized (queue) {
-							queue.add(order);
-							queue.notifyAll();
-						}
-					} catch (InterruptedException e) {
-					}
-				}
-			} else {
-				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
-				orderCancelHolder.setOrder(order);
-				orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
-				cancelOrderProcessing.addOrderCancel(orderCancelHolder);
-			}
+			orderProcessing.chooseWinnerProcessing(order, cancelorderTimeout, repeatPause);
 		}
 	}
 
@@ -123,18 +75,11 @@ public class ChooseWinnerProcessing {
 	private Thread mainThread;
 	private volatile boolean processing = true;
 	private ExecutorService executor;
-	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	private OrderProcessing orderProcessing;
-	private IOrderStatusBusiness orderStatusBusiness;
-	private CancelOrderProcessing cancelOrderProcessing;
 
 	@Autowired
-	public ChooseWinnerProcessing(IOrderAcceptAlacrityBusiness alacrityBuiness, OrderProcessing orderProcessing,
-			IOrderStatusBusiness orderStatusBusiness, CancelOrderProcessing cancelOrderProcessing) {
-		this.alacrityBuiness = alacrityBuiness;
+	public ChooseWinnerProcessing(OrderProcessing orderProcessing) {
 		this.orderProcessing = orderProcessing;
-		this.orderStatusBusiness = orderStatusBusiness;
-		this.cancelOrderProcessing = cancelOrderProcessing;
 
 		queue = new ArrayDeque<Order>();
 	}

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.w3c.dom.Document;
 
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IOfferedOrderBrokerBusiness;
+import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
@@ -52,16 +54,19 @@ public class OrderProcessing {
 	private IOrderStatusBusiness orderStatusBusiness;
 	@Autowired
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
+	@Autowired
+	private IOrderAcceptAlacrityBusiness alacrityBuiness;
+	@Autowired
+	private CancelOrderProcessing cancelOrderProcessing;
+	@Autowired
+	private ChooseWinnerProcessing chooseWinnerProcessing;
+	@Autowired
+	private OfferOrderProcessing offerOrderProcessing;
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
 	@Transactional
 	public boolean offerOrder(Order order) {
-		// check right status
-		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
-		if (orderStatus.getStatus() != OrderStatusType.Created) {
-			return false;
-		}
 
 		List<Broker> brokers = brokerBusiness.getAll();
 		Document orderXml = OrderSerializer.OrderToXml(order);
@@ -213,22 +218,91 @@ public class OrderProcessing {
 		return responseCode;
 	}
 
-	// set failed status to timeout order
-	@Transactional
-	public void OrderTimeout(Order order) {
-		OrderStatus failedStatus = new OrderStatus();
-		failedStatus.setDate(new Date());
-		failedStatus.setOrder(order);
-		failedStatus.setStatus(OrderStatusType.Failed);
-		orderStatusBusiness.save(failedStatus);
-	}
-	
-	// deleting order with all childs
 	@Transactional
 	public void deleteOrder(Long orderId) {
 
 		Order order = orderBusiness.get(orderId);
 
 		orderBusiness.delete(order);
+	}
+
+	// TODO: bad practice
+	@Transactional
+	public void chooseWinnerProcessing(Order order, int cancelorderTimeout, int repeatPause) {
+		// check right status
+		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
+		if (orderStatus.getStatus() == OrderStatusType.Cancelled || orderStatus.getStatus() == OrderStatusType.Failed) {
+			return;
+		}
+
+		Broker winner = alacrityBuiness.getWinner(order);
+		boolean success = false;
+		if (winner != null) {
+			success = giveOrder(order.getId(), winner.getId());
+		}
+
+		if (!success) {
+			// check date supply for obsolete order
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(order.getBookingDate());
+			cal.add(Calendar.MINUTE, cancelorderTimeout);
+			if ((new Date()).after(cal.getTime())) {
+				OrderStatus failedStatus = new OrderStatus();
+				failedStatus.setDate(new Date());
+				failedStatus.setOrder(order);
+				failedStatus.setStatus(OrderStatusType.Failed);
+				orderStatusBusiness.save(failedStatus);
+
+				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+				orderCancelHolder.setOrder(order);
+				orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
+				cancelOrderProcessing.addOrderCancel(orderCancelHolder);
+			} else {
+				try {
+					Thread.sleep(repeatPause);
+					chooseWinnerProcessing.addOrder(order);
+				} catch (InterruptedException e) {
+				}
+			}
+		} else {
+			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+			orderCancelHolder.setOrder(order);
+			orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
+			cancelOrderProcessing.addOrderCancel(orderCancelHolder);
+		}
+	}
+
+	// TODO: bad practice
+	@Transactional
+	public void offerOrderProcessing(Order order, int repeatPause) {
+		// do pause before offer, maybe client canceled order
+		Date currentDatetime = new Date();
+		if (order.getStartOffer().after(currentDatetime)) {
+			long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
+			try {
+				Thread.sleep(diff);
+			} catch (InterruptedException e) {
+				return;
+			}
+		}
+
+		// check right status
+		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
+		if (orderStatus.getStatus() != OrderStatusType.Created) {
+			return;
+		}
+
+		// do offer
+		boolean offered = offerOrder(order);
+
+		if (offered) {
+			chooseWinnerProcessing.addOrder(order);
+		} else {
+			try {
+				Thread.sleep(repeatPause);
+				offerOrderProcessing.addOrder(order);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 }

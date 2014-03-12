@@ -2,7 +2,6 @@ package tb2014.business.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.dao.IOrderCancelDao;
@@ -18,7 +17,6 @@ public class OrderCancelBusiness implements IOrderCancelBusiness {
 		this.orderCancelDao = orderCancelDao;
 	}
 
-	@Transactional
 	@Override
 	public void save(OrderCancel orderCancel) {
 		orderCancelDao.save(orderCancel);
