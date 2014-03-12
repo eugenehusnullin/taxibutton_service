@@ -6,3 +6,4 @@ target/*
 /target
 jdbc.settings
 log4j.properties
+WebContent/WEB-INF/settings/main.settings

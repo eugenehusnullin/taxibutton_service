@@ -21,6 +21,7 @@ import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,9 @@ import tb2014.service.serialize.OrderJsonParser;
 public class OrderController {
 
 	private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+	
+	@Value("#{mainSettings['offerorder.wait.pause']}")
+	private Integer waitPause;
 
 	@Autowired
 	private IOrderBusiness orderBusiness;
@@ -127,7 +131,7 @@ public class OrderController {
 					response.setStatus(200);
 
 					Calendar cal = Calendar.getInstance();
-					cal.add(Calendar.MINUTE, 1);
+					cal.add(Calendar.MINUTE, waitPause);
 					order.setStartOffer(cal.getTime());
 					offerOrderProcessing.addOrder(order);
 				}

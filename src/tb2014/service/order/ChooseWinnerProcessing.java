@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tb2014.business.IOrderAcceptAlacrityBusiness;
@@ -27,6 +28,15 @@ import tb2014.utils.ThreadFactorySecuenceNaming;
 @Service
 public class ChooseWinnerProcessing {
 	private static final Logger log = LoggerFactory.getLogger(ChooseWinnerProcessing.class);
+
+	@Value("#{mainSettings['choosewinner.threads.count']}")
+	private Integer threadsCount;
+
+	@Value("#{mainSettings['choosewinner.repeat.pause']}")
+	private Integer repeatPause;
+
+	@Value("#{mainSettings['choosewinner.cancelorder.timeout']}")
+	private Integer cancelorderTimeout;
 
 	class RecieverOrderRunnable implements Runnable {
 		@Override
@@ -82,21 +92,21 @@ public class ChooseWinnerProcessing {
 				// check date supply for obsolete order
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(order.getBookingDate());
-				cal.add(Calendar.MINUTE, 15);
+				cal.add(Calendar.MINUTE, cancelorderTimeout);
 				if ((new Date()).after(cal.getTime())) {
 					OrderStatus failedStatus = new OrderStatus();
 					failedStatus.setDate(new Date());
 					failedStatus.setOrder(order);
 					failedStatus.setStatus(OrderStatusType.Failed);
 					orderStatusBusiness.save(failedStatus);
-					
+
 					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
 					orderCancelHolder.setOrder(order);
 					orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
 					cancelOrderProcessing.addOrderCancel(orderCancelHolder);
 				} else {
 					try {
-						Thread.sleep(5000);
+						Thread.sleep(repeatPause);
 						synchronized (queue) {
 							queue.add(order);
 							queue.notifyAll();
@@ -131,12 +141,13 @@ public class ChooseWinnerProcessing {
 		this.cancelOrderProcessing = cancelOrderProcessing;
 
 		queue = new ArrayDeque<Order>();
-		executor = Executors.newFixedThreadPool(30,
-				new ThreadFactorySecuenceNaming("ChooseWinnerProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct
 	public void startProcessing() {
+		executor = Executors.newFixedThreadPool(threadsCount, new ThreadFactorySecuenceNaming(
+				"ChooseWinnerProcessing EXECUTOR #"));
+
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);
 		mainThread.setName("ChooseWinnerProcessing MAIN THREAD");

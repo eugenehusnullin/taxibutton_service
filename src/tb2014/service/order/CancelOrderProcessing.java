@@ -11,6 +11,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tb2014.domain.order.Order;
@@ -20,6 +21,9 @@ import tb2014.utils.ThreadFactorySecuenceNaming;
 @Service
 public class CancelOrderProcessing {
 	private static final Logger log = LoggerFactory.getLogger(CancelOrderProcessing.class);
+
+	@Value("#{mainSettings['cancelorder.threads.count']}")
+	private Integer threadsCount;
 
 	public static class OrderCancelHolder {
 		private Order order;
@@ -93,11 +97,13 @@ public class CancelOrderProcessing {
 	public CancelOrderProcessing() {
 		processing = true;
 		queue = new LinkedList<>();
-		executor = Executors.newFixedThreadPool(5, new ThreadFactorySecuenceNaming("CancelOrderProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct
 	public void startProcessing() {
+		executor = Executors.newFixedThreadPool(threadsCount, new ThreadFactorySecuenceNaming(
+				"CancelOrderProcessing EXECUTOR #"));
+
 		Runnable processRunnable = new ReceiverOrderCancelRunnable();
 		mainThread = new Thread(processRunnable);
 		mainThread.setName("CancelOrderProcessing MAIN THREAD");

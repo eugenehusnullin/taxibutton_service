@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tb2014.business.IOrderStatusBusiness;
@@ -23,6 +24,12 @@ import tb2014.utils.ThreadFactorySecuenceNaming;
 @Service()
 public class OfferOrderProcessing {
 	private static final Logger log = LoggerFactory.getLogger(OfferOrderProcessing.class);
+
+	@Value("#{mainSettings['offerorder.threads.count']}")
+	private Integer threadsCount;
+
+	@Value("#{mainSettings['offerorder.repeat.pause']}")
+	private Integer repeatPause;
 
 	class RecieverOrderRunnable implements Runnable {
 		@Override
@@ -86,7 +93,7 @@ public class OfferOrderProcessing {
 				chooseWinnerProcessing.addOrder(order);
 			} else {
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(repeatPause);
 					synchronized (queue) {
 						queue.add(order);
 						queue.notifyAll();
@@ -113,11 +120,13 @@ public class OfferOrderProcessing {
 		this.orderStatusBusiness = orderStatusBusiness;
 
 		queue = new ArrayDeque<Order>();
-		executor = Executors.newFixedThreadPool(30, new ThreadFactorySecuenceNaming("OfferOrderProcessing EXECUTOR #"));
 	}
 
 	@PostConstruct
 	public void startProcessing() {
+		executor = Executors.newFixedThreadPool(threadsCount, new ThreadFactorySecuenceNaming(
+				"OfferOrderProcessing EXECUTOR #"));
+
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);
 		mainThread.setName("OfferOrderProcessing MAIN THREAD");

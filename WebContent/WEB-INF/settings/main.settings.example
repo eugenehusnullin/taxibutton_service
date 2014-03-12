@@ -1,0 +1,9 @@
+choosewinner.threads.count=30
+choosewinner.repeat.pause=5000
+choosewinner.cancelorder.timeout=15
+
+offerorder.threads.count=30
+offerorder.repeat.pause=5000
+offerorder.wait.pause=1
+
+cancelorder.threads.count=10
