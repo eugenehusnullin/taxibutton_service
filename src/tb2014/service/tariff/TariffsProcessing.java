@@ -22,15 +22,10 @@ public class TariffsProcessing {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
-	private IBrokerBusiness brokerBusiness;
-	private ISimpleTariffBusiness simpleTariffBusiness;
-
 	@Autowired
-	public TariffsProcessing(IBrokerBusiness brokerBusiness, ISimpleTariffBusiness simpleTariffBusiness) {
-
-		this.brokerBusiness = brokerBusiness;
-		this.simpleTariffBusiness = simpleTariffBusiness;
-	}
+	private IBrokerBusiness brokerBusiness;
+	@Autowired
+	private ISimpleTariffBusiness simpleTariffBusiness;
 
 	@Transactional
 	public void pullBrokersTariffs() {
