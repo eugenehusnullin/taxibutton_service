@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.Run;
 import tb2014.business.IBrokerBusiness;
@@ -31,7 +32,8 @@ public class TariffsProcessing {
 		this.simpleTariffBusiness = simpleTariffBusiness;
 	}
 
-	public void GetBrokersTariffs() {
+	@Transactional
+	public void pullBrokersTariffs() {
 
 		List<Broker> brokers = brokerBusiness.getAll();
 

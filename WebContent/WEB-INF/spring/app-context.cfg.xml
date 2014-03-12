@@ -50,7 +50,7 @@
 	<context:annotation-config />
 
 	<task:scheduled-tasks scheduler="tariffsProcessingScheduler">
-		<task:scheduled ref="tariffsProcessing" method="GetBrokersTariffs"
+		<task:scheduled ref="tariffsProcessing" method="pullBrokersTariffs"
 			fixed-delay="3600000" />
 	</task:scheduled-tasks>
 

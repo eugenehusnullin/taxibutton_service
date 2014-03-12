@@ -56,7 +56,7 @@ public class BrokerController {
 	@RequestMapping(value = "/tariffs", method = RequestMethod.GET)
 	public String tariffs() {
 
-		tariffsProcessing.GetBrokersTariffs();
+		tariffsProcessing.pullBrokersTariffs();
 		return "redirect:list";
 	}
 
