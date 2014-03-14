@@ -12,8 +12,6 @@ public interface ISimpleTariffBusiness {
 	SimpleTariff get(Broker broker);
 
 	List<SimpleTariff> getAll();
-	
-	List<SimpleTariff> getAllWithChilds();
 
 	void save(SimpleTariff tariff);
 	

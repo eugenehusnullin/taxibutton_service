@@ -67,7 +67,19 @@ public class ChooseWinnerProcessing {
 
 		@Override
 		public void run() {
-			orderProcessing.chooseWinnerProcessing(order, cancelorderTimeout, repeatPause);
+			Object object = orderProcessing.chooseWinnerProcessing(order, cancelorderTimeout, repeatPause);
+
+			if (object != null) {
+				if (object.getClass().equals(Order.class)) {
+					try {
+						Thread.sleep(repeatPause);
+						addOrder((Order)object);
+					} catch (InterruptedException e) {
+					}
+				} else {
+					cancelOrderProcessing.addOrderCancel((CancelOrderProcessing.OrderCancelHolder)object);
+				}
+			}
 		}
 	}
 
@@ -76,10 +88,12 @@ public class ChooseWinnerProcessing {
 	private volatile boolean processing = true;
 	private ExecutorService executor;
 	private OrderProcessing orderProcessing;
+	private CancelOrderProcessing cancelOrderProcessing;
 
 	@Autowired
-	public ChooseWinnerProcessing(OrderProcessing orderProcessing) {
+	public ChooseWinnerProcessing(OrderProcessing orderProcessing, CancelOrderProcessing cancelOrderProcessing) {
 		this.orderProcessing = orderProcessing;
+		this.cancelOrderProcessing = cancelOrderProcessing;
 
 		queue = new ArrayDeque<Order>();
 	}

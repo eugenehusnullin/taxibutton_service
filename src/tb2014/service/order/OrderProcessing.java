@@ -56,12 +56,6 @@ public class OrderProcessing {
 	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
 	@Autowired
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
-	@Autowired
-	private CancelOrderProcessing cancelOrderProcessing;
-	@Autowired
-	private ChooseWinnerProcessing chooseWinnerProcessing;
-	@Autowired
-	private OfferOrderProcessing offerOrderProcessing;
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
@@ -226,13 +220,12 @@ public class OrderProcessing {
 		orderBusiness.delete(order);
 	}
 
-	// TODO: bad practice
 	@Transactional
-	public void chooseWinnerProcessing(Order order, int cancelorderTimeout, int repeatPause) {
+	public Object chooseWinnerProcessing(Order order, int cancelorderTimeout, int repeatPause) {
 		// check right status
 		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
 		if (orderStatus.getStatus() == OrderStatusType.Cancelled || orderStatus.getStatus() == OrderStatusType.Failed) {
-			return;
+			return null;
 		}
 
 		Broker winner = alacrityBuiness.getWinner(order);
@@ -256,53 +249,28 @@ public class OrderProcessing {
 				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
 				orderCancelHolder.setOrder(order);
 				orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
-				cancelOrderProcessing.addOrderCancel(orderCancelHolder);
+				return orderCancelHolder;
 			} else {
-				try {
-					Thread.sleep(repeatPause);
-					chooseWinnerProcessing.addOrder(order);
-				} catch (InterruptedException e) {
-				}
+				return order;
 			}
 		} else {
 			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
 			orderCancelHolder.setOrder(order);
 			orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
-			cancelOrderProcessing.addOrderCancel(orderCancelHolder);
+			return orderCancelHolder;
 		}
 	}
 
 	// TODO: bad practice
 	@Transactional
-	public void offerOrderProcessing(Order order, int repeatPause) {
-		// do pause before offer, maybe client canceled order
-		Date currentDatetime = new Date();
-		if (order.getStartOffer().after(currentDatetime)) {
-			long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
-			try {
-				Thread.sleep(diff);
-			} catch (InterruptedException e) {
-				return;
-			}
-		}
-
+	public Boolean offerOrderProcessing(Order order, int repeatPause) {
 		// check right status
 		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
 		if (orderStatus.getStatus() != OrderStatusType.Created) {
-			return;
+			return null;
 		}
 
 		// do offer
-		boolean offered = offerOrder(order);
-
-		if (offered) {
-			chooseWinnerProcessing.addOrder(order);
-		} else {
-			try {
-				Thread.sleep(repeatPause);
-				offerOrderProcessing.addOrder(order);
-			} catch (InterruptedException e) {
-			}
-		}
+		return offerOrder(order);
 	}
 }

@@ -54,11 +54,8 @@ public class GeoDataProcessing {
 
 							if (needupdate) {
 								map.put(geoData.getOrder().getId(), geoData);
+								geoDataBusiness.save(geoData);
 							}
-						}
-
-						if (needupdate) {
-							geoDataBusiness.save(geoData);
 						}
 					}
 				} catch (Exception e) {

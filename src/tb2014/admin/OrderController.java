@@ -23,7 +23,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,18 +30,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IGeoDataBusiness;
+import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderStatusBusiness;
-import tb2014.business.IOrderAcceptAlacrityBusiness;
-import tb2014.service.order.OrderProcessing;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderStatus;
+import tb2014.service.OrderService;
+import tb2014.service.order.OrderProcessing;
 
 @RequestMapping("/order")
 @Controller("devTestOrderController")
 public class OrderController {
 
+	@Autowired
+	private OrderService orderService;
 	@Autowired
 	private OrderProcessing orderProcessing;
 	@Autowired
@@ -56,7 +58,6 @@ public class OrderController {
 	@Autowired
 	private IGeoDataBusiness geoDataBusiness;
 
-	@Transactional
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(HttpServletRequest request, Model model) {
 
@@ -89,10 +90,8 @@ public class OrderController {
 			count = Integer.parseInt(request.getParameter("count"));
 		}
 
-		List<Order> orderList = orderBusiness.getPagination(orderField, orderDirection, start, count);
-		Long allOrdersCount = orderBusiness.getAllOrdersCount();
-
-		model.addAttribute("orders", orderList);
+		List<Order> orderList = orderService.listByPage(orderField, orderDirection, start, count);
+		Long allOrdersCount = orderService.getAllCount();
 
 		int pagesCount = (int) Math.ceil(allOrdersCount / (double) count);
 		int[] pages = new int[pagesCount];
@@ -101,6 +100,7 @@ public class OrderController {
 			pages[i] = i + 1;
 		}
 
+		model.addAttribute("orders", orderList);
 		model.addAttribute("pages", pages);
 		model.addAttribute("orderField", orderField);
 		model.addAttribute("orderDirection", orderDirection);
@@ -546,7 +546,6 @@ public class OrderController {
 		return "redirect:list";
 	}
 
-	@Transactional
 	@RequestMapping(value = "/send", method = RequestMethod.GET)
 	public String send(@RequestParam("id") Long orderId, Model model) {
 

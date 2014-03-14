@@ -1,6 +1,7 @@
 package tb2014.service.order;
 
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,7 +65,30 @@ public class OfferOrderProcessing {
 
 		@Override
 		public void run() {
-			orderProcessing.offerOrderProcessing(order, repeatPause);
+			// do pause before offer, maybe client canceled order
+			Date currentDatetime = new Date();
+			if (order.getStartOffer().after(currentDatetime)) {
+				long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
+				try {
+					Thread.sleep(diff);
+				} catch (InterruptedException e) {
+					return;
+				}
+			}
+
+			Boolean offered = orderProcessing.offerOrderProcessing(order, repeatPause);
+
+			if (offered != null) {
+				if (offered) {
+					chooseWinnerProcessing.addOrder(order);
+				} else {
+					try {
+						Thread.sleep(repeatPause);
+						addOrder(order);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
 		}
 	}
 
@@ -73,10 +97,12 @@ public class OfferOrderProcessing {
 	private volatile boolean processing = true;
 	private ExecutorService executor;
 	private OrderProcessing orderProcessing;
+	private ChooseWinnerProcessing chooseWinnerProcessing;
 
 	@Autowired
-	public OfferOrderProcessing(OrderProcessing orderProcessing) {
+	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing) {
 		this.orderProcessing = orderProcessing;
+		this.chooseWinnerProcessing = chooseWinnerProcessing;
 
 		queue = new ArrayDeque<Order>();
 	}

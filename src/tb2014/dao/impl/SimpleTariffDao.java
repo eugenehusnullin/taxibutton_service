@@ -47,10 +47,4 @@ public class SimpleTariffDao implements ISimpleTariffDao {
 	public void saveOrUpdate(SimpleTariff tariff) {
 		sessionFactory.getCurrentSession().saveOrUpdate(tariff);
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<SimpleTariff> getAllWithChilds() {
-		return sessionFactory.getCurrentSession().createCriteria(SimpleTariff.class).list();
-	}
 }

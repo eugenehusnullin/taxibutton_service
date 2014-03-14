@@ -1,6 +1,6 @@
 package tb2014.admin;
 
-import java.util.UUID;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,27 +9,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import tb2014.business.IBrokerBusiness;
 import tb2014.domain.Broker;
+import tb2014.service.BrokerService;
 import tb2014.service.tariff.TariffsProcessing;
 
 @RequestMapping("/broker")
 @Controller
 public class BrokerController {
 
-	private IBrokerBusiness brokerBusiness;
-	private TariffsProcessing tariffsProcessing;
-
 	@Autowired
-	public BrokerController(IBrokerBusiness brokerBusiness, TariffsProcessing tariffsProcessing) {
-		this.brokerBusiness = brokerBusiness;
-		this.tariffsProcessing = tariffsProcessing;
-	}
+	private BrokerService brokerService;
+	@Autowired
+	private TariffsProcessing tariffsProcessing;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
-
-		model.addAttribute("brokers", brokerBusiness.getAll());
+		List<Broker> list = brokerService.getAll();
+		model.addAttribute("brokers", list);
 		return "broker/list";
 	}
 
@@ -47,8 +43,7 @@ public class BrokerController {
 		broker.setApiurl(apiurl);
 		broker.setApiId(apiId);
 		broker.setApiKey(apiKey);
-		broker.setUuid(UUID.randomUUID().toString());
-		brokerBusiness.add(broker);
+		brokerService.add(broker);
 
 		return "redirect:list";
 	}
@@ -62,17 +57,14 @@ public class BrokerController {
 
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String delete(@RequestParam("id") Long brokerId) {
-
-		Broker broker = brokerBusiness.getById(brokerId);
-		brokerBusiness.delete(broker);
-
+		brokerService.delete(brokerId);
 		return "redirect:list";
 	}
 
 	@RequestMapping(value = "/edit", method = RequestMethod.GET)
 	public String edit(@RequestParam("id") Long brokerId, Model model) {
 
-		Broker broker = brokerBusiness.getById(brokerId);
+		Broker broker = brokerService.get(brokerId);
 
 		model.addAttribute("brokerId", brokerId);
 		model.addAttribute("apiId", broker.getApiId());
@@ -84,17 +76,11 @@ public class BrokerController {
 	}
 
 	@RequestMapping(value = "/edit", method = RequestMethod.POST)
-	public String edit(@RequestParam("brokerId") Long brokerId, @RequestParam("apiId") String apiId, @RequestParam("apiKey") String apiKey, @RequestParam("name") String name, @RequestParam("apiUrl") String apiUrl) {
+	public String edit(@RequestParam("brokerId") Long brokerId, @RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey, @RequestParam("name") String name,
+			@RequestParam("apiUrl") String apiUrl) {
 
-		Broker broker = brokerBusiness.getById(brokerId);
-		
-		broker.setApiId(apiId);
-		broker.setApiKey(apiKey);
-		broker.setApiurl(apiUrl);
-		broker.setName(name);
-		
-		brokerBusiness.saveOrUpdate(broker);
-		
+		brokerService.update(brokerId, apiId, apiKey, name, apiUrl);
 		return "redirect:list";
 	}
 }
