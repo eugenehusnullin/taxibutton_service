@@ -114,7 +114,7 @@ public class OrderController {
 	public String alacrity(@RequestParam("id") Long orderId, Model model) {
 
 		Order order = orderBusiness.get(orderId);
-		List<OrderAcceptAlacrity> listAlacrity = orderAlacrityBusiness.getAll(order); 
+		List<OrderAcceptAlacrity> listAlacrity = orderAlacrityBusiness.getAll(order);
 
 		model.addAttribute("alacrities", listAlacrity);
 		model.addAttribute("orderId", orderId);
@@ -419,7 +419,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(HttpServletRequest request) {
+	public String create(HttpServletRequest request, Model model) {
 
 		JSONObject createOrderJson = new JSONObject();
 
@@ -520,32 +520,33 @@ public class OrderController {
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
-				System.out.println("Error sending order to server");
-			}
+				model.addAttribute("result", "Error sending order request to server, code: " + responceCode);
+			} else {
+				// need to get an response with order id
+				StringBuffer stringBuffer = new StringBuffer();
+				String line = null;
 
-			// need to get an response with order id
-			StringBuffer stringBuffer = new StringBuffer();
-			String line = null;
+				try {
+					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+							connection.getInputStream()));
 
-			try {
-
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-				while ((line = bufferedReader.readLine()) != null) {
-					stringBuffer.append(line);
+					while ((line = bufferedReader.readLine()) != null) {
+						stringBuffer.append(line);
+					}
+				} catch (Exception ex) {
+					model.addAttribute("result", "Error receiving server respone: " + ex.toString());
 				}
-			} catch (Exception ex) {
-				System.out.println("Error receiving server respone: " + ex.toString());
+
+				JSONObject responseJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+
+				System.out.println("Server JSON response: " + responseJson.toString());
+				model.addAttribute("result", "Order created successfully");
 			}
-
-			JSONObject responseJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
-
-			System.out.println("Server JSON response: " + responseJson.toString());
 		} catch (Exception ex) {
-			System.out.println("Error creating new order: " + ex.toString());
+			model.addAttribute("result", "Error creating new order: " + ex.toString());
 		}
 
-		return "redirect:list";
+		return "result";
 	}
 
 	@RequestMapping(value = "/send", method = RequestMethod.GET)

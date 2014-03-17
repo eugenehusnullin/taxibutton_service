@@ -66,19 +66,7 @@ public class OrderJsonParser {
 		bookingDate = cal.getTime();
 
 		SortedSet<AddressPoint> addressPoints = new TreeSet<AddressPoint>();
-		AddressPoint source = new AddressPoint();
 		JSONObject sourceJson = null;
-		Double lon = null;
-		Double lat = null;
-		String fullAddress = null;
-		String shortAddress = null;
-		String closestStation = null;
-		String country = null;
-		String locality = null;
-		String street = null;
-		String housing = null;
-
-		source.setIndexNumber(0);
 
 		try {
 			sourceJson = jsonObject.getJSONObject("source");
@@ -86,38 +74,13 @@ public class OrderJsonParser {
 			return null;
 		}
 
-		try {
-			lon = sourceJson.getDouble("lon");
-			lat = sourceJson.getDouble("lat");
-		} catch (JSONException ex) {
+		AddressPoint source = OrderJsonParser.getPoint(sourceJson, order, 0);
+
+		if (source != null) {
+			addressPoints.add(source);
+		} else {
 			return null;
 		}
-
-		try {
-
-			fullAddress = sourceJson.getString("fullAddress");
-			shortAddress = sourceJson.getString("shortAddress");
-			closestStation = sourceJson.getString("closestStation");
-			country = sourceJson.getString("country");
-			locality = sourceJson.getString("locality");
-			street = sourceJson.getString("street");
-			housing = sourceJson.getString("housing");
-		} catch (JSONException ex) {
-			return null;
-		}
-
-		source.setLon(lon);
-		source.setLat(lat);
-		source.setFullAddress(fullAddress);
-		source.setShortAddress(shortAddress);
-		source.setClosesStation(closestStation);
-		source.setCounty(country);
-		source.setLocality(locality);
-		source.setStreet(street);
-		source.setHousing(housing);
-		source.setOrder(order);
-
-		addressPoints.add(source);
 
 		JSONArray destinationsJson = null;
 
@@ -128,42 +91,22 @@ public class OrderJsonParser {
 		}
 
 		for (int i = 0; i < destinationsJson.length(); i++) {
-
 			JSONObject destinationJson = destinationsJson.getJSONObject(i);
-			AddressPoint destination = new AddressPoint();
-			lon = null;
-			lat = null;
 			int index = 0;
 
 			try {
-
-				lon = destinationJson.getDouble("lon");
-				lat = destinationJson.getDouble("lat");
 				index = destinationJson.getInt("index");
-				fullAddress = destinationJson.getString("fullAddress");
-				shortAddress = destinationJson.getString("shortAddress");
-				closestStation = destinationJson.getString("closestStation");
-				country = destinationJson.getString("country");
-				locality = destinationJson.getString("locality");
-				street = destinationJson.getString("street");
-				housing = destinationJson.getString("housing");
 			} catch (JSONException ex) {
 				return null;
 			}
 
-			destination.setLon(lon);
-			destination.setLat(lat);
-			destination.setIndexNumber(index);
-			destination.setFullAddress(fullAddress);
-			destination.setShortAddress(shortAddress);
-			destination.setClosesStation(closestStation);
-			destination.setCounty(country);
-			destination.setLocality(locality);
-			destination.setStreet(street);
-			destination.setHousing(housing);
-			destination.setOrder(order);
+			AddressPoint destination = OrderJsonParser.getPoint(sourceJson, order, index);
 
-			addressPoints.add(destination);
+			if (destination != null) {
+				addressPoints.add(destination);
+			} else {
+				return null;
+			}
 		}
 
 		Set<Requirement> requirements = new HashSet<Requirement>();
@@ -176,7 +119,6 @@ public class OrderJsonParser {
 		}
 
 		for (int i = 0; i < requirementsJson.length(); i++) {
-
 			JSONObject requirementJson = requirementsJson.getJSONObject(i);
 			Requirement currentRequirement = new Requirement();
 			String name = null;
@@ -229,5 +171,46 @@ public class OrderJsonParser {
 		order.setOfferBrokerList(offerBrokerList);
 
 		return order;
+	}
+
+	private static AddressPoint getPoint(JSONObject pointJson, Order order, int index) {
+		AddressPoint result = new AddressPoint();
+		Double lon = null;
+		Double lat = null;
+		String fullAddress = null;
+		String shortAddress = null;
+		String closestStation = null;
+		String country = null;
+		String locality = null;
+		String street = null;
+		String housing = null;
+
+		try {
+			lon = pointJson.getDouble("lon");
+			lat = pointJson.getDouble("lat");
+			fullAddress = pointJson.getString("fullAddress");
+			shortAddress = pointJson.getString("shortAddress");
+			closestStation = pointJson.getString("closestStation");
+			country = pointJson.getString("country");
+			locality = pointJson.getString("locality");
+			street = pointJson.getString("street");
+			housing = pointJson.getString("housing");
+		} catch (JSONException ex) {
+			return null;
+		}
+
+		result.setLon(lon);
+		result.setLat(lat);
+		result.setFullAddress(fullAddress);
+		result.setShortAddress(shortAddress);
+		result.setClosesStation(closestStation);
+		result.setCounty(country);
+		result.setLocality(locality);
+		result.setStreet(street);
+		result.setHousing(housing);
+		result.setOrder(order);
+		result.setIndexNumber(index);
+
+		return result;
 	}
 }
