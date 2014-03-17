@@ -28,6 +28,9 @@ public class OfferOrderProcessing {
 	@Value("#{mainSettings['offerorder.repeat.pause']}")
 	private Integer repeatPause;
 
+	@Value("#{mainSettings['choosewinner.cancelorder.timeout']}")
+	private Integer cancelOrderTimeout;
+
 	class RecieverOrderRunnable implements Runnable {
 		@Override
 		public void run() {
@@ -76,16 +79,22 @@ public class OfferOrderProcessing {
 				}
 			}
 
-			Boolean offered = orderProcessing.offerOrderProcessing(order, repeatPause);
+			Boolean offered = orderProcessing.offerOrderProcessing(order);
 
 			if (offered != null) {
 				if (offered) {
 					chooseWinnerProcessing.addOrder(order);
 				} else {
-					try {
-						Thread.sleep(repeatPause);
-						addOrder(order);
-					} catch (InterruptedException e) {
+					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderProcessing.checkExpired(order,
+							cancelOrderTimeout, new Date());
+					if (orderCancelHolder != null) {
+						cancelOrderProcessing.addOrderCancel(orderCancelHolder);
+					} else {
+						try {
+							Thread.sleep(repeatPause);
+							addOrder(order);
+						} catch (InterruptedException e) {
+						}
 					}
 				}
 			}
@@ -96,14 +105,14 @@ public class OfferOrderProcessing {
 	private Thread mainThread;
 	private volatile boolean processing = true;
 	private ExecutorService executor;
-	private OrderProcessing orderProcessing;
-	private ChooseWinnerProcessing chooseWinnerProcessing;
-
 	@Autowired
-	public OfferOrderProcessing(OrderProcessing orderProcessing, ChooseWinnerProcessing chooseWinnerProcessing) {
-		this.orderProcessing = orderProcessing;
-		this.chooseWinnerProcessing = chooseWinnerProcessing;
+	private OrderProcessing orderProcessing;
+	@Autowired
+	private ChooseWinnerProcessing chooseWinnerProcessing;
+	@Autowired
+	private CancelOrderProcessing cancelOrderProcessing;
 
+	public OfferOrderProcessing() {
 		queue = new ArrayDeque<Order>();
 	}
 

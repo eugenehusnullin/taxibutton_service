@@ -57,7 +57,6 @@ public class OrderJsonParser {
 			return null;
 		}
 
-		// TODO: need time zone from device
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(bookingDate);
 		cal.set(Calendar.HOUR_OF_DAY, bookingHour);

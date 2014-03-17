@@ -37,6 +37,11 @@ import tb2014.domain.order.OrderCancel;
 import tb2014.domain.order.OrderCancelType;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
+import tb2014.service.exceptions.BrokerNotFoundException;
+import tb2014.service.exceptions.DeviceNotFoundException;
+import tb2014.service.exceptions.NotValidOrderStatusException;
+import tb2014.service.exceptions.OrderNotFoundException;
+import tb2014.service.exceptions.ParseOrderException;
 import tb2014.service.geo.GeoDataProcessing;
 import tb2014.service.order.CancelOrderProcessing;
 import tb2014.service.order.OfferOrderProcessing;
@@ -101,7 +106,7 @@ public class OrderService {
 		orderStatusBusiness.save(orderStatus);
 
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MINUTE, waitPause);
+		cal.add(Calendar.MILLISECOND, waitPause);
 		order.setStartOffer(cal.getTime());
 		offerOrderProcessing.addOrder(order);
 

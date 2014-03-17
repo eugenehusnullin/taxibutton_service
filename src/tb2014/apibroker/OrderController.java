@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import tb2014.domain.order.Car;
 import tb2014.domain.order.Driver;
-import tb2014.service.BrokerNotFoundException;
-import tb2014.service.OrderNotFoundException;
 import tb2014.service.OrderService;
+import tb2014.service.exceptions.BrokerNotFoundException;
+import tb2014.service.exceptions.OrderNotFoundException;
 
 @RequestMapping("/order")
 @Controller("apiBrokerOrderController")

@@ -20,4 +20,8 @@ public enum OrderStatusType {
 		return statusType == OrderStatusType.Completed || statusType == OrderStatusType.Cancelled
 				|| statusType == OrderStatusType.Failed;
 	}
+
+	public static boolean IsValidForOffer(OrderStatusType status) {
+		return status == OrderStatusType.Created;
+	}
 }

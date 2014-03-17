@@ -19,11 +19,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import tb2014.service.DeviceNotFoundException;
-import tb2014.service.NotValidOrderStatusException;
-import tb2014.service.OrderNotFoundException;
 import tb2014.service.OrderService;
-import tb2014.service.ParseOrderException;
+import tb2014.service.exceptions.DeviceNotFoundException;
+import tb2014.service.exceptions.NotValidOrderStatusException;
+import tb2014.service.exceptions.OrderNotFoundException;
+import tb2014.service.exceptions.ParseOrderException;
 
 @RequestMapping("/order")
 @Controller("apiDeviceOrderController")

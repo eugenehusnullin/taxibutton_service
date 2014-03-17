@@ -23,6 +23,7 @@ import tb2014.business.ISimpleTariffBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.Device;
 import tb2014.domain.tariff.SimpleTariff;
+import tb2014.service.exceptions.DeviceNotFoundException;
 import tb2014.utils.ConverterUtil;
 
 @Service

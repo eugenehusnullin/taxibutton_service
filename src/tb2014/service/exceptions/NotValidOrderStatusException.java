@@ -1,4 +1,4 @@
-package tb2014.service;
+package tb2014.service.exceptions;
 
 import tb2014.domain.order.OrderStatus;
 

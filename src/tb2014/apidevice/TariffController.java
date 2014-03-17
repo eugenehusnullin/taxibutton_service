@@ -16,8 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import tb2014.service.DeviceNotFoundException;
 import tb2014.service.TariffService;
+import tb2014.service.exceptions.DeviceNotFoundException;
 import tb2014.utils.NetStreamUtils;
 
 @RequestMapping("/tariff")

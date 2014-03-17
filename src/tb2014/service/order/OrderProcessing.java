@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +37,7 @@ import tb2014.domain.order.OrderCancelType;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
+import tb2014.utils.OrderTimeoutUtil;
 
 @Service("ordersProcessing")
 public class OrderProcessing {
@@ -221,10 +221,10 @@ public class OrderProcessing {
 	}
 
 	@Transactional
-	public Object chooseWinnerProcessing(Order order, int cancelorderTimeout, int repeatPause) {
+	public Object chooseWinnerProcessing(Order order, int cancelOrderTimeout) {
 		// check right status
 		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
-		if (orderStatus.getStatus() == OrderStatusType.Cancelled || orderStatus.getStatus() == OrderStatusType.Failed) {
+		if (OrderStatusType.EndProcessingStatus(orderStatus.getStatus())) {
 			return null;
 		}
 
@@ -236,19 +236,9 @@ public class OrderProcessing {
 
 		if (!success) {
 			// check date supply for obsolete order
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(order.getBookingDate());
-			cal.add(Calendar.MINUTE, cancelorderTimeout);
-			if ((new Date()).after(cal.getTime())) {
-				OrderStatus failedStatus = new OrderStatus();
-				failedStatus.setDate(new Date());
-				failedStatus.setOrder(order);
-				failedStatus.setStatus(OrderStatusType.Failed);
-				orderStatusBusiness.save(failedStatus);
-
-				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
-				orderCancelHolder.setOrder(order);
-				orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
+			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = checkExpired(order, cancelOrderTimeout,
+					new Date());
+			if (orderCancelHolder != null) {
 				return orderCancelHolder;
 			} else {
 				return order;
@@ -261,12 +251,29 @@ public class OrderProcessing {
 		}
 	}
 
-	// TODO: bad practice
 	@Transactional
-	public Boolean offerOrderProcessing(Order order, int repeatPause) {
+	public CancelOrderProcessing.OrderCancelHolder checkExpired(Order order, int cancelOrderTimeout, Date checkTime) {
+		if (OrderTimeoutUtil.isTimeoutExpired(order, cancelOrderTimeout, new Date())) {
+			OrderStatus failedStatus = new OrderStatus();
+			failedStatus.setDate(new Date());
+			failedStatus.setOrder(order);
+			failedStatus.setStatus(OrderStatusType.Failed);
+			orderStatusBusiness.save(failedStatus);
+
+			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+			orderCancelHolder.setOrder(order);
+			orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
+			return orderCancelHolder;
+		} else {
+			return null;
+		}
+	}
+
+	@Transactional
+	public Boolean offerOrderProcessing(Order order) {
 		// check right status
 		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
-		if (orderStatus.getStatus() != OrderStatusType.Created) {
+		if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {
 			return null;
 		}
 
