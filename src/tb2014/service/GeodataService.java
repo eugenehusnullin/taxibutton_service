@@ -8,17 +8,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.admin.model.GeodataModel;
-import tb2014.business.impl.GeoDataBusiness;
-import tb2014.business.impl.OrderBusiness;
+import tb2014.business.IGeoDataBusiness;
+import tb2014.business.IOrderBusiness;
 import tb2014.domain.order.GeoData;
 
 @Service
 public class GeodataService {
 
 	@Autowired
-	private OrderBusiness orderBusiness;
+	private IOrderBusiness orderBusiness;
 	@Autowired
-	private GeoDataBusiness geoDataBusiness;
+	private IGeoDataBusiness geoDataBusiness;
 
 	@Transactional
 	public List<GeodataModel> getGeodata(Long orderId) {

@@ -26,7 +26,6 @@ import tb2014.business.IOrderAcceptAlacrityBusiness;
 import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderCancelBusiness;
 import tb2014.business.IOrderStatusBusiness;
-import tb2014.business.impl.OrderAcceptAlacrityBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.Device;
 import tb2014.domain.order.Car;
@@ -69,7 +68,7 @@ public class OrderService {
 	@Autowired
 	private GeoDataProcessing geoDataProcessing;
 	@Autowired
-	private OrderAcceptAlacrityBusiness orderAlacrityBusiness;
+	private IOrderAcceptAlacrityBusiness orderAlacrityBusiness;
 
 	@Value("#{mainSettings['offerorder.wait.pause']}")
 	private Integer waitPause;
