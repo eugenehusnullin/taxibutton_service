@@ -15,25 +15,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import tb2014.business.IDeviceBusiness;
-import tb2014.domain.Device;
+import tb2014.service.DeviceService;
 import tb2014.utils.NetStreamUtils;
 
 @RequestMapping("/device")
 @Controller
 public class DeviceController {
 
-	private IDeviceBusiness deviceBusiness;
-
 	@Autowired
-	public DeviceController(IDeviceBusiness deviceBusiness) {
-		this.deviceBusiness = deviceBusiness;
-	}
+	private DeviceService deviceService;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
 
-		model.addAttribute("devices", deviceBusiness.getAll());
+		model.addAttribute("devices", deviceService.getAll());
 		return "device/list";
 	}
 
@@ -85,14 +80,11 @@ public class DeviceController {
 	}
 
 	@RequestMapping(value = "/tariffs", method = RequestMethod.GET)
-	public String getTariffs(@RequestParam("id") Long deviceId, Model model) {
-
-		Device device = deviceBusiness.get(deviceId);
-		JSONObject requestJson = new JSONObject();
-
-		requestJson.put("apiId", device.getApiId());
+	public String getTariffs(@RequestParam("apiId") String apiId, Model model) {
 
 		try {
+			JSONObject requestJson = new JSONObject();
+			requestJson.put("apiId", apiId);
 
 			String url = "http://localhost:8080/tb2014/apidevice/tariff/get";
 			URL obj = new URL(url);
