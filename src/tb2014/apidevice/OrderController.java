@@ -43,10 +43,9 @@ public class OrderController {
 			log.trace(stringBuffer.toString());
 
 			JSONObject createOrderObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
-			String deviceApiid = createOrderObject.getString("apiId");
 
 			try {
-				String orderUuid = orderService.create(deviceApiid, createOrderObject);
+				String orderUuid = orderService.create(createOrderObject);
 
 				JSONObject responseJson = new JSONObject();
 				responseJson.put("status", "ok");
@@ -61,7 +60,7 @@ public class OrderController {
 			} catch (DeviceNotFoundException dnfe) {
 				response.setStatus(403);
 			} catch (ParseOrderException e) {
-				response.setStatus(403);
+				response.setStatus(404);
 			}
 		} catch (UnsupportedEncodingException e) {
 			log.error("apiDeviceOrderController.create", e);

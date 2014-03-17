@@ -35,6 +35,7 @@ import tb2014.business.IOrderBusiness;
 import tb2014.business.IOrderStatusBusiness;
 import tb2014.domain.Broker;
 import tb2014.domain.order.Order;
+import tb2014.domain.order.OrderAcceptAlacrity;
 import tb2014.domain.order.OrderStatus;
 import tb2014.service.OrderService;
 import tb2014.service.order.OrderProcessing;
@@ -113,8 +114,9 @@ public class OrderController {
 	public String alacrity(@RequestParam("id") Long orderId, Model model) {
 
 		Order order = orderBusiness.get(orderId);
+		List<OrderAcceptAlacrity> listAlacrity = orderAlacrityBusiness.getAll(order); 
 
-		model.addAttribute("alacrities", orderAlacrityBusiness.getAll(order));
+		model.addAttribute("alacrities", listAlacrity);
 		model.addAttribute("orderId", orderId);
 
 		return "order/alacrity";

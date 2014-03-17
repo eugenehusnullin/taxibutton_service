@@ -68,9 +68,10 @@ public class OrderService {
 	private Integer waitPause;
 
 	@Transactional
-	public String create(String deviceApiid, JSONObject createOrderObject) throws DeviceNotFoundException,
+	public String create(JSONObject createOrderObject) throws DeviceNotFoundException,
 			ParseOrderException {
 
+		String deviceApiid = createOrderObject.optString("apiId");
 		Device device = deviceBusiness.get(deviceApiid);
 		if (device == null) {
 			throw new DeviceNotFoundException(deviceApiid);
