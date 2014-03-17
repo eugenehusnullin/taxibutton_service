@@ -1,7 +1,6 @@
 package tb2014.admin;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,12 +10,6 @@ import java.net.URL;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,15 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import tb2014.business.IBrokerBusiness;
-import tb2014.business.IGeoDataBusiness;
-import tb2014.business.IOrderAcceptAlacrityBusiness;
-import tb2014.business.IOrderBusiness;
-import tb2014.business.IOrderStatusBusiness;
-import tb2014.domain.Broker;
-import tb2014.domain.order.Order;
-import tb2014.domain.order.OrderAcceptAlacrity;
-import tb2014.domain.order.OrderStatus;
+import tb2014.admin.model.AlacrityModel;
+import tb2014.admin.model.GeodataModel;
+import tb2014.admin.model.OrderModel;
+import tb2014.admin.model.OrderStatusModel;
+import tb2014.service.BrokerService;
+import tb2014.service.GeodataService;
 import tb2014.service.OrderService;
 import tb2014.service.order.OrderProcessing;
 
@@ -49,15 +39,9 @@ public class OrderController {
 	@Autowired
 	private OrderProcessing orderProcessing;
 	@Autowired
-	private IOrderBusiness orderBusiness;
+	private BrokerService brokerService;
 	@Autowired
-	private IBrokerBusiness brokerBusiness;
-	@Autowired
-	private IOrderStatusBusiness orderStatusBusiness;
-	@Autowired
-	private IOrderAcceptAlacrityBusiness orderAlacrityBusiness;
-	@Autowired
-	private IGeoDataBusiness geoDataBusiness;
+	private GeodataService geodataService;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(HttpServletRequest request, Model model) {
@@ -91,7 +75,7 @@ public class OrderController {
 			count = Integer.parseInt(request.getParameter("count"));
 		}
 
-		List<Order> orderList = orderService.listByPage(orderField, orderDirection, start, count);
+		List<OrderModel> orderList = orderService.listByPage(orderField, orderDirection, start, count);
 		Long allOrdersCount = orderService.getAllCount();
 
 		int pagesCount = (int) Math.ceil(allOrdersCount / (double) count);
@@ -112,9 +96,7 @@ public class OrderController {
 
 	@RequestMapping(value = "/alacrity", method = RequestMethod.GET)
 	public String alacrity(@RequestParam("id") Long orderId, Model model) {
-
-		Order order = orderBusiness.get(orderId);
-		List<OrderAcceptAlacrity> listAlacrity = orderAlacrityBusiness.getAll(order); 
+		List<AlacrityModel> listAlacrity = orderService.getAlacrities(orderId);
 
 		model.addAttribute("alacrities", listAlacrity);
 		model.addAttribute("orderId", orderId);
@@ -157,10 +139,7 @@ public class OrderController {
 
 	@RequestMapping(value = "/setStatus", method = RequestMethod.GET)
 	public String sendStatus(@RequestParam("id") Long orderId, Model model) {
-
-		Order order = orderBusiness.get(orderId);
-
-		model.addAttribute("orderId", order.getId());
+		model.addAttribute("orderId", orderId);
 		return "order/setStatus";
 	}
 
@@ -168,13 +147,14 @@ public class OrderController {
 	public String sendStatus(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
 			@RequestParam("apiKey") String apiKey, @RequestParam("status") String status) throws IOException {
 
-		Order order = orderBusiness.get(orderId);
+		OrderModel orderModel = orderService.getOrder(orderId);
 
 		String url = "http://localhost:8080/tb2014/apibroker/order/setStatus";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + order.getUuid() + "&apiId=" + apiId + "&apiKey=" + apiKey + "&status=" + status;
+		String params = "orderId=" + orderModel.getUuid() + "&apiId=" + apiId + "&apiKey=" + apiKey + "&status="
+				+ status;
 
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -254,11 +234,11 @@ public class OrderController {
 	@RequestMapping(value = "/getStatus", method = RequestMethod.POST)
 	public String getStatus(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
 
-		Order order = orderBusiness.get(orderId);
+		OrderModel orderModel = orderService.getOrder(orderId);
 		JSONObject getStatusJson = new JSONObject();
 
 		getStatusJson.put("apiId", apiId);
-		getStatusJson.put("orderId", order.getUuid());
+		getStatusJson.put("orderId", orderModel.getUuid());
 
 		try {
 
@@ -303,11 +283,11 @@ public class OrderController {
 	public String getGeoData(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
 			@RequestParam("lastDate") String lastDate, Model model) {
 
-		Order order = orderBusiness.get(orderId);
+		OrderModel orderModel = orderService.getOrder(orderId);
 		JSONObject getGeoDataJson = new JSONObject();
 
 		getGeoDataJson.put("apiId", apiId);
-		getGeoDataJson.put("orderId", order.getUuid());
+		getGeoDataJson.put("orderId", orderModel.getUuid());
 		getGeoDataJson.put("lastDate", lastDate);
 
 		try {
@@ -344,10 +324,7 @@ public class OrderController {
 
 	@RequestMapping(value = "/showStatus", method = RequestMethod.GET)
 	public String showStatus(@RequestParam("id") Long orderId, Model model) {
-
-		Order order = orderBusiness.get(orderId);
-		List<OrderStatus> statusList = orderStatusBusiness.get(order);
-
+		List<OrderStatusModel> statusList = orderService.getStatuses(orderId);
 		model.addAttribute("statusList", statusList);
 
 		return "order/statusList";
@@ -356,7 +333,8 @@ public class OrderController {
 	@RequestMapping(value = "/showGeoData", method = RequestMethod.GET)
 	public String showGeoData(@RequestParam("id") Long orderId, Model model) {
 
-		model.addAttribute("geoList", geoDataBusiness.getAll(orderBusiness.get(orderId)));
+		List<GeodataModel> list = geodataService.getGeodata(orderId);
+		model.addAttribute("geoList", list);
 		return "order/geoList";
 	}
 
@@ -371,11 +349,10 @@ public class OrderController {
 	public String cancel(HttpServletRequest request, Model model) {
 
 		JSONObject cancelOrderJson = new JSONObject();
-
-		Order order = orderBusiness.get(Long.parseLong(request.getParameter("orderId")));
+		OrderModel orderModel = orderService.getOrder(Long.parseLong(request.getParameter("orderId")));
 
 		cancelOrderJson.put("apiId", request.getParameter("apiId"));
-		cancelOrderJson.put("orderId", order.getUuid());
+		cancelOrderJson.put("orderId", orderModel.getUuid());
 		cancelOrderJson.put("reason", request.getParameter("reason"));
 
 		String jsonResult = cancelOrderJson.toString();
@@ -414,7 +391,7 @@ public class OrderController {
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public String create(Model model) {
 
-		model.addAttribute("brokers", brokerBusiness.getAll());
+		model.addAttribute("brokers", brokerService.getAll());
 		return "order/create";
 	}
 
@@ -548,57 +525,10 @@ public class OrderController {
 		return "redirect:list";
 	}
 
-	@RequestMapping(value = "/send", method = RequestMethod.GET)
-	public String send(@RequestParam("id") Long orderId, Model model) {
-
-		orderProcessing.offerOrder(orderBusiness.get(orderId));
-
-		return "redirect:list";
-	}
-
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String delete(@RequestParam("id") Long orderId) {
-
 		orderProcessing.deleteOrder(orderId);
-
 		return "redirect:list";
-	}
-
-	@RequestMapping(value = "/give", method = RequestMethod.GET)
-	public String give(@RequestParam("id") Long orderId, Model model) {
-
-		model.addAttribute("orderId", orderId);
-		return "order/give";
-	}
-
-	@RequestMapping(value = "/give", method = RequestMethod.POST)
-	public String give(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId) {
-
-		Broker broker = brokerBusiness.getByApiId(apiId);
-
-		orderProcessing.giveOrder(orderId, broker.getId());
-
-		return "redirect:list";
-	}
-
-	@RequestMapping(value = "/offer", method = RequestMethod.POST)
-	public void offer(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-		DataInputStream inputStream = new DataInputStream(request.getInputStream());
-
-		try {
-			Source source = new StreamSource(inputStream);
-			Result outputTarget = new StreamResult(System.out);
-
-			TransformerFactory.newInstance().newTransformer().transform(source, outputTarget);
-		} catch (Exception ex) {
-			System.out.println("Error recieving XML document: " + ex.toString());
-		}
-
-		response.setContentType("text/html");
-		response.setHeader("Pragma", "No-cache");
-		response.setDateHeader("Expires", 0);
-		response.setHeader("Cache-Control", "no-cache");
 	}
 
 	private String getStringFromInputStream(InputStream stream) {
