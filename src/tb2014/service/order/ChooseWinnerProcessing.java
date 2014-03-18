@@ -67,7 +67,7 @@ public class ChooseWinnerProcessing {
 
 		@Override
 		public void run() {
-			Object object = orderProcessing.chooseWinnerProcessing(order, cancelorderTimeout, repeatPause);
+			Object object = orderProcessing.chooseWinnerProcessing(order, cancelorderTimeout);
 
 			if (object != null) {
 				if (object.getClass().equals(Order.class)) {

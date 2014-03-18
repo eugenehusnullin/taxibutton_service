@@ -2,7 +2,6 @@ package tb2014.service.serialize;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,8 +28,6 @@ public class OrderJsonParser {
 		Boolean urgent = null;
 		String recipientPhone = null;
 		Date bookingDate = null;
-		int bookingHour = 0;
-		int bookingMinute = 0;
 
 		try {
 			urgent = jsonObject.getBoolean("urgent");
@@ -42,28 +39,13 @@ public class OrderJsonParser {
 		try {
 
 			String bookingDateStr = jsonObject.getString("bookingDate");
-			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 			bookingDate = dateFormatter.parse(bookingDateStr);
 		} catch (JSONException ex) {
 			return null;
 		} catch (ParseException ex) {
 			return null;
 		}
-
-		try {
-			bookingHour = jsonObject.getInt("bookingHour");
-			bookingMinute = jsonObject.getInt("bookingMin");
-		} catch (JSONException ex) {
-			return null;
-		}
-
-		// TODO: need time zone from device
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(bookingDate);
-		cal.set(Calendar.HOUR_OF_DAY, bookingHour);
-		cal.set(Calendar.MINUTE, bookingMinute);
-		cal.set(Calendar.SECOND, 0);
-		bookingDate = cal.getTime();
 
 		SortedSet<AddressPoint> addressPoints = new TreeSet<AddressPoint>();
 		JSONObject sourceJson = null;

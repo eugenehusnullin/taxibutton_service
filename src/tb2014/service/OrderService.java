@@ -2,6 +2,7 @@ package tb2014.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import tb2014.admin.model.AlacrityModel;
+import tb2014.admin.model.OrderModel;
+import tb2014.admin.model.OrderStatusModel;
 import tb2014.business.IBrokerBusiness;
 import tb2014.business.IDeviceBusiness;
 import tb2014.business.IGeoDataBusiness;
@@ -33,10 +37,16 @@ import tb2014.domain.order.OrderCancel;
 import tb2014.domain.order.OrderCancelType;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
+import tb2014.service.exceptions.BrokerNotFoundException;
+import tb2014.service.exceptions.DeviceNotFoundException;
+import tb2014.service.exceptions.NotValidOrderStatusException;
+import tb2014.service.exceptions.OrderNotFoundException;
+import tb2014.service.exceptions.ParseOrderException;
 import tb2014.service.geo.GeoDataProcessing;
 import tb2014.service.order.CancelOrderProcessing;
 import tb2014.service.order.OfferOrderProcessing;
 import tb2014.service.serialize.OrderJsonParser;
+import tb2014.utils.DatetimeUtil;
 
 @Service
 public class OrderService {
@@ -63,13 +73,14 @@ public class OrderService {
 	private IOrderAcceptAlacrityBusiness alacrityBuiness;
 	@Autowired
 	private GeoDataProcessing geoDataProcessing;
+	@Autowired
+	private IOrderAcceptAlacrityBusiness orderAlacrityBusiness;
 
 	@Value("#{mainSettings['offerorder.wait.pause']}")
 	private Integer waitPause;
 
 	@Transactional
-	public String create(JSONObject createOrderObject) throws DeviceNotFoundException,
-			ParseOrderException {
+	public String create(JSONObject createOrderObject) throws DeviceNotFoundException, ParseOrderException {
 
 		String deviceApiid = createOrderObject.optString("apiId");
 		Device device = deviceBusiness.get(deviceApiid);
@@ -79,6 +90,12 @@ public class OrderService {
 
 		JSONObject orderObject = createOrderObject.getJSONObject("order");
 		Order order = OrderJsonParser.Json2Order(orderObject, brokerBusiness);
+
+		// check booking date
+		if (DatetimeUtil.isTimeoutExpired(order, 0, new Date()))
+		{
+			throw new ParseOrderException();
+		}
 
 		if (order == null) {
 			throw new ParseOrderException();
@@ -96,7 +113,7 @@ public class OrderService {
 		orderStatusBusiness.save(orderStatus);
 
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MINUTE, waitPause);
+		cal.add(Calendar.MILLISECOND, waitPause);
 		order.setStartOffer(cal.getTime());
 		offerOrderProcessing.addOrder(order);
 
@@ -342,14 +359,83 @@ public class OrderService {
 
 		geoDataProcessing.addGeoData(geoData);
 	}
-	
+
 	@Transactional
-	public List<Order> listByPage(String orderField, String orderDirection, int start, int count) {
-		return orderBusiness.getPagination(orderField, orderDirection, start, count);
+	public List<OrderModel> listByPage(String orderField, String orderDirection, int start, int count) {
+		List<Order> orders = orderBusiness.getPagination(orderField, orderDirection, start, count);
+
+		List<OrderModel> models = new ArrayList<>();
+		for (Order order : orders) {
+			OrderModel model = new OrderModel();
+			models.add(model);
+			model.setId(order.getId());
+			model.setBookingDate(order.getBookingDate());
+			model.setLastStatus(order.getLastStatus().getStatus().toString());
+			model.setPhone(order.getPhone());
+			model.setSourceShortAddress(order.getSource().getShortAddress());
+			model.setUrgent(order.getUrgent());
+			model.setUuid(order.getUuid());
+			if (order.getBroker() != null) {
+				model.setBrokerName(order.getBroker().getName());
+			}
+		}
+
+		return models;
 	}
-	
-	@Transactional 
+
+	@Transactional
 	public Long getAllCount() {
 		return orderBusiness.getAllOrdersCount();
+	}
+
+	@Transactional
+	public List<AlacrityModel> getAlacrities(Long orderId) {
+		Order order = orderBusiness.get(orderId);
+		List<OrderAcceptAlacrity> listAlacrity = orderAlacrityBusiness.getAll(order);
+
+		List<AlacrityModel> models = new ArrayList<>();
+		for (OrderAcceptAlacrity orderAcceptAlacrity : listAlacrity) {
+			AlacrityModel model = new AlacrityModel();
+			models.add(model);
+
+			model.setId(orderAcceptAlacrity.getOrder().getId());
+			model.setDate(orderAcceptAlacrity.getDate());
+		}
+		return models;
+	}
+
+	@Transactional
+	public OrderModel getOrder(Long orderId) {
+		Order order = orderBusiness.get(orderId);
+		OrderModel model = new OrderModel();
+		model.setId(order.getId());
+		model.setBookingDate(order.getBookingDate());
+		model.setLastStatus(order.getLastStatus().getStatus().toString());
+		model.setPhone(order.getPhone());
+		model.setSourceShortAddress(order.getSource().getShortAddress());
+		model.setUrgent(order.getUrgent());
+		model.setUuid(order.getUuid());
+		if (order.getBroker() != null) {
+			model.setBrokerName(order.getBroker().getName());
+		}
+		return model;
+	}
+
+	@Transactional
+	public List<OrderStatusModel> getStatuses(Long orderId) {
+		Order order = orderBusiness.get(orderId);
+		List<OrderStatus> statusList = orderStatusBusiness.get(order);
+
+		List<OrderStatusModel> models = new ArrayList<>();
+		for (OrderStatus orderStatus : statusList) {
+			OrderStatusModel model = new OrderStatusModel();
+			models.add(model);
+
+			model.setId(orderStatus.getId());
+			model.setDate(orderStatus.getDate());
+			model.setStatus(orderStatus.getStatus().toString());
+		}
+
+		return models;
 	}
 }

@@ -1,4 +1,4 @@
-package tb2014.service;
+package tb2014.service.exceptions;
 
 public class ParseOrderException extends Exception {
 

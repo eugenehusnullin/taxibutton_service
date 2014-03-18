@@ -1,5 +1,7 @@
 package tb2014.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONObject;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import tb2014.admin.model.DeviceModel;
 import tb2014.business.IDeviceBusiness;
 import tb2014.domain.Device;
 
@@ -28,5 +31,21 @@ public class DeviceService {
 		JSONObject resultJson = new JSONObject();
 		resultJson.put("apiId", device.getApiId());
 		return resultJson;
+	}
+	
+	@Transactional
+	public List<DeviceModel> getAll() {
+		List<Device> devices = deviceBusiness.getAll();
+		
+		List<DeviceModel> models = new ArrayList<>();
+		for (Device device : devices) {
+			DeviceModel model = new DeviceModel();
+			model.setId(device.getId());
+			model.setApiId(device.getApiId());
+			model.setPhone(device.getPhone());			
+			models.add(model);
+		}
+		
+		return models;
 	}
 }

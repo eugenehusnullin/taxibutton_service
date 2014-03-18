@@ -128,11 +128,11 @@
 					<tr class="infoTr">
 						<td>${order.getId()}</td>
 						<td>${order.getBookingDate()}</td>
-						<td>${order.getSource().getShortAddress()}</td>
+						<td>${order.getSourceShortAddress()}</td>
 						<td>${order.getUrgent()}</td>
-						<td>${order.getBroker().getName()}</td>
+						<td>${order.getBrokerName()}</td>
 						<td>${order.getPhone()}</td>
-						<td>${order.getLastStatus().getStatus().toString()}
+						<td>${order.getLastStatus()}
 							<div class="actionTr">
 								<a href="send?id=${order.getId()}">Send</a>---<a
 									href="give?id=${order.getId()}">Give</a>---<a

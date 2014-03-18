@@ -96,7 +96,13 @@ public class OrderController {
 
 	@RequestMapping(value = "/alacrity", method = RequestMethod.GET)
 	public String alacrity(@RequestParam("id") Long orderId, Model model) {
+<<<<<<< HEAD
+
+		Order order = orderBusiness.get(orderId);
+		List<OrderAcceptAlacrity> listAlacrity = orderAlacrityBusiness.getAll(order);
+=======
 		List<AlacrityModel> listAlacrity = orderService.getAlacrities(orderId);
+>>>>>>> 00995090bcf7e385c1eb368b91b5568ecd005147
 
 		model.addAttribute("alacrities", listAlacrity);
 		model.addAttribute("orderId", orderId);

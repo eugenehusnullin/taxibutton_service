@@ -30,7 +30,7 @@
 					<td>${device.getId()}</td>
 					<td>${device.getApiId()}</td>
 					<td>${device.getPhone()}</td>
-					<td><a href="tariffs?id=${device.getId()}">Tariffs</a></td>
+					<td><a href="tariffs?apiId=${device.getApiId()}">Tariffs</a></td>
 				</tr>
 			</c:forEach>
 		</tbody>
