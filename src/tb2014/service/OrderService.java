@@ -46,6 +46,7 @@ import tb2014.service.geo.GeoDataProcessing;
 import tb2014.service.order.CancelOrderProcessing;
 import tb2014.service.order.OfferOrderProcessing;
 import tb2014.service.serialize.OrderJsonParser;
+import tb2014.utils.DatetimeUtil;
 
 @Service
 public class OrderService {
@@ -89,6 +90,12 @@ public class OrderService {
 
 		JSONObject orderObject = createOrderObject.getJSONObject("order");
 		Order order = OrderJsonParser.Json2Order(orderObject, brokerBusiness);
+
+		// check booking date
+		if (DatetimeUtil.isTimeoutExpired(order, 0, new Date()))
+		{
+			throw new ParseOrderException();
+		}
 
 		if (order == null) {
 			throw new ParseOrderException();
@@ -187,7 +194,7 @@ public class OrderService {
 		statusJson.put("orderId", orderUuid);
 		statusJson.put("status", status.getStatus().toString());
 		statusJson.put("date", status.getDate());
-		if (order.getBroker() == null) {
+		if (order.getBroker() != null) {
 			statusJson.put("executor", order.getBroker().getName());
 		}
 

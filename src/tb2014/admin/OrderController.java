@@ -260,13 +260,14 @@ public class OrderController {
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
-				System.out.println("Error sending order to server");
+				model.addAttribute("result",
+						"Error sending order to server: " + getStringFromInputStream(connection.getInputStream()));
+			} else {
+				model.addAttribute("result", getStringFromInputStream(connection.getInputStream()));
 			}
 
-			model.addAttribute("result", getStringFromInputStream(connection.getInputStream()));
-
 		} catch (Exception ex) {
-			System.out.println("Error getting order status: " + ex.toString());
+			model.addAttribute("result", "Error getting order status: " + ex.toString());
 		}
 
 		return "result";

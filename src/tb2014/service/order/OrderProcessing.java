@@ -37,7 +37,7 @@ import tb2014.domain.order.OrderCancelType;
 import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.serialize.OrderSerializer;
-import tb2014.utils.OrderTimeoutUtil;
+import tb2014.utils.DatetimeUtil;
 
 @Service("ordersProcessing")
 public class OrderProcessing {
@@ -253,7 +253,7 @@ public class OrderProcessing {
 
 	@Transactional
 	public CancelOrderProcessing.OrderCancelHolder checkExpired(Order order, int cancelOrderTimeout, Date checkTime) {
-		if (OrderTimeoutUtil.isTimeoutExpired(order, cancelOrderTimeout, new Date())) {
+		if (DatetimeUtil.isTimeoutExpired(order, cancelOrderTimeout, new Date())) {
 			OrderStatus failedStatus = new OrderStatus();
 			failedStatus.setDate(new Date());
 			failedStatus.setOrder(order);

@@ -6,7 +6,7 @@ import java.util.TimeZone;
 
 import tb2014.domain.order.Order;
 
-public class OrderTimeoutUtil {
+public class DatetimeUtil {
 
 	public static boolean isTimeoutExpired(Order order, int cancelOrderTimeout, Date checkTime) {
 		// 1) date in db in utc without time zone
@@ -14,8 +14,8 @@ public class OrderTimeoutUtil {
 		fromDB.setTime(order.getBookingDate());
 
 		// 2) now apply UTC time zone
-		TimeZone utc = TimeZone.getTimeZone("UTC");
-		Calendar booking = Calendar.getInstance(utc);
+		TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+		Calendar booking = Calendar.getInstance(utcTimeZone);
 		booking.set(fromDB.get(Calendar.YEAR), fromDB.get(Calendar.MONTH), fromDB.get(Calendar.DAY_OF_MONTH),
 				fromDB.get(Calendar.HOUR_OF_DAY), fromDB.get(Calendar.MINUTE));
 
