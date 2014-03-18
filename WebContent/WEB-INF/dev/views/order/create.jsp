@@ -96,17 +96,9 @@
 		<input type="text" name="dHousing" />
 		<br />
 		<h3>Booking</h3>
-		Date:
+		Date (dd-MM-yyyy HH:mm):
 		<br />
 		<input type="text" name="bookingDate">
-		<br />
-		Hour:
-		<br />
-		<input type="text" name="bookingHour">
-		<br />
-		Minute:
-		<br />
-		<input type="text" name="bookingMin">
 		<br />
 		<h3>Requirements</h3>
 		<input type="checkbox" name="requirements" value="isAnimalTransport"> animals<br />

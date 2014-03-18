@@ -444,8 +444,6 @@ public class OrderController {
 		orderJson.put("destinations", destinationsJson);
 		orderJson.put("urgent", request.getParameter("orderType"));
 		orderJson.put("bookingDate", request.getParameter("bookingDate"));
-		orderJson.put("bookingHour", request.getParameter("bookingHour"));
-		orderJson.put("bookingMin", request.getParameter("bookingMin"));
 
 		JSONArray requirementsJson = new JSONArray();
 
