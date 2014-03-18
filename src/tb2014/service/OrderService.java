@@ -177,7 +177,7 @@ public class OrderService {
 		statusJson.put("orderId", orderUuid);
 		statusJson.put("status", status.getStatus().toString());
 		statusJson.put("date", status.getDate());
-		if (order.getBroker() == null) {
+		if (order.getBroker() != null) {
 			statusJson.put("executor", order.getBroker().getName());
 		}
 
