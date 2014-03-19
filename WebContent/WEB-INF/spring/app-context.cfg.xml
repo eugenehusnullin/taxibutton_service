@@ -44,16 +44,14 @@
 		destroy-method="stop">
 	</bean>
 
-	<bean id="tariffsProcessing" class="tb2014.service.tariff.TariffsProcessing" />
-
 	<context:component-scan base-package="tb2014" />
 	<context:annotation-config />
 
+
+	<bean id="tariffService" class="tb2014.service.TariffService" />
 	<task:scheduled-tasks scheduler="tariffsProcessingScheduler">
-		<task:scheduled ref="tariffsProcessing" method="pullBrokersTariffs"
+		<task:scheduled ref="tariffService" method="pullBrokersTariffs"
 			fixed-delay="3600000" />
 	</task:scheduled-tasks>
-
-	<task:scheduler id="tariffsProcessingScheduler"
-		pool-size="10" />
+	<task:scheduler id="tariffsProcessingScheduler" pool-size="10" />
 </beans>

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tb2014.domain.order.Order;
+import tb2014.service.OrderService;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service()
@@ -79,13 +80,13 @@ public class OfferOrderProcessing {
 				}
 			}
 
-			Boolean offered = orderProcessing.offerOrderProcessing(order);
+			Boolean offered = orderService.offerOrderProcessing(order);
 
 			if (offered != null) {
 				if (offered) {
 					chooseWinnerProcessing.addOrder(order);
 				} else {
-					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderProcessing.checkExpired(order,
+					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderService.checkExpired(order,
 							cancelOrderTimeout, new Date());
 					if (orderCancelHolder != null) {
 						cancelOrderProcessing.addOrderCancel(orderCancelHolder);
@@ -106,7 +107,7 @@ public class OfferOrderProcessing {
 	private volatile boolean processing = true;
 	private ExecutorService executor;
 	@Autowired
-	private OrderProcessing orderProcessing;
+	private OrderService orderService;
 	@Autowired
 	private ChooseWinnerProcessing chooseWinnerProcessing;
 	@Autowired

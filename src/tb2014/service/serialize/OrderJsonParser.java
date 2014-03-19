@@ -12,7 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tb2014.business.IBrokerBusiness;
+import tb2014.dao.IBrokerDao;
 import tb2014.domain.Broker;
 import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
@@ -21,7 +21,7 @@ import tb2014.domain.order.VehicleClass;
 
 public class OrderJsonParser {
 
-	public static Order Json2Order(JSONObject jsonObject, IBrokerBusiness brokerBusiness) {
+	public static Order Json2Order(JSONObject jsonObject, IBrokerDao brokerDao) {
 
 		Order order = new Order();
 
@@ -139,7 +139,7 @@ public class OrderJsonParser {
 			for (int i = 0; i < brokersUuids.length(); i++) {
 
 				String currentBrokerUuid = brokersUuids.getString(i);
-				Broker broker = brokerBusiness.get(currentBrokerUuid);
+				Broker broker = brokerDao.get(currentBrokerUuid);
 
 				offerBrokerList.add(broker);
 			}

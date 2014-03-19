@@ -7,47 +7,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import tb2014.business.IBrokerBusiness;
+import tb2014.dao.IBrokerDao;
 import tb2014.domain.Broker;
 
 @Service
 public class BrokerService {
 
 	@Autowired
-	private IBrokerBusiness brokerBusiness;
+	private IBrokerDao brokerDao;
 
 	@Transactional
 	public List<Broker> getAll() {
-		return brokerBusiness.getAll();
+		return brokerDao.getAll();
 	}
 
 	@Transactional
 	public void add(Broker broker) {
 		broker.setUuid(UUID.randomUUID().toString());
-		brokerBusiness.add(broker);
+		brokerDao.save(broker);
 	}
 
 	@Transactional
 	public void delete(Long brokerId) {
-		Broker broker = brokerBusiness.getById(brokerId);
-		brokerBusiness.delete(broker);
+		Broker broker = brokerDao.get(brokerId);
+		brokerDao.delete(broker);
 	}
 
 	@Transactional
 	public Broker get(Long brokerId) {
-		return brokerBusiness.getById(brokerId);
+		return brokerDao.get(brokerId);
 	}
 
 	@Transactional
 	public void update(Long brokerId, String apiId, String apiKey, String name, String apiUrl) {
-		Broker broker = brokerBusiness.getById(brokerId);
+		Broker broker = brokerDao.get(brokerId);
 
 		broker.setApiId(apiId);
 		broker.setApiKey(apiKey);
 		broker.setApiurl(apiUrl);
 		broker.setName(name);
 
-		brokerBusiness.saveOrUpdate(broker);
+		brokerDao.saveOrUpdate(broker);
 	}
 
 }

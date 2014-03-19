@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tb2014.domain.order.Order;
+import tb2014.service.OrderService;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service
@@ -67,17 +68,17 @@ public class ChooseWinnerProcessing {
 
 		@Override
 		public void run() {
-			Object object = orderProcessing.chooseWinnerProcessing(order, cancelorderTimeout);
+			Object object = orderService.chooseWinnerProcessing(order, cancelorderTimeout);
 
 			if (object != null) {
 				if (object.getClass().equals(Order.class)) {
 					try {
 						Thread.sleep(repeatPause);
-						addOrder((Order)object);
+						addOrder((Order) object);
 					} catch (InterruptedException e) {
 					}
 				} else {
-					cancelOrderProcessing.addOrderCancel((CancelOrderProcessing.OrderCancelHolder)object);
+					cancelOrderProcessing.addOrderCancel((CancelOrderProcessing.OrderCancelHolder) object);
 				}
 			}
 		}
@@ -87,14 +88,12 @@ public class ChooseWinnerProcessing {
 	private Thread mainThread;
 	private volatile boolean processing = true;
 	private ExecutorService executor;
-	private OrderProcessing orderProcessing;
+	@Autowired
+	private OrderService orderService;
+	@Autowired
 	private CancelOrderProcessing cancelOrderProcessing;
 
-	@Autowired
-	public ChooseWinnerProcessing(OrderProcessing orderProcessing, CancelOrderProcessing cancelOrderProcessing) {
-		this.orderProcessing = orderProcessing;
-		this.cancelOrderProcessing = cancelOrderProcessing;
-
+	public ChooseWinnerProcessing() {
 		queue = new ArrayDeque<Order>();
 	}
 

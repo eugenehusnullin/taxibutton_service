@@ -28,7 +28,6 @@ import tb2014.admin.model.OrderStatusModel;
 import tb2014.service.BrokerService;
 import tb2014.service.GeodataService;
 import tb2014.service.OrderService;
-import tb2014.service.order.OrderProcessing;
 
 @RequestMapping("/order")
 @Controller("devTestOrderController")
@@ -36,8 +35,6 @@ public class OrderController {
 
 	@Autowired
 	private OrderService orderService;
-	@Autowired
-	private OrderProcessing orderProcessing;
 	@Autowired
 	private BrokerService brokerService;
 	@Autowired
@@ -527,7 +524,7 @@ public class OrderController {
 
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String delete(@RequestParam("id") Long orderId) {
-		orderProcessing.deleteOrder(orderId);
+		orderService.deleteOrder(orderId);
 		return "redirect:list";
 	}
 

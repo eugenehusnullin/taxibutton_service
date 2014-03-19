@@ -8,21 +8,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.admin.model.GeodataModel;
-import tb2014.business.IGeoDataBusiness;
-import tb2014.business.IOrderBusiness;
+import tb2014.dao.IGeoDataDao;
+import tb2014.dao.IOrderDao;
 import tb2014.domain.order.GeoData;
 
 @Service
 public class GeodataService {
 
 	@Autowired
-	private IOrderBusiness orderBusiness;
+	private IOrderDao orderDao;
 	@Autowired
-	private IGeoDataBusiness geoDataBusiness;
+	private IGeoDataDao geoDataDao;
 
 	@Transactional
 	public List<GeodataModel> getGeodata(Long orderId) {
-		List<GeoData> geoDatas = geoDataBusiness.getAll(orderBusiness.get(orderId));
+		List<GeoData> geoDatas = geoDataDao.getAll(orderDao.get(orderId));
 
 		List<GeodataModel> models = new ArrayList<>();
 		for (GeoData geoData : geoDatas) {
@@ -36,5 +36,10 @@ public class GeodataService {
 		}
 
 		return models;
+	}
+
+	@Transactional
+	public void save(GeoData geoData) {
+		geoDataDao.save(geoData);
 	}
 }

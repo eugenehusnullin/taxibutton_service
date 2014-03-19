@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import tb2014.domain.Broker;
 import tb2014.service.BrokerService;
-import tb2014.service.tariff.TariffsProcessing;
+import tb2014.service.TariffService;
 
 @RequestMapping("/broker")
 @Controller
@@ -20,7 +20,7 @@ public class BrokerController {
 	@Autowired
 	private BrokerService brokerService;
 	@Autowired
-	private TariffsProcessing tariffsProcessing;
+	private TariffService tariffService;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
@@ -51,7 +51,7 @@ public class BrokerController {
 	@RequestMapping(value = "/tariffs", method = RequestMethod.GET)
 	public String tariffs() {
 
-		tariffsProcessing.pullBrokersTariffs();
+		tariffService.pullBrokersTariffs();
 		return "redirect:list";
 	}
 
