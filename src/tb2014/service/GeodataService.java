@@ -37,4 +37,9 @@ public class GeodataService {
 
 		return models;
 	}
+
+	@Transactional
+	public void save(GeoData geoData) {
+		geoDataDao.save(geoData);
+	}
 }

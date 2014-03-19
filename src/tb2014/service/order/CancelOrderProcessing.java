@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import tb2014.domain.order.Order;
 import tb2014.domain.order.OrderCancelType;
+import tb2014.service.OrderService;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
 @Service
@@ -83,12 +84,12 @@ public class CancelOrderProcessing {
 
 		@Override
 		public void run() {
-			orderProcessing.cancelOfferedOrder(orderCancelHolder);
+			orderService.cancelOfferedOrder(orderCancelHolder);
 		}
 	}
 
 	@Autowired
-	private OrderProcessing orderProcessing;
+	private OrderService orderService;
 	private Queue<OrderCancelHolder> queue;
 	private Thread mainThread;
 	private ExecutorService executor;

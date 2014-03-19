@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import tb2014.dao.IGeoDataDao;
 import tb2014.domain.order.GeoData;
+import tb2014.service.GeodataService;
 
 @Service
 public class GeoDataProcessing {
@@ -54,7 +54,7 @@ public class GeoDataProcessing {
 
 							if (needupdate) {
 								map.put(geoData.getOrder().getId(), geoData);
-								geoDataDao.save(geoData);
+								geodataService.save(geoData);
 							}
 						}
 					}
@@ -66,7 +66,7 @@ public class GeoDataProcessing {
 	}
 
 	@Autowired
-	private IGeoDataDao geoDataDao;
+	private GeodataService geodataService;
 	private Queue<GeoData> queue;
 	private Map<Long, GeoData> map;
 	private Thread mainThread;
