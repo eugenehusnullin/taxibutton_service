@@ -24,12 +24,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
-import tb2014.business.IBrokerBusiness;
-import tb2014.business.IOfferedOrderBrokerBusiness;
-import tb2014.business.IOrderAcceptAlacrityBusiness;
-import tb2014.business.IOrderBusiness;
-import tb2014.business.IOrderCancelBusiness;
-import tb2014.business.IOrderStatusBusiness;
+import tb2014.dao.IBrokerDao;
+import tb2014.dao.IOfferedOrderBrokerDao;
+import tb2014.dao.IOrderAcceptAlacrityDao;
+import tb2014.dao.IOrderCancelDao;
+import tb2014.dao.IOrderDao;
+import tb2014.dao.IOrderStatusDao;
 import tb2014.domain.Broker;
 import tb2014.domain.order.OfferedOrderBroker;
 import tb2014.domain.order.Order;
@@ -45,24 +45,24 @@ public class OrderProcessing {
 	private static final Logger log = LoggerFactory.getLogger(OrderProcessing.class);
 
 	@Autowired
-	private IOrderBusiness orderBusiness;
+	private IOrderDao orderDao;
 	@Autowired
-	private IBrokerBusiness brokerBusiness;
+	private IBrokerDao brokerDao;
 	@Autowired
-	private IOrderCancelBusiness orderCancelBusiness;
+	private IOrderCancelDao orderCancelDao;
 	@Autowired
-	private IOrderStatusBusiness orderStatusBusiness;
+	private IOrderStatusDao orderStatusDao;
 	@Autowired
-	private IOfferedOrderBrokerBusiness offeredOrderBrokerBusiness;
+	private IOfferedOrderBrokerDao offeredOrderBrokerDao;
 	@Autowired
-	private IOrderAcceptAlacrityBusiness alacrityBuiness;
+	private IOrderAcceptAlacrityDao alacrityDao;
 
 	// offer order to all connected brokers (need to apply any rules to share
 	// order between bounded set of brokers)
 	@Transactional
 	public boolean offerOrder(Order order) {
 
-		List<Broker> brokers = brokerBusiness.getAll();
+		List<Broker> brokers = brokerDao.getAll();
 		Document orderXml = OrderSerializer.OrderToXml(order);
 		boolean offered = false;
 
@@ -77,7 +77,7 @@ public class OrderProcessing {
 					offeredOrderBroker.setOrder(order);
 					offeredOrderBroker.setBroker(currentBroker);
 					offeredOrderBroker.setTimestamp(new Date());
-					offeredOrderBrokerBusiness.save(offeredOrderBroker);
+					offeredOrderBrokerDao.save(offeredOrderBroker);
 				}
 			} catch (Exception ex) {
 				log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
@@ -125,9 +125,9 @@ public class OrderProcessing {
 	public boolean giveOrder(Long orderId, Long brokerId) {
 
 		boolean result = true;
-		Broker broker = brokerBusiness.getById(brokerId);
+		Broker broker = brokerDao.get(brokerId);
 		try {
-			Order order = orderBusiness.get(orderId);
+			Order order = orderDao.get(orderId);
 
 			String url = broker.getApiurl() + "/give";
 			url += "?orderId=" + order.getUuid();
@@ -143,13 +143,13 @@ public class OrderProcessing {
 				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
 				order.setBroker(broker);
-				orderBusiness.saveOrUpdate(order);
+				orderDao.saveOrUpdate(order);
 
 				OrderStatus orderStatus = new OrderStatus();
 				orderStatus.setDate(new Date());
 				orderStatus.setOrder(order);
 				orderStatus.setStatus(OrderStatusType.Taked);
-				orderStatusBusiness.save(orderStatus);
+				orderStatusDao.save(orderStatus);
 			}
 		} catch (Exception ex) {
 			result = false;
@@ -163,7 +163,7 @@ public class OrderProcessing {
 	@Transactional
 	public Boolean cancelOfferedOrder(CancelOrderProcessing.OrderCancelHolder orderCancelHolder) {
 		Boolean result = true;
-		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerBusiness.get(orderCancelHolder.getOrder());
+		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerDao.get(orderCancelHolder.getOrder());
 		String reason = orderCancelHolder.getOrderCancelType().toString();
 
 		String params = "orderId=" + orderCancelHolder.getOrder().getUuid() + "&reason=" + reason;
@@ -215,20 +215,20 @@ public class OrderProcessing {
 	@Transactional
 	public void deleteOrder(Long orderId) {
 
-		Order order = orderBusiness.get(orderId);
+		Order order = orderDao.get(orderId);
 
-		orderBusiness.delete(order);
+		orderDao.delete(order);
 	}
 
 	@Transactional
 	public Object chooseWinnerProcessing(Order order, int cancelOrderTimeout) {
 		// check right status
-		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
+		OrderStatus orderStatus = orderStatusDao.getLast(order);
 		if (OrderStatusType.EndProcessingStatus(orderStatus.getStatus())) {
 			return null;
 		}
 
-		Broker winner = alacrityBuiness.getWinner(order);
+		Broker winner = alacrityDao.getWinner(order);
 		boolean success = false;
 		if (winner != null) {
 			success = giveOrder(order.getId(), winner.getId());
@@ -258,7 +258,7 @@ public class OrderProcessing {
 			failedStatus.setDate(new Date());
 			failedStatus.setOrder(order);
 			failedStatus.setStatus(OrderStatusType.Failed);
-			orderStatusBusiness.save(failedStatus);
+			orderStatusDao.save(failedStatus);
 
 			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
 			orderCancelHolder.setOrder(order);
@@ -272,7 +272,7 @@ public class OrderProcessing {
 	@Transactional
 	public Boolean offerOrderProcessing(Order order) {
 		// check right status
-		OrderStatus orderStatus = orderStatusBusiness.getLast(order);
+		OrderStatus orderStatus = orderStatusDao.getLast(order);
 		if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {
 			return null;
 		}

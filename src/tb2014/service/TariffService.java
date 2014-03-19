@@ -17,9 +17,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import tb2014.business.IBrokerBusiness;
-import tb2014.business.IDeviceBusiness;
-import tb2014.business.ISimpleTariffBusiness;
+import tb2014.dao.IBrokerDao;
+import tb2014.dao.IDeviceDao;
+import tb2014.dao.ISimpleTariffDao;
 import tb2014.domain.Broker;
 import tb2014.domain.Device;
 import tb2014.domain.tariff.SimpleTariff;
@@ -30,22 +30,22 @@ import tb2014.utils.ConverterUtil;
 public class TariffService {
 
 	@Autowired
-	private ISimpleTariffBusiness simpleTariffBusiness;
+	private ISimpleTariffDao simpleTariffDao;
 	@Autowired
-	private IDeviceBusiness deviceBusiness;
+	private IDeviceDao deviceDao;
 	@Autowired
-	private IBrokerBusiness brokerBusiness;
+	private IBrokerDao brokerDao;
 
 	@Transactional
 	public JSONArray getAll(JSONObject requestJson) throws DeviceNotFoundException {
 
 		String apiId = requestJson.optString("apiId");
-		Device device = deviceBusiness.get(apiId);
+		Device device = deviceDao.get(apiId);
 		if (device == null) {
 			throw new DeviceNotFoundException(apiId);
 		}
 
-		List<SimpleTariff> tariffs = simpleTariffBusiness.getAll();
+		List<SimpleTariff> tariffs = simpleTariffDao.getAll();
 		JSONArray tariffsJsonArray = new JSONArray();
 		for (SimpleTariff simoleTariff : tariffs) {
 			JSONObject tariffJson = new JSONObject();
@@ -58,8 +58,8 @@ public class TariffService {
 
 	@Transactional
 	public String getTariff(Long brokerId) {
-		Broker broker = brokerBusiness.getById(brokerId);
-		SimpleTariff simpleTariff = simpleTariffBusiness.get(broker);
+		Broker broker = brokerDao.get(brokerId);
+		SimpleTariff simpleTariff = simpleTariffDao.get(broker);
 		return simpleTariff.getTariffs();
 	}
 
@@ -69,8 +69,8 @@ public class TariffService {
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		Document doc = docBuilder.parse(new InputSource(new StringReader(tariff)));
 
-		Broker broker = brokerBusiness.getById(brokerId);
-		SimpleTariff simpleTariff = simpleTariffBusiness.get(broker);
+		Broker broker = brokerDao.get(brokerId);
+		SimpleTariff simpleTariff = simpleTariffDao.get(broker);
 
 		if (simpleTariff == null) {
 			simpleTariff = new SimpleTariff();
@@ -78,6 +78,6 @@ public class TariffService {
 		}
 
 		simpleTariff.setTariffs(ConverterUtil.XmlToString(doc).replace("\r", "").replace("\n", ""));
-		simpleTariffBusiness.saveOrUpdate(simpleTariff);
+		simpleTariffDao.saveOrUpdate(simpleTariff);
 	}
 }

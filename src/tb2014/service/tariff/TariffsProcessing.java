@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.Run;
-import tb2014.business.IBrokerBusiness;
-import tb2014.business.ISimpleTariffBusiness;
+import tb2014.dao.IBrokerDao;
+import tb2014.dao.ISimpleTariffDao;
 import tb2014.domain.Broker;
 import tb2014.domain.tariff.SimpleTariff;
 import tb2014.utils.NetStreamUtils;
@@ -23,14 +23,14 @@ public class TariffsProcessing {
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
 	@Autowired
-	private IBrokerBusiness brokerBusiness;
+	private IBrokerDao brokerDao;
 	@Autowired
-	private ISimpleTariffBusiness simpleTariffBusiness;
+	private ISimpleTariffDao simpleTariffDao;
 
 	@Transactional
 	public void pullBrokersTariffs() {
 
-		List<Broker> brokers = brokerBusiness.getAll();
+		List<Broker> brokers = brokerDao.getAll();
 
 		for (Broker currentBroker : brokers) {
 
@@ -71,7 +71,7 @@ public class TariffsProcessing {
 
 	private void UpdateBrokerTariffs(Broker broker, String tariff) {
 
-		SimpleTariff simpleTariff = simpleTariffBusiness.get(broker);
+		SimpleTariff simpleTariff = simpleTariffDao.get(broker);
 
 		if (simpleTariff == null) {
 
@@ -81,6 +81,6 @@ public class TariffsProcessing {
 
 		simpleTariff.setTariffs(tariff);
 
-		simpleTariffBusiness.saveOrUpdate(simpleTariff);
+		simpleTariffDao.saveOrUpdate(simpleTariff);
 	}
 }

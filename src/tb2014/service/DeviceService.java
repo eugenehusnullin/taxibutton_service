@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.admin.model.DeviceModel;
-import tb2014.business.IDeviceBusiness;
+import tb2014.dao.IDeviceDao;
 import tb2014.domain.Device;
 
 @Service
 public class DeviceService {
 	@Autowired
-	private IDeviceBusiness deviceBusiness;
+	private IDeviceDao deviceDao;
 
 	@Transactional
 	public JSONObject register(JSONObject registerJson) {
@@ -26,7 +26,7 @@ public class DeviceService {
 		Device device = new Device();
 		device.setApiId(newDeviceUuid);
 		device.setPhone(phone);
-		deviceBusiness.save(device);
+		deviceDao.save(device);
 
 		JSONObject resultJson = new JSONObject();
 		resultJson.put("apiId", device.getApiId());
@@ -35,7 +35,7 @@ public class DeviceService {
 	
 	@Transactional
 	public List<DeviceModel> getAll() {
-		List<Device> devices = deviceBusiness.getAll();
+		List<Device> devices = deviceDao.getAll();
 		
 		List<DeviceModel> models = new ArrayList<>();
 		for (Device device : devices) {
