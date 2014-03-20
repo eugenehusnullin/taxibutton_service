@@ -69,34 +69,42 @@ public class OfferOrderProcessing {
 
 		@Override
 		public void run() {
-			// do pause before offer, maybe client canceled order
-			Date currentDatetime = new Date();
-			if (order.getStartOffer().after(currentDatetime)) {
-				long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
-				try {
-					Thread.sleep(diff);
-				} catch (InterruptedException e) {
-					return;
+			try {
+				// do pause before offer, maybe client canceled order
+				Date currentDatetime = new Date();
+				if (order.getStartOffer().after(currentDatetime)) {
+					long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
+					try {
+						Thread.sleep(diff);
+					} catch (InterruptedException e) {
+						return;
+					}
 				}
-			}
 
-			Boolean offered = orderService.offerOrderProcessing(order);
+				Boolean offered = orderService.offerOrderProcessing(order);
 
-			if (offered != null) {
-				if (offered) {
-					chooseWinnerProcessing.addOrder(order);
-				} else {
-					CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderService.checkExpired(order,
-							cancelOrderTimeout, new Date());
-					if (orderCancelHolder != null) {
-						cancelOrderProcessing.addOrderCancel(orderCancelHolder);
+				if (offered != null) {
+					if (offered) {
+						chooseWinnerProcessing.addOrder(order);
 					} else {
-						try {
-							Thread.sleep(repeatPause);
-							addOrder(order);
-						} catch (InterruptedException e) {
+						CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderService.checkExpired(order,
+								cancelOrderTimeout, new Date());
+						if (orderCancelHolder != null) {
+							cancelOrderProcessing.addOrderCancel(orderCancelHolder);
+						} else {
+							try {
+								Thread.sleep(repeatPause);
+								addOrder(order);
+							} catch (InterruptedException e) {
+							}
 						}
 					}
+				}
+			} catch (Exception ex) {
+				try {
+					Thread.sleep(repeatPause);
+					addOrder(order);
+				} catch (InterruptedException e) {
 				}
 			}
 		}

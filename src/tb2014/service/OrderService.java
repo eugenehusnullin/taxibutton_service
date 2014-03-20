@@ -69,7 +69,7 @@ import tb2014.utils.DatetimeUtil;
 
 @Service
 public class OrderService {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
 	@Autowired
@@ -113,8 +113,7 @@ public class OrderService {
 		Order order = OrderJsonParser.Json2Order(orderObject, brokerDao);
 
 		// check booking date
-		if (DatetimeUtil.isTimeoutExpired(order, 0, new Date()))
-		{
+		if (DatetimeUtil.isTimeoutExpired(order, 0, new Date())) {
 			throw new ParseOrderException();
 		}
 
@@ -363,8 +362,8 @@ public class OrderService {
 		GeoData geoData = new GeoData();
 		geoData.setOrder(order);
 		geoData.setDate(new Date());
-		geoData.setLat(Double.parseDouble(lat));
-		geoData.setLon(Double.parseDouble(lon));
+		geoData.setLat(Double.parseDouble(lat.replace(',', '.')));
+		geoData.setLon(Double.parseDouble(lon.replace(',', '.')));
 
 		if (category != null && !category.isEmpty()) {
 			geoData.setCategory(category);
@@ -375,7 +374,7 @@ public class OrderService {
 		}
 
 		if (speed != null && !speed.isEmpty()) {
-			geoData.setSpeed(Double.parseDouble(speed));
+			geoData.setSpeed(Double.parseDouble(speed.replace(',', '.')));
 		}
 
 		geoDataProcessing.addGeoData(geoData);
@@ -459,228 +458,228 @@ public class OrderService {
 
 		return models;
 	}
-	
+
 	// offer order to all connected brokers (need to apply any rules to share
-		// order between bounded set of brokers)
-		@Transactional
-		public boolean offerOrder(Order order) {
+	// order between bounded set of brokers)
+	@Transactional
+	public boolean offerOrder(Order order) {
 
-			List<Broker> brokers = brokerDao.getAll();
-			Document orderXml = OrderSerializer.OrderToXml(order);
-			boolean offered = false;
+		List<Broker> brokers = brokerDao.getAll();
+		Document orderXml = OrderSerializer.OrderToXml(order);
+		boolean offered = false;
 
-			for (Broker currentBroker : brokers) {
+		for (Broker currentBroker : brokers) {
 
-				try {
+			try {
 
-					offered = offerOrderHTTP(currentBroker, orderXml);
+				offered = offerOrderHTTP(currentBroker, orderXml);
 
-					if (offered) {
-						OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
-						offeredOrderBroker.setOrder(order);
-						offeredOrderBroker.setBroker(currentBroker);
-						offeredOrderBroker.setTimestamp(new Date());
-						offeredOrderBrokerDao.save(offeredOrderBroker);
-					}
-				} catch (Exception ex) {
-					log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
+				if (offered) {
+					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
+					offeredOrderBroker.setOrder(order);
+					offeredOrderBroker.setBroker(currentBroker);
+					offeredOrderBroker.setTimestamp(new Date());
+					offeredOrderBrokerDao.save(offeredOrderBroker);
 				}
+			} catch (Exception ex) {
+				log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
 			}
-
-			return offered;
 		}
 
-		// offer order via HTTP protocol
-		private boolean offerOrderHTTP(Broker broker, Document document) throws IOException,
-				TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+		return offered;
+	}
 
-			String url = broker.getApiurl() + "/offer";
+	// offer order via HTTP protocol
+	private boolean offerOrderHTTP(Broker broker, Document document) throws IOException,
+			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+
+		String url = broker.getApiurl() + "/offer";
+		URL obj = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+		connection.setRequestMethod("POST");
+		connection.setRequestProperty("Content-Type", "application/xml");
+		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		connection.setReadTimeout(0);
+
+		connection.setDoOutput(true);
+		DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+
+		Source source = new DOMSource(document);
+		Result result = new StreamResult(wr);
+
+		TransformerFactory.newInstance().newTransformer().transform(source, result);
+		wr.flush();
+		wr.close();
+
+		int responceCode = connection.getResponseCode();
+
+		if (responceCode != 200) {
+			log.info("Error offering order to broker (code: " + responceCode + "): " + broker.getId().toString());
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	// assign order executer
+	@Transactional
+	public boolean giveOrder(Long orderId, Long brokerId) {
+
+		boolean result = true;
+		Broker broker = brokerDao.get(brokerId);
+		try {
+			Order order = orderDao.get(orderId);
+
+			String url = broker.getApiurl() + "/give";
+			url += "?orderId=" + order.getUuid();
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/xml");
-			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-			connection.setReadTimeout(0);
-
-			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-
-			Source source = new DOMSource(document);
-			Result result = new StreamResult(wr);
-
-			TransformerFactory.newInstance().newTransformer().transform(source, result);
-			wr.flush();
-			wr.close();
+			connection.setRequestMethod("GET");
 
 			int responceCode = connection.getResponseCode();
 
 			if (responceCode != 200) {
-				log.info("Error offering order to broker (code: " + responceCode + "): " + broker.getId().toString());
-				return false;
-			} else {
-				return true;
-			}
-		}
-
-		// assign order executer
-		@Transactional
-		public boolean giveOrder(Long orderId, Long brokerId) {
-
-			boolean result = true;
-			Broker broker = brokerDao.get(brokerId);
-			try {
-				Order order = orderDao.get(orderId);
-
-				String url = broker.getApiurl() + "/give";
-				url += "?orderId=" + order.getUuid();
-				URL obj = new URL(url);
-				HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-				connection.setRequestMethod("GET");
-
-				int responceCode = connection.getResponseCode();
-
-				if (responceCode != 200) {
-					result = false;
-					log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
-				} else {
-					order.setBroker(broker);
-					orderDao.saveOrUpdate(order);
-
-					OrderStatus orderStatus = new OrderStatus();
-					orderStatus.setDate(new Date());
-					orderStatus.setOrder(order);
-					orderStatus.setStatus(OrderStatusType.Taked);
-					orderStatusDao.save(orderStatus);
-				}
-			} catch (Exception ex) {
 				result = false;
-				log.error("Giving order for broker " + broker.getId() + " error: " + ex.toString());
-			}
-
-			return result;
-		}
-
-		// cancel order to prepared broker
-		@Transactional
-		public Boolean cancelOfferedOrder(CancelOrderProcessing.OrderCancelHolder orderCancelHolder) {
-			Boolean result = true;
-			List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerDao.get(orderCancelHolder.getOrder());
-			String reason = orderCancelHolder.getOrderCancelType().toString();
-
-			String params = "orderId=" + orderCancelHolder.getOrder().getUuid() + "&reason=" + reason;
-
-			for (OfferedOrderBroker currentOffer : offeredBrokerList) {
-				if (orderCancelHolder.getOrderCancelType() == OrderCancelType.Assigned
-						&& orderCancelHolder.getOrder().getBroker().getId().equals(currentOffer.getBroker().getId())) {
-					continue;
-				}
-				String url = currentOffer.getBroker().getApiurl() + "/cancel";
-				int resultCode = sendHttpGet(url, params);
-
-				if (resultCode != 200) {
-					result = false;
-				}
-			}
-
-			return result;
-		}
-
-		// sending HTTP GET request
-		private int sendHttpGet(String url, String params) {
-
-			String protocol = url.split(":")[0];
-			String[] fullAddress = url.split("//")[1].split("/", 2);
-			String address = fullAddress[0];
-			String path = "/" + fullAddress[1];
-
-			int responseCode = 0;
-
-			try {
-				URI uriObject = new URI(protocol, address, path, params, null);
-
-				URL obj = uriObject.toURL();
-				HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-				connection.setRequestMethod("GET");
-
-				responseCode = connection.getResponseCode();
-			} catch (Exception ex) {
-
-				System.out.println("Sending HTTP GET to: " + url + " FAILED, error: " + ex.toString());
-				responseCode = -1;
-			}
-
-			return responseCode;
-		}
-
-		@Transactional
-		public void deleteOrder(Long orderId) {
-
-			Order order = orderDao.get(orderId);
-
-			orderDao.delete(order);
-		}
-
-		@Transactional
-		public Object chooseWinnerProcessing(Order order, int cancelOrderTimeout) {
-			// check right status
-			OrderStatus orderStatus = orderStatusDao.getLast(order);
-			if (OrderStatusType.EndProcessingStatus(orderStatus.getStatus())) {
-				return null;
-			}
-
-			Broker winner = alacrityDao.getWinner(order);
-			boolean success = false;
-			if (winner != null) {
-				success = giveOrder(order.getId(), winner.getId());
-			}
-
-			if (!success) {
-				// check date supply for obsolete order
-				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = checkExpired(order, cancelOrderTimeout,
-						new Date());
-				if (orderCancelHolder != null) {
-					return orderCancelHolder;
-				} else {
-					return order;
-				}
+				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
 			} else {
-				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
-				orderCancelHolder.setOrder(order);
-				orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
-				return orderCancelHolder;
+				order.setBroker(broker);
+				orderDao.saveOrUpdate(order);
+
+				OrderStatus orderStatus = new OrderStatus();
+				orderStatus.setDate(new Date());
+				orderStatus.setOrder(order);
+				orderStatus.setStatus(OrderStatusType.Taked);
+				orderStatusDao.save(orderStatus);
+			}
+		} catch (Exception ex) {
+			result = false;
+			log.error("Giving order for broker " + broker.getId() + " error: " + ex.toString());
+		}
+
+		return result;
+	}
+
+	// cancel order to prepared broker
+	@Transactional
+	public Boolean cancelOfferedOrder(CancelOrderProcessing.OrderCancelHolder orderCancelHolder) {
+		orderCancelHolder.setOrder(orderDao.get(orderCancelHolder.getOrder().getId()));
+
+		Boolean result = true;
+		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerDao.get(orderCancelHolder.getOrder());
+		String reason = orderCancelHolder.getOrderCancelType().toString();
+
+		String params = "orderId=" + orderCancelHolder.getOrder().getUuid() + "&reason=" + reason;
+
+		for (OfferedOrderBroker currentOffer : offeredBrokerList) {
+			if (orderCancelHolder.getOrderCancelType() == OrderCancelType.Assigned
+					&& orderCancelHolder.getOrder().getBroker().getId().equals(currentOffer.getBroker().getId())) {
+				continue;
+			}
+			String url = currentOffer.getBroker().getApiurl() + "/cancel";
+			int resultCode = sendHttpGet(url, params);
+
+			if (resultCode != 200) {
+				result = false;
 			}
 		}
 
-		@Transactional
-		public CancelOrderProcessing.OrderCancelHolder checkExpired(Order order, int cancelOrderTimeout, Date checkTime) {
-			if (DatetimeUtil.isTimeoutExpired(order, cancelOrderTimeout, new Date())) {
-				OrderStatus failedStatus = new OrderStatus();
-				failedStatus.setDate(new Date());
-				failedStatus.setOrder(order);
-				failedStatus.setStatus(OrderStatusType.Failed);
-				orderStatusDao.save(failedStatus);
+		return result;
+	}
 
-				CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
-				orderCancelHolder.setOrder(order);
-				orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
+	// sending HTTP GET request
+	private int sendHttpGet(String url, String params) {
+
+		String protocol = url.split(":")[0];
+		String[] fullAddress = url.split("//")[1].split("/", 2);
+		String address = fullAddress[0];
+		String path = "/" + fullAddress[1];
+
+		int responseCode = 0;
+
+		try {
+			URI uriObject = new URI(protocol, address, path, params, null);
+
+			URL obj = uriObject.toURL();
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+			connection.setRequestMethod("GET");
+
+			responseCode = connection.getResponseCode();
+		} catch (Exception ex) {
+
+			System.out.println("Sending HTTP GET to: " + url + " FAILED, error: " + ex.toString());
+			responseCode = -1;
+		}
+
+		return responseCode;
+	}
+
+	@Transactional
+	public void deleteOrder(Long orderId) {
+		Order order = orderDao.get(orderId);
+		orderDao.delete(order);
+	}
+
+	@Transactional
+	public Object chooseWinnerProcessing(Order order, int cancelOrderTimeout) {
+		// check right status
+		OrderStatus orderStatus = orderStatusDao.getLast(order);
+		if (OrderStatusType.EndProcessingStatus(orderStatus.getStatus())) {
+			return null;
+		}
+
+		Broker winner = alacrityDao.getWinner(order);
+		boolean success = false;
+		if (winner != null) {
+			success = giveOrder(order.getId(), winner.getId());
+		}
+
+		if (!success) {
+			// check date supply for obsolete order
+			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = checkExpired(order, cancelOrderTimeout,
+					new Date());
+			if (orderCancelHolder != null) {
 				return orderCancelHolder;
 			} else {
-				return null;
+				return order;
 			}
+		} else {
+			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+			orderCancelHolder.setOrder(order);
+			orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
+			return orderCancelHolder;
+		}
+	}
+
+	@Transactional
+	public CancelOrderProcessing.OrderCancelHolder checkExpired(Order order, int cancelOrderTimeout, Date checkTime) {
+		if (DatetimeUtil.isTimeoutExpired(order, cancelOrderTimeout, new Date())) {
+			OrderStatus failedStatus = new OrderStatus();
+			failedStatus.setDate(new Date());
+			failedStatus.setOrder(order);
+			failedStatus.setStatus(OrderStatusType.Failed);
+			orderStatusDao.save(failedStatus);
+
+			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+			orderCancelHolder.setOrder(order);
+			orderCancelHolder.setOrderCancelType(OrderCancelType.Timeout);
+			return orderCancelHolder;
+		} else {
+			return null;
+		}
+	}
+
+	@Transactional
+	public Boolean offerOrderProcessing(Order order) {
+		// check right status
+		OrderStatus orderStatus = orderStatusDao.getLast(order);
+		if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {
+			return null;
 		}
 
-		@Transactional
-		public Boolean offerOrderProcessing(Order order) {
-			// check right status
-			OrderStatus orderStatus = orderStatusDao.getLast(order);
-			if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {
-				return null;
-			}
-
-			// do offer
-			return offerOrder(order);
-		}
+		// do offer
+		return offerOrder(order);
+	}
 }
