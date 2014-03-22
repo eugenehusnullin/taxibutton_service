@@ -1,7 +1,6 @@
-package tb2014.service.order;
+package tb2014.service.processing;
 
 import java.util.ArrayDeque;
-import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,18 +18,18 @@ import tb2014.domain.order.Order;
 import tb2014.service.OrderService;
 import tb2014.utils.ThreadFactorySecuenceNaming;
 
-@Service()
-public class OfferOrderProcessing {
-	private static final Logger log = LoggerFactory.getLogger(OfferOrderProcessing.class);
+@Service
+public class ChooseWinnerProcessing {
+	private static final Logger log = LoggerFactory.getLogger(ChooseWinnerProcessing.class);
 
-	@Value("#{mainSettings['offerorder.threads.count']}")
+	@Value("#{mainSettings['choosewinner.threads.count']}")
 	private Integer threadsCount;
 
-	@Value("#{mainSettings['offerorder.repeat.pause']}")
+	@Value("#{mainSettings['choosewinner.repeat.pause']}")
 	private Integer repeatPause;
 
 	@Value("#{mainSettings['choosewinner.cancelorder.timeout']}")
-	private Integer cancelOrderTimeout;
+	private Integer cancelorderTimeout;
 
 	class RecieverOrderRunnable implements Runnable {
 		@Override
@@ -50,61 +49,36 @@ public class OfferOrderProcessing {
 					}
 
 					if (order != null) {
-						OfferOrderRunnable offerOrderRunnable = new OfferOrderRunnable(order);
-						executor.execute(offerOrderRunnable);
+						ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(order);
+						executor.execute(chooseWinnerRunnable);
 					}
 				} catch (Exception e) {
-					log.error("OfferOrderProcessing exception in RecieverOrderRunnable.", e);
+					log.error("ChooseWinnerProcessing exception in RecieverOrderRunnable.", e);
 				}
 			}
 		}
 	}
 
-	class OfferOrderRunnable implements Runnable {
+	class ChooseWinnerRunnable implements Runnable {
 		private Order order;
 
-		public OfferOrderRunnable(Order order) {
+		public ChooseWinnerRunnable(Order order) {
 			this.order = order;
 		}
 
 		@Override
 		public void run() {
-			try {
-				// do pause before offer, maybe client canceled order
-				Date currentDatetime = new Date();
-				if (order.getStartOffer().after(currentDatetime)) {
-					long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
+			Object object = orderService.chooseWinnerProcessing(order, cancelorderTimeout);
+
+			if (object != null) {
+				if (object.getClass().equals(Order.class)) {
 					try {
-						Thread.sleep(diff);
+						Thread.sleep(repeatPause);
+						addOrder((Order) object);
 					} catch (InterruptedException e) {
-						return;
 					}
-				}
-
-				Boolean offered = orderService.offerOrderProcessing(order);
-
-				if (offered != null) {
-					if (offered) {
-						chooseWinnerProcessing.addOrder(order);
-					} else {
-						CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderService.checkExpired(order,
-								cancelOrderTimeout, new Date());
-						if (orderCancelHolder != null) {
-							cancelOrderProcessing.addOrderCancel(orderCancelHolder);
-						} else {
-							try {
-								Thread.sleep(repeatPause);
-								addOrder(order);
-							} catch (InterruptedException e) {
-							}
-						}
-					}
-				}
-			} catch (Exception ex) {
-				try {
-					Thread.sleep(repeatPause);
-					addOrder(order);
-				} catch (InterruptedException e) {
+				} else {
+					cancelOrderProcessing.addOrderCancel((CancelOrderProcessing.OrderCancelHolder) object);
 				}
 			}
 		}
@@ -117,22 +91,20 @@ public class OfferOrderProcessing {
 	@Autowired
 	private OrderService orderService;
 	@Autowired
-	private ChooseWinnerProcessing chooseWinnerProcessing;
-	@Autowired
 	private CancelOrderProcessing cancelOrderProcessing;
 
-	public OfferOrderProcessing() {
+	public ChooseWinnerProcessing() {
 		queue = new ArrayDeque<Order>();
 	}
 
 	@PostConstruct
 	public void startProcessing() {
 		executor = Executors.newFixedThreadPool(threadsCount, new ThreadFactorySecuenceNaming(
-				"OfferOrderProcessing EXECUTOR #"));
+				"ChooseWinnerProcessing EXECUTOR #"));
 
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);
-		mainThread.setName("OfferOrderProcessing MAIN THREAD");
+		mainThread.setName("ChooseWinnerProcessing MAIN THREAD");
 		mainThread.start();
 	}
 
