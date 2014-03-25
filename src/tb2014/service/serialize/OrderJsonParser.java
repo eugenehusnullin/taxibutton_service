@@ -25,19 +25,17 @@ public class OrderJsonParser {
 
 		Order order = new Order();
 
-		Boolean urgent = null;
-		String recipientPhone = null;
-		Date bookingDate = null;
+		Boolean urgent = jsonObject.optBoolean("urgent", true);
 
+		String recipientPhone = null;
 		try {
-			urgent = jsonObject.getBoolean("urgent");
 			recipientPhone = jsonObject.getString("recipientPhone");
 		} catch (JSONException ex) {
 			return null;
 		}
 
+		Date bookingDate = null;
 		try {
-
 			String bookingDateStr = jsonObject.getString("bookingDate");
 			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 			bookingDate = dateFormatter.parse(bookingDateStr);
@@ -48,82 +46,64 @@ public class OrderJsonParser {
 		}
 
 		SortedSet<AddressPoint> addressPoints = new TreeSet<AddressPoint>();
-		JSONObject sourceJson = null;
-
 		try {
-			sourceJson = jsonObject.getJSONObject("source");
+			JSONObject sourceJson = jsonObject.getJSONObject("source");
+			addressPoints.add(OrderJsonParser.getPoint(sourceJson, order, 0));
 		} catch (JSONException ex) {
 			return null;
 		}
 
-		AddressPoint source = OrderJsonParser.getPoint(sourceJson, order, 0);
-
-		if (source != null) {
-			addressPoints.add(source);
-		} else {
-			return null;
-		}
-
-		JSONArray destinationsJson = null;
-
 		try {
-			destinationsJson = jsonObject.getJSONArray("destinations");
+			JSONArray destinationsJson = jsonObject.optJSONArray("destinations");
+
+			for (int i = 0; i < destinationsJson.length(); i++) {
+				JSONObject destinationJson = destinationsJson.getJSONObject(i);
+				int index = 0;
+
+				try {
+					index = destinationJson.getInt("index");
+				} catch (JSONException ex) {
+					return null;
+				}
+
+				addressPoints.add(OrderJsonParser.getPoint(destinationJson, order, index));
+			}
 		} catch (JSONException ex) {
 			return null;
-		}
-
-		for (int i = 0; i < destinationsJson.length(); i++) {
-			JSONObject destinationJson = destinationsJson.getJSONObject(i);
-			int index = 0;
-
-			try {
-				index = destinationJson.getInt("index");
-			} catch (JSONException ex) {
-				return null;
-			}
-
-			AddressPoint destination = OrderJsonParser.getPoint(sourceJson, order, index);
-
-			if (destination != null) {
-				addressPoints.add(destination);
-			} else {
-				return null;
-			}
 		}
 
 		Set<Requirement> requirements = new HashSet<Requirement>();
-		JSONArray requirementsJson = null;
-
 		try {
-			requirementsJson = jsonObject.getJSONArray("requirements");
+			JSONArray requirementsJson = jsonObject.optJSONArray("requirements");
+
+			if (requirementsJson != null) {
+				for (int i = 0; i < requirementsJson.length(); i++) {
+					JSONObject requirementJson = requirementsJson.getJSONObject(i);
+					Requirement currentRequirement = new Requirement();
+					String name = null;
+					String value = null;
+
+					try {
+						name = requirementJson.getString("name");
+						value = requirementJson.getString("value");
+					} catch (JSONException ex) {
+						return null;
+					}
+
+					if (value.equals("yes") == false) {
+						currentRequirement.setOptions(value);
+					}
+
+					currentRequirement.setType(name);
+					currentRequirement.setOrder(order);
+					requirements.add(currentRequirement);
+				}
+			}
 		} catch (JSONException ex) {
 			return null;
 		}
 
-		for (int i = 0; i < requirementsJson.length(); i++) {
-			JSONObject requirementJson = requirementsJson.getJSONObject(i);
-			Requirement currentRequirement = new Requirement();
-			String name = null;
-			String value = null;
-
-			try {
-				name = requirementJson.getString("name");
-				value = requirementJson.getString("value");
-			} catch (JSONException ex) {
-				return null;
-			}
-
-			if (value.equals("yes") == false) {
-				currentRequirement.setOptions(value);
-			}
-
-			currentRequirement.setType(name);
-			currentRequirement.setOrder(order);
-			requirements.add(currentRequirement);
-		}
-
 		try {
-
 			int vehicleClass = jsonObject.getInt("vehicleClass");
 			order.setOrderVehicleClass(VehicleClass.values()[vehicleClass]);
 		} catch (JSONException ex) {
@@ -131,16 +111,11 @@ public class OrderJsonParser {
 		}
 
 		Set<Broker> offerBrokerList = new HashSet<Broker>();
-
 		if (!jsonObject.isNull("brokers")) {
-
 			JSONArray brokersUuids = jsonObject.getJSONArray("brokers");
-
 			for (int i = 0; i < brokersUuids.length(); i++) {
-
 				String currentBrokerUuid = brokersUuids.getString(i);
 				Broker broker = brokerDao.get(currentBrokerUuid);
-
 				offerBrokerList.add(broker);
 			}
 		}
@@ -167,19 +142,15 @@ public class OrderJsonParser {
 		String street = null;
 		String housing = null;
 
-		try {
-			lon = pointJson.getDouble("lon");
-			lat = pointJson.getDouble("lat");
-			fullAddress = pointJson.getString("fullAddress");
-			shortAddress = pointJson.getString("shortAddress");
-			closestStation = pointJson.getString("closestStation");
-			country = pointJson.getString("country");
-			locality = pointJson.getString("locality");
-			street = pointJson.getString("street");
-			housing = pointJson.getString("housing");
-		} catch (JSONException ex) {
-			return null;
-		}
+		lon = pointJson.optDouble("lon", 0.0);
+		lat = pointJson.optDouble("lat", 0.0);
+		fullAddress = pointJson.optString("fullAddress", "");
+		shortAddress = pointJson.optString("shortAddress", "");
+		closestStation = pointJson.optString("closestStation", "");
+		country = pointJson.optString("country", "");
+		locality = pointJson.optString("locality", "");
+		street = pointJson.optString("street", "");
+		housing = pointJson.optString("housing", "");
 
 		result.setLon(lon);
 		result.setLat(lat);

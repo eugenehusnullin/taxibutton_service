@@ -100,6 +100,9 @@ public class OrderService {
 	@Value("#{mainSettings['offerorder.wait.pause']}")
 	private Integer waitPause;
 
+	@Value("#{mainSettings['createorder.limit']}")
+	private Integer createOrderLimit = 60000;
+
 	@Transactional
 	public String create(JSONObject createOrderObject) throws DeviceNotFoundException, ParseOrderException {
 
@@ -112,12 +115,12 @@ public class OrderService {
 		JSONObject orderObject = createOrderObject.getJSONObject("order");
 		Order order = OrderJsonParser.Json2Order(orderObject, brokerDao);
 
-		// check booking date
-		if (DatetimeUtil.isTimeoutExpired(order, 0, new Date())) {
+		if (order == null) {
 			throw new ParseOrderException();
 		}
 
-		if (order == null) {
+		// check booking date
+		if (DatetimeUtil.isTimeoutExpired(order, createOrderLimit, new Date())) {
 			throw new ParseOrderException();
 		}
 
