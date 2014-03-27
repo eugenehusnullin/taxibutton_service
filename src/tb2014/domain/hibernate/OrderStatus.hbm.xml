@@ -17,5 +17,6 @@
 			</type>
 		</property>
 		<property name="date" />
+		<property name="statusDescription" length="50" />
 	</class>
 </hibernate-mapping>

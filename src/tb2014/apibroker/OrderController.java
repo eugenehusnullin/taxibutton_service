@@ -17,7 +17,8 @@ import tb2014.service.exceptions.OrderNotFoundException;
 @RequestMapping("/order")
 @Controller("apiBrokerOrderController")
 public class OrderController {
-	// private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+	// private static final Logger log =
+	// LoggerFactory.getLogger(OrderController.class);
 
 	@Autowired
 	private OrderService orderService;
@@ -51,8 +52,19 @@ public class OrderController {
 	@RequestMapping(value = "/setStatus", method = RequestMethod.POST)
 	public void setStatus(HttpServletRequest request, HttpServletResponse response) {
 		try {
+			String status = request.getParameter("status");
+			String params = "";
+
+			if (status.equals("Completed")) {
+				String timeWay = request.getParameter("timeWay");
+				String longWay = request.getParameter("longWay");
+				String amount = request.getParameter("amount");
+				String amountDriver = request.getParameter("amountDriver");
+				params = timeWay + "|" + longWay + "|" + amount + "|" + amountDriver;
+			}
+
 			orderService.setStatus(request.getParameter("apiId"), request.getParameter("apiKey"),
-					request.getParameter("orderId"), request.getParameter("status"));
+					request.getParameter("orderId"), status, params);
 		} catch (BrokerNotFoundException e) {
 			response.setStatus(403);
 		} catch (OrderNotFoundException e) {
@@ -63,7 +75,6 @@ public class OrderController {
 
 	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
 	public void setGeoData(HttpServletRequest request, HttpServletResponse response) {
-
 		try {
 			orderService.setGeoData(request.getParameter("apiId"), request.getParameter("apiKey"),
 					request.getParameter("orderId"), request.getParameter("category"),

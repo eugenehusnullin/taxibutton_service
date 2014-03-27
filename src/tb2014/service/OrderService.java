@@ -194,7 +194,6 @@ public class OrderService {
 
 	@Transactional
 	public JSONObject getStatus(JSONObject getStatusObject) throws DeviceNotFoundException, OrderNotFoundException {
-
 		String apiId = getStatusObject.getString("apiId");
 		Device device = deviceDao.get(apiId);
 		if (device == null) {
@@ -212,11 +211,12 @@ public class OrderService {
 		}
 
 		OrderStatus status = orderStatusDao.getLast(order);
-
 		JSONObject statusJson = new JSONObject();
 		statusJson.put("orderId", orderUuid);
 		statusJson.put("status", status.getStatus().toString());
 		statusJson.put("date", status.getDate());
+		statusJson.put("description", status.getStatusDescription());
+		System.out.println(statusJson.toString());
 		if (order.getBroker() != null) {
 			statusJson.put("executor", order.getBroker().getName());
 		}
@@ -227,7 +227,6 @@ public class OrderService {
 	@Transactional
 	public JSONObject getGeodata(JSONObject getGeodataJsonObject) throws DeviceNotFoundException,
 			OrderNotFoundException, ParseException {
-
 		String apiId = getGeodataJsonObject.optString("apiId");
 		Device device = deviceDao.get(apiId);
 		if (device == null) {
@@ -309,7 +308,7 @@ public class OrderService {
 	}
 
 	@Transactional
-	public void setStatus(String brokerApiId, String brokerApiKey, String orderUuid, String newStatus)
+	public void setStatus(String brokerApiId, String brokerApiKey, String orderUuid, String newStatus, String statusParams)
 			throws BrokerNotFoundException, OrderNotFoundException {
 		Broker broker = brokerDao.getByApiId(brokerApiId);
 		if (broker == null) {
@@ -333,6 +332,7 @@ public class OrderService {
 		status.setOrder(order);
 		status.setDate(new Date());
 		status.setStatus(OrderStatusType.valueOf(newStatus));
+		status.setStatusDescription(statusParams);
 		orderStatusDao.save(status);
 
 		if (OrderStatusType.EndProcessingStatus(status.getStatus())) {

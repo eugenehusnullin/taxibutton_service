@@ -7,12 +7,21 @@ public class OrderStatus {
 	private Long id;
 	private Order order;
 	private OrderStatusType status;
+	private String statusDescription;
 	private Date date;
 	
 	public Long getId() {
 		return id;
 	}
 	
+	public String getStatusDescription() {
+		return statusDescription;
+	}
+
+	public void setStatusDescription(String statusDescription) {
+		this.statusDescription = statusDescription;
+	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
