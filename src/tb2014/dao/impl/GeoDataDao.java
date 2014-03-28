@@ -25,8 +25,8 @@ public class GeoDataDao implements IGeoDataDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<GeoData> getAll(Order order) {
-		return sessionFactory.getCurrentSession().createCriteria(GeoData.class)
-				.add(Restrictions.eq("order", order)).list();
+		return sessionFactory.getCurrentSession().createCriteria(GeoData.class).add(Restrictions.eq("order", order))
+				.list();
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class GeoDataDao implements IGeoDataDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<GeoData> getAll(Order order, Date date) {
-		return sessionFactory.getCurrentSession().createCriteria(GeoData.class)
+		return sessionFactory.getCurrentSession().createCriteria(GeoData.class).add(Restrictions.eq("order", order))
 				.add(Restrictions.ge("date", date)).list();
 	}
 
