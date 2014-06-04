@@ -107,8 +107,10 @@ public class OrderController {
 		String url = "http://localhost:8080/tb2014/apibroker/order/alacrity";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+		
+		OrderModel orderModel = orderService.getOrder(Long.parseLong(request.getParameter("orderId")));
 
-		String params = "orderId=" + request.getParameter("orderId") + "&apiId=" + request.getParameter("apiId")
+		String params = "orderId=" + orderModel.getUuid() + "&apiId=" + request.getParameter("apiId")
 				+ "&apiKey=" + request.getParameter("apiKey") + "&driverName=" + request.getParameter("driverName")
 				+ "&driverSecondName=" + request.getParameter("driverSecondName") + "&driverThirdName="
 				+ request.getParameter("driverThirdName") + "&driverPhone=" + request.getParameter("driverPhone")
