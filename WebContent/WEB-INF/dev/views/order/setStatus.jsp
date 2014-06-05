@@ -11,7 +11,7 @@
 <body>
 	<form method="POST">
 		<input type="hidden" name="orderId" value="${orderId}" /> Broker api
-		id <br /> <input type="text" name="apiId" /> <br /> Broker api url
+		id <br /> <input type="text" name="apiId" /> <br /> Broker api key
 		<br /> <input type="text" name="apiKey" /> <br /> Order status <br />
 		<input type="text" name="status" /><input type="submit" value="Send" />
 	</form>
