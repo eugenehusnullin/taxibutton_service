@@ -217,17 +217,17 @@ public class OrderService {
 		statusJson.put("date", status.getDate());
 		statusJson.put("description", status.getStatusDescription());
 
-		if (order.getBroker() != null) {
-			statusJson.put("executor", order.getBroker().getName());
-			
-			OrderAcceptAlacrity oaa = alacrityDao.get(order, order.getBroker());
-			statusJson.put("driver_name", oaa.getDriver().getName());
-			statusJson.put("driver_phone", oaa.getDriver().getPhone());
-			statusJson.put("car_color", oaa.getCar().getColor());
-			statusJson.put("car_mark", oaa.getCar().getMark());
-			statusJson.put("car_model", oaa.getCar().getModel());
-			statusJson.put("car_number", oaa.getCar().getNumber());
-		}
+//		if (order.getBroker() != null) {
+//			statusJson.put("executor", order.getBroker().getName());
+//			
+//			OrderAcceptAlacrity oaa = alacrityDao.get(order, order.getBroker());
+//			statusJson.put("driver_name", oaa.getDriver().getName());
+//			statusJson.put("driver_phone", oaa.getDriver().getPhone());
+//			statusJson.put("car_color", oaa.getCar().getColor());
+//			statusJson.put("car_mark", oaa.getCar().getMark());
+//			statusJson.put("car_model", oaa.getCar().getModel());
+//			statusJson.put("car_number", oaa.getCar().getNumber());
+//		}
 		return statusJson;
 	}
 
