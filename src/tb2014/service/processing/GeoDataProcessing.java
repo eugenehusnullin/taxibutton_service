@@ -1,7 +1,7 @@
 package tb2014.service.processing;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
@@ -25,7 +25,7 @@ public class GeoDataProcessing {
 		public void run() {
 			while (processing) {
 				try {
-					GeoData geoData = null;
+					GeoData newGeoData = null;
 					synchronized (queue) {
 						if (queue.isEmpty()) {
 							try {
@@ -34,27 +34,27 @@ public class GeoDataProcessing {
 								break;
 							}
 						}
-						geoData = queue.poll();
+						newGeoData = queue.poll();
 					}
 
-					if (geoData != null) {
+					if (newGeoData != null) {
 						boolean needupdate = false;
 						synchronized (map) {
-							GeoData storedGeoData = map.get(geoData.getOrder().getId());
+							GeoData storedGeoData = map.get(newGeoData.getOrder().getId());
 							if (storedGeoData == null) {
 								needupdate = true;
 							} else {
 								Double lat = storedGeoData.getLat();
 								Double lon = storedGeoData.getLon();
 
-								if (!lat.equals(geoData.getLat()) || !lon.equals(geoData.getLon())) {
+								if (!lat.equals(newGeoData.getLat()) || !lon.equals(newGeoData.getLon())) {
 									needupdate = true;
 								}
 							}
 
 							if (needupdate) {
-								map.put(geoData.getOrder().getId(), geoData);
-								geodataService.save(geoData);
+								map.put(newGeoData.getOrder().getId(), newGeoData);
+								geodataService.save(newGeoData);
 							}
 						}
 					}
@@ -74,7 +74,7 @@ public class GeoDataProcessing {
 
 	public GeoDataProcessing() {
 		processing = true;
-		queue = new LinkedList<>();
+		queue = new ArrayDeque<>();
 		map = new HashMap<>();
 	}
 
@@ -98,8 +98,8 @@ public class GeoDataProcessing {
 
 	public void addGeoData(GeoData geoData) {
 		synchronized (queue) {
-			queue.offer(geoData);
-			queue.notify();
+			queue.add(geoData);
+			queue.notifyAll();
 		}
 	}
 
