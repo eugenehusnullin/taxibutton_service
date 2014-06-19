@@ -10,15 +10,13 @@
 			<key-many-to-one name="order" column="orderId"></key-many-to-one>
 		</composite-id>
 		<property name="date" />
-		<component name="driver" class="tb2014.domain.order.Driver"
-			insert="true" update="true" access="field">
+		<component name="driver" class="tb2014.domain.order.Driver">
 			<property name="name" />
 			<property name="secondName"/>
 			<property name="thirdName" />
 			<property name="phone"/>
 		</component>
-		<component name="car" class="tb2014.domain.order.Car"
-			insert="true" update="true" access="field">
+		<component name="car" class="tb2014.domain.order.Car">
 			<property name="number" />
 			<property name="color" />
 			<property name="mark"  />
