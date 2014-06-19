@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import tb2014.dao.IOrderDao;
+import tb2014.domain.order.Feedback;
 import tb2014.domain.order.Order;
 
 @Repository("OrderDao")
@@ -66,6 +67,11 @@ public class OrderDao implements IOrderDao {
 	public Long getAllOrdersCount() {
 		return (Long) sessionFactory.getCurrentSession().createCriteria(Order.class)
 				.setProjection(Projections.rowCount()).uniqueResult();
+	}
+
+	@Override
+	public void saveFeedback(Feedback feedback) {
+		sessionFactory.getCurrentSession().save(feedback);
 	}
 
 }

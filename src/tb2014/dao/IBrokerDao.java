@@ -11,6 +11,8 @@ public interface IBrokerDao {
 	Broker get(String uuid);
 
 	Broker getByApiId(String id);
+	
+	Broker getByApiId(String apiId, String apiKey);
 
 	List<Broker> getAll();
 

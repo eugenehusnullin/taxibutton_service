@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import tb2014.service.OrderService;
 import tb2014.service.exceptions.DeviceNotFoundException;
+import tb2014.service.exceptions.WrongData;
 import tb2014.service.exceptions.NotValidOrderStatusException;
 import tb2014.service.exceptions.OrderNotFoundException;
 import tb2014.service.exceptions.ParseOrderException;
@@ -45,7 +46,7 @@ public class OrderController {
 			JSONObject createOrderObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
 			try {
-				String orderUuid = orderService.create(createOrderObject);
+				String orderUuid = orderService.createFromDevice(createOrderObject);
 
 				JSONObject responseJson = new JSONObject();
 				responseJson.put("status", "ok");
@@ -164,6 +165,30 @@ public class OrderController {
 		} catch (IOException e) {
 			log.error("apiDeviceOrderController.cancel", e);
 			response.setStatus(500);
+		}
+	}
+
+	@RequestMapping(value = "/feedback", method = RequestMethod.POST)
+	public void feedback(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
+			log.trace(stringBuffer.toString());
+
+			JSONObject feedbackJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			orderService.saveFeedback(feedbackJson);
+			response.setStatus(200);
+		} catch (UnsupportedEncodingException e) {
+			log.error("apiDeviceOrderController.feedback", e);
+			response.setStatus(500);
+		} catch (IOException e) {
+			log.error("apiDeviceOrderController.feedback", e);
+			response.setStatus(500);
+		} catch (OrderNotFoundException e) {
+			log.error("apiDeviceOrderController.feedback", e);
+			response.setStatus(403);
+		} catch (WrongData e) {
+			log.error("apiDeviceOrderController.feedback", e);
+			response.setStatus(404);
 		}
 	}
 

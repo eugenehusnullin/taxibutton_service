@@ -49,6 +49,13 @@ public class BrokerDao implements IBrokerDao {
 	}
 
 	@Override
+	public Broker getByApiId(String apiId, String apiKey) {
+		return (Broker) sessionFactory.getCurrentSession().createCriteria(Broker.class)
+				.add(Restrictions.eq("apiId", apiId))
+				.add(Restrictions.eq("apiKey", apiKey)).uniqueResult();
+	}
+
+	@Override
 	public void delete(Broker broker) {
 		sessionFactory.getCurrentSession().delete(broker);
 	}
@@ -57,5 +64,4 @@ public class BrokerDao implements IBrokerDao {
 	public void saveOrUpdate(Broker broker) {
 		sessionFactory.getCurrentSession().saveOrUpdate(broker);
 	}
-
 }

@@ -23,6 +23,7 @@ public class Order {
 	private Set<GeoData> geoData;
 	private Set<Broker> offerBrokerList;
 	private VehicleClass orderVehicleClass;
+	private Broker brokerCreator;
 
 	// don't persistent fields
 	private Date startOffer;
@@ -158,5 +159,13 @@ public class Order {
 
 	public void setBookingDate(Date bookingDate) {
 		this.bookingDate = bookingDate;
+	}
+
+	public Broker getBrokerCreator() {
+		return brokerCreator;
+	}
+
+	public void setBrokerCreator(Broker brokerCreator) {
+		this.brokerCreator = brokerCreator;
 	}
 }

@@ -2,6 +2,7 @@ package tb2014.dao;
 
 import java.util.List;
 
+import tb2014.domain.order.Feedback;
 import tb2014.domain.order.Order;
 
 public interface IOrderDao {
@@ -19,4 +20,6 @@ public interface IOrderDao {
 	void saveOrUpdate(Order order);
 
 	Long getAllOrdersCount();
+
+	void saveFeedback(Feedback feedback);
 }

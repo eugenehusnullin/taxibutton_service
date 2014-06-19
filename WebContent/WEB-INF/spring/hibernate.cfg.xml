@@ -16,5 +16,6 @@
 		<mapping resource="tb2014/domain/hibernate/OrderCancel.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/Device.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/OfferedOrderBroker.hbm.xml" />
+		<mapping resource="tb2014/domain/hibernate/Feedback.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

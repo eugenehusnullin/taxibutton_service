@@ -47,6 +47,7 @@ import tb2014.domain.Broker;
 import tb2014.domain.Device;
 import tb2014.domain.order.Car;
 import tb2014.domain.order.Driver;
+import tb2014.domain.order.Feedback;
 import tb2014.domain.order.GeoData;
 import tb2014.domain.order.OfferedOrderBroker;
 import tb2014.domain.order.Order;
@@ -57,6 +58,7 @@ import tb2014.domain.order.OrderStatus;
 import tb2014.domain.order.OrderStatusType;
 import tb2014.service.exceptions.BrokerNotFoundException;
 import tb2014.service.exceptions.DeviceNotFoundException;
+import tb2014.service.exceptions.WrongData;
 import tb2014.service.exceptions.NotValidOrderStatusException;
 import tb2014.service.exceptions.OrderNotFoundException;
 import tb2014.service.exceptions.ParseOrderException;
@@ -102,18 +104,79 @@ public class OrderService {
 
 	@Value("#{mainSettings['createorder.limit']}")
 	private Integer createOrderLimit = 60000;
+	
+	@Transactional
+	public void saveFeedback(JSONObject feedbackJson) throws OrderNotFoundException, WrongData {
+		String apiId = feedbackJson.optString("apiId");
+		String orderUuid = feedbackJson.optString("orderId");
+		Order order = orderDao.get(orderUuid);
+		if (order == null || !order.getDevice().getApiId().equals(apiId)) {
+			throw new OrderNotFoundException(orderUuid);
+		}
+		
+		int rating = feedbackJson.optInt("rating", -1);
+		String text = feedbackJson.optString("feedback");
+		if (rating == -1 && text == null) {
+			throw new WrongData();
+		}
+		
+		Feedback feedback = new Feedback();
+		feedback.setDate(new Date());
+		feedback.setOrder(order);
+		feedback.setRating(rating);
+		feedback.setText(text);
+		
+		orderDao.saveFeedback(feedback);
+		return;
+	}
 
 	@Transactional
-	public String create(JSONObject createOrderObject) throws DeviceNotFoundException, ParseOrderException {
+	public void getOrders(String apiId, String apiKey) throws BrokerNotFoundException {
+		Broker broker = brokerDao.getByApiId(apiId, apiKey);
+		if (broker == null) {
+			throw new BrokerNotFoundException(apiId);
+		}
+		
+		
+		
+	}
 
+	@Transactional
+	public String createFromBroker(JSONObject createOrderObject) throws BrokerNotFoundException, ParseOrderException {
+		String apiId = createOrderObject.optString("apiId");
+		String apiKey = createOrderObject.optString("apiKey");
+		if (apiId == null || apiKey == null) {
+			throw new BrokerNotFoundException(apiId);
+		}
+		
+		Broker broker = brokerDao.getByApiId(apiId, apiKey);
+		if (broker == null) {
+			throw new BrokerNotFoundException(apiId);
+		}
+		
+		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), brokerDao);
+		order.setBrokerCreator(broker);
+		create(order);
+		
+		return order.getUuid();
+	}
+
+	@Transactional
+	public String createFromDevice(JSONObject createOrderObject) throws DeviceNotFoundException, ParseOrderException {
 		String deviceApiid = createOrderObject.optString("apiId");
 		Device device = deviceDao.get(deviceApiid);
 		if (device == null) {
 			throw new DeviceNotFoundException(deviceApiid);
 		}
 
-		JSONObject orderObject = createOrderObject.getJSONObject("order");
-		Order order = OrderJsonParser.Json2Order(orderObject, brokerDao);
+		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), brokerDao);
+		order.setDevice(device);
+		create(order);
+
+		return order.getUuid();
+	}
+
+	private void create(Order order) throws ParseOrderException {
 
 		if (order == null) {
 			throw new ParseOrderException();
@@ -124,7 +187,6 @@ public class OrderService {
 			throw new ParseOrderException();
 		}
 
-		order.setDevice(device);
 		order.setUuid(UUID.randomUUID().toString());
 		orderDao.save(order);
 
@@ -139,8 +201,6 @@ public class OrderService {
 		cal.add(Calendar.MILLISECOND, waitPause);
 		order.setStartOffer(cal.getTime());
 		offerOrderProcessing.addOrder(order);
-
-		return order.getUuid();
 	}
 
 	@Transactional
@@ -217,17 +277,17 @@ public class OrderService {
 		statusJson.put("date", status.getDate());
 		statusJson.put("description", status.getStatusDescription());
 
-//		if (order.getBroker() != null) {
-//			statusJson.put("executor", order.getBroker().getName());
-//			
-//			OrderAcceptAlacrity oaa = alacrityDao.get(order, order.getBroker());
-//			statusJson.put("driver_name", oaa.getDriver().getName());
-//			statusJson.put("driver_phone", oaa.getDriver().getPhone());
-//			statusJson.put("car_color", oaa.getCar().getColor());
-//			statusJson.put("car_mark", oaa.getCar().getMark());
-//			statusJson.put("car_model", oaa.getCar().getModel());
-//			statusJson.put("car_number", oaa.getCar().getNumber());
-//		}
+		// if (order.getBroker() != null) {
+		// statusJson.put("executor", order.getBroker().getName());
+		//
+		// OrderAcceptAlacrity oaa = alacrityDao.get(order, order.getBroker());
+		// statusJson.put("driver_name", oaa.getDriver().getName());
+		// statusJson.put("driver_phone", oaa.getDriver().getPhone());
+		// statusJson.put("car_color", oaa.getCar().getColor());
+		// statusJson.put("car_mark", oaa.getCar().getMark());
+		// statusJson.put("car_model", oaa.getCar().getModel());
+		// statusJson.put("car_number", oaa.getCar().getNumber());
+		// }
 		return statusJson;
 	}
 
@@ -315,8 +375,8 @@ public class OrderService {
 	}
 
 	@Transactional
-	public void setStatus(String brokerApiId, String brokerApiKey, String orderUuid, String newStatus, String statusParams)
-			throws BrokerNotFoundException, OrderNotFoundException {
+	public void setStatus(String brokerApiId, String brokerApiKey, String orderUuid, String newStatus,
+			String statusParams) throws BrokerNotFoundException, OrderNotFoundException {
 		Broker broker = brokerDao.getByApiId(brokerApiId);
 		if (broker == null) {
 			throw new BrokerNotFoundException(brokerApiId);
