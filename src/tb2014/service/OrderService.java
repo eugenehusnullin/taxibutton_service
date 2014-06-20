@@ -279,12 +279,14 @@ public class OrderService {
 			statusJson.put("executor", order.getBroker().getName());
 
 			OrderAcceptAlacrity oaa = alacrityDao.get(order, order.getBroker());
-			statusJson.put("driver_name", oaa.getDriver().getName());
-			statusJson.put("driver_phone", oaa.getDriver().getPhone());
-			statusJson.put("car_color", oaa.getCar().getColor());
-			statusJson.put("car_mark", oaa.getCar().getMark());
-			statusJson.put("car_model", oaa.getCar().getModel());
-			statusJson.put("car_number", oaa.getCar().getNumber());
+			Driver driver = oaa.getDriver();
+			statusJson.put("driver_name", driver.getName());
+			statusJson.put("driver_phone", driver.getPhone());
+			Car car = oaa.getCar();
+			statusJson.put("car_color", car.getColor());
+			statusJson.put("car_mark", car.getMark());
+			statusJson.put("car_model", car.getModel());
+			statusJson.put("car_number", car.getNumber());
 		}
 		return statusJson;
 	}
