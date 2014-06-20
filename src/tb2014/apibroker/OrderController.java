@@ -35,16 +35,16 @@ public class OrderController {
 	@RequestMapping(value = "/alacrity", method = RequestMethod.POST)
 	public void alacrity(HttpServletRequest request, HttpServletResponse response) {
 		Driver driver = new Driver();
-		driver.setName(request.getParameter("driverName"));
-		driver.setSecondName(request.getParameter("driverSecondName"));
-		driver.setThirdName(request.getParameter("driverThirdName"));
-		driver.setPhone(request.getParameter("driverPhone"));
+		driver.setName(request.getParameter("driverName") == null ? "не указано" : request.getParameter("driverName"));
+		driver.setSecondName(request.getParameter("driverSecondName") == null ? "не указано" : request.getParameter("driverSecondName"));
+		driver.setThirdName(request.getParameter("driverThirdName") == null ? "не указано" : request.getParameter("driverThirdName"));
+		driver.setPhone(request.getParameter("driverPhone") == null ? "не указано" : request.getParameter("driverPhone"));
 
 		Car car = new Car();
-		car.setNumber(request.getParameter("carNumber"));
-		car.setColor(request.getParameter("carColor"));
-		car.setMark(request.getParameter("carMark"));
-		car.setModel(request.getParameter("carModel"));
+		car.setNumber(request.getParameter("carNumber") == null ? "не указано" : request.getParameter("carNumber"));
+		car.setColor(request.getParameter("carColor") == null ? "не указано" : request.getParameter("carColor"));
+		car.setMark(request.getParameter("carMark") == null ? "не указано" : request.getParameter("carMark"));
+		car.setModel(request.getParameter("carModel") == null ? "не указано" : request.getParameter("carModel"));
 
 		try {
 			orderService.alacrity(request.getParameter("apiId"), request.getParameter("apiKey"),
