@@ -86,7 +86,7 @@ public class TariffService {
 			simpleTariff.setBroker(broker);
 		}
 
-		simpleTariff.setTariffs(ConverterUtil.XmlToString(doc).replace("\r", "").replace("\n", ""));
+		simpleTariff.setTariffs(ConverterUtil.xmlToString(doc).replace("\r", "").replace("\n", ""));
 		simpleTariffDao.saveOrUpdate(simpleTariff);
 	}
 	

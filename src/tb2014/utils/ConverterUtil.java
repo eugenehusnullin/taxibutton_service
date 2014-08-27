@@ -13,7 +13,7 @@ import org.w3c.dom.Document;
 
 public class ConverterUtil {
 	
-	public static String XmlToString(Document document) {
+	public static String xmlToString(Document document) {
 
 		String xmlString = null;
 
