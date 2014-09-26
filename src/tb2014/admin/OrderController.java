@@ -454,20 +454,21 @@ public class OrderController {
 		JSONArray requirementsJson = new JSONArray();
 
 		String[] formRequirements = request.getParameterValues("requirements");
-
-		for (String currentRequirementName : formRequirements) {
-
-			JSONObject currentRequirementJson = new JSONObject();
-
-			currentRequirementJson.put("name", currentRequirementName);
-
-			if (currentRequirementName.trim().equals("isChildChair")) {
-				currentRequirementJson.put("value", request.getParameter("childAge"));
-			} else {
-				currentRequirementJson.put("value", "yes");
+		if (formRequirements != null) {
+			for (String currentRequirementName : formRequirements) {
+	
+				JSONObject currentRequirementJson = new JSONObject();
+	
+				currentRequirementJson.put("name", currentRequirementName);
+	
+				if (currentRequirementName.trim().equals("isChildChair")) {
+					currentRequirementJson.put("value", request.getParameter("childAge"));
+				} else {
+					currentRequirementJson.put("value", "yes");
+				}
+	
+				requirementsJson.put(currentRequirementJson);
 			}
-
-			requirementsJson.put(currentRequirementJson);
 		}
 
 		orderJson.put("requirements", requirementsJson);
