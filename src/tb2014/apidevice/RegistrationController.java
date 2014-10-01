@@ -44,4 +44,24 @@ public class RegistrationController {
 			log.error("apiDeviceRegistrationController.register", e);
 		}
 	}
+
+	@RequestMapping(value = "/confirm", method = RequestMethod.POST)
+	public void confirm(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			StringBuffer requestBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
+			JSONObject requestJson = (JSONObject) new JSONTokener(requestBuffer.toString()).nextValue();
+
+			JSONObject responseJson = deviceService.register(requestJson);
+
+			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
+			outputStream.writeBytes(responseJson.toString());
+			outputStream.flush();
+			outputStream.close();
+		} catch (IOException e) {
+			response.setStatus(500);
+			log.error("apiDeviceRegistrationController.confirm", e);
+		}
+	}
+
 }

@@ -13,4 +13,6 @@ public interface IDeviceDao {
 	public List<Device> getAll();
 	
 	public void save(Device device);
+	
+	public Device getByPhone(String phone);
 }

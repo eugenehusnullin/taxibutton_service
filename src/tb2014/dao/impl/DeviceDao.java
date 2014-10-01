@@ -44,4 +44,11 @@ public class DeviceDao implements IDeviceDao {
 	public void save(Device device) {
 		sessionFactory.getCurrentSession().save(device);
 	}
+
+	@Override
+	public Device getByPhone(String phone) {
+		return (Device) sessionFactory.getCurrentSession()
+				.createCriteria(Device.class)
+				.add(Restrictions.eq("phone", phone)).uniqueResult();
+	}
 }
