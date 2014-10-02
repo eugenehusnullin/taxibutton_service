@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class Sms48 {
 
+	@Value("#{sms48Settings['sms48.request']}")
+	private String request;
 	@Value("#{sms48Settings['sms48.login']}")
 	private String login;
 	@Value("#{sms48Settings['sms48.pass']}")
@@ -26,9 +28,14 @@ public class Sms48 {
 		String md5;
 		try {
 			md5 = md5(login + md5(pass) + reciever);
-			String requestString = "http://sms48.ru/send_sms.php" + "?login=" + login + "&to=" + urlEncode(reciever)
-					+ "&from=" + urlEncode(sender) + "&msg=" + urlEncode(msg) + "&check2=" + urlEncode(md5);
-			URL url = new URL(requestString);
+
+			request = request.replaceAll("[login]", login);
+			request = request.replaceAll("[reciever]", urlEncode(reciever));
+			request = request.replaceAll("[sender]", urlEncode(sender));
+			request = request.replaceAll("[msg]", urlEncode(msg));
+			request = request.replaceAll("[md5]", urlEncode(md5));
+
+			URL url = new URL(request);
 			URLConnection connection = url.openConnection();
 			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String inputLine;
