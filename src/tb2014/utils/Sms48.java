@@ -29,11 +29,11 @@ public class Sms48 {
 		try {
 			md5 = md5(login + md5(pass) + reciever);
 
-			request = request.replaceAll("[login]", login);
-			request = request.replaceAll("[reciever]", urlEncode(reciever));
-			request = request.replaceAll("[sender]", urlEncode(sender));
-			request = request.replaceAll("[msg]", urlEncode(msg));
-			request = request.replaceAll("[md5]", urlEncode(md5));
+			request = request.replace("[login]", login);
+			request = request.replace("[reciever]", urlEncode(reciever));
+			request = request.replace("[sender]", urlEncode(sender));
+			request = request.replace("[msg]", urlEncode(msg));
+			request = request.replace("[md5]", urlEncode(md5));
 
 			URL url = new URL(request);
 			URLConnection connection = url.openConnection();
