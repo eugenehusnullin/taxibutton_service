@@ -29,13 +29,14 @@ public class Sms48 {
 		try {
 			md5 = md5(login + md5(pass) + reciever);
 
-			request = request.replace("[login]", login);
-			request = request.replace("[reciever]", urlEncode(reciever));
-			request = request.replace("[sender]", urlEncode(sender));
-			request = request.replace("[msg]", urlEncode(msg));
-			request = request.replace("[md5]", urlEncode(md5));
+			String requString = new String(request);
+			requString = requString.replace("[login]", login);
+			requString = requString.replace("[reciever]", urlEncode(reciever));
+			requString = requString.replace("[sender]", urlEncode(sender));
+			requString = requString.replace("[msg]", urlEncode(msg));
+			requString = requString.replace("[md5]", urlEncode(md5));
 
-			URL url = new URL(request);
+			URL url = new URL(requString);
 			URLConnection connection = url.openConnection();
 			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String inputLine;
