@@ -52,7 +52,7 @@ public class RegistrationController {
 			StringBuffer requestBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
 			JSONObject requestJson = (JSONObject) new JSONTokener(requestBuffer.toString()).nextValue();
 
-			JSONObject responseJson = deviceService.register(requestJson);
+			JSONObject responseJson = deviceService.confirm(requestJson);
 
 			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 			outputStream.writeBytes(responseJson.toString());
