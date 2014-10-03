@@ -38,7 +38,7 @@ public class OrderSerializer {
 			offer.appendChild(orderId);
 
 			Element orderType = doc.createElement("OrderType");
-			int intVehicleClass = order.getOrderVehicleClass().index();
+			int intVehicleClass = order.getOrderVehicleClass().ordinal();
 
 			orderType.appendChild(doc.createTextNode(Integer.toString(intVehicleClass)));
 			offer.appendChild(orderType);

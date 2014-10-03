@@ -110,9 +110,9 @@
 		<input type="checkbox" name="requirements" value="isCoupon"> coupon<br />
 		<br /><br />
 		<h3>Vehicle class</h3>
-		<input type="radio" name="vehicleClass" value="1" checked>Эконом<br />
-		<input type="radio" name="vehicleClass" value="2">Комфорт<br />
-		<input type="radio" name="vehicleClass" value="3">Бизнес<br />
+		<input type="radio" name="vehicleClass" value="0" checked>Эконом<br />
+		<input type="radio" name="vehicleClass" value="1">Комфорт<br />
+		<input type="radio" name="vehicleClass" value="2">Бизнес<br />
 		<br />
 		<c:forEach items="${brokers}" var="broker">
 			<input type="checkbox" name="brokers" value="${broker.getUuid()}" />${broker.getName()}<br />
