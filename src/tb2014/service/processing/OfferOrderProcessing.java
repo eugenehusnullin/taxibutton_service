@@ -81,7 +81,7 @@ public class OfferOrderProcessing {
 					}
 				}
 
-				Boolean offered = orderService.offerOrderProcessing(order);
+				Boolean offered = orderService.offerOrderProcessing(order.getId());
 
 				if (offered != null) {
 					if (offered) {

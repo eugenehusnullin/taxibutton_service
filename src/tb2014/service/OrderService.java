@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -534,7 +535,12 @@ public class OrderService {
 	@Transactional
 	public boolean offerOrder(Order order) {
 
-		List<Broker> brokers = brokerDao.getAll();
+		Collection<Broker> brokers;
+		if (order.getOfferBrokerList() == null || order.getOfferBrokerList().size() == 0) {
+			brokers = brokerDao.getAll();
+		} else {
+			brokers = order.getOfferBrokerList();
+		}
 		Document orderXml = OrderSerializer.OrderToXml(order);
 		boolean offered = false;
 
@@ -742,7 +748,9 @@ public class OrderService {
 	}
 
 	@Transactional
-	public Boolean offerOrderProcessing(Order order) {
+	public Boolean offerOrderProcessing(Long orderId) {
+		Order order = orderDao.get(orderId);
+
 		// check right status
 		OrderStatus orderStatus = orderStatusDao.getLast(order);
 		if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {

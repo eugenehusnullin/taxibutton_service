@@ -20,7 +20,7 @@
 		<input type="radio" name="orderType" value="false" /> non-urgent order
 		<br />
 		Client phone:<br />
-		<input type="text" name="phone" value="12"/><br />
+		<input type="text" name="phone" value="00000000000"/><br />
 		<h3>Source</h3>
 		Full address:
 		<br />
