@@ -153,7 +153,7 @@ public class OrderService {
 			throw new BrokerNotFoundException(apiId);
 		}
 
-		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), brokerDao);
+		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), null, brokerDao);
 		order.setBrokerCreator(broker);
 		create(order);
 
@@ -168,7 +168,10 @@ public class OrderService {
 			throw new DeviceNotFoundException(deviceApiid);
 		}
 
-		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), brokerDao);
+		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
+		if (order == null) {
+			throw new ParseOrderException();
+		}
 		order.setDevice(device);
 		create(order);
 

@@ -21,18 +21,13 @@ import tb2014.domain.order.VehicleClass;
 
 public class OrderJsonParser {
 
-	public static Order Json2Order(JSONObject jsonObject, IBrokerDao brokerDao) {
+	public static Order Json2Order(JSONObject jsonObject, String phone, IBrokerDao brokerDao) {
 
 		Order order = new Order();
 
 		Boolean urgent = jsonObject.optBoolean("urgent", true);
 
-		String recipientPhone = null;
-		try {
-			recipientPhone = jsonObject.getString("recipientPhone");
-		} catch (JSONException ex) {
-			return null;
-		}
+		String recipientPhone = phone != null ? phone : jsonObject.optString("recipientPhone");
 
 		Date bookingDate = null;
 		try {
@@ -53,9 +48,8 @@ public class OrderJsonParser {
 			return null;
 		}
 
-		try {
-			JSONArray destinationsJson = jsonObject.optJSONArray("destinations");
-
+		JSONArray destinationsJson = jsonObject.optJSONArray("destinations");
+		if (destinationsJson != null) {
 			for (int i = 0; i < destinationsJson.length(); i++) {
 				JSONObject destinationJson = destinationsJson.getJSONObject(i);
 				int index = 0;
@@ -68,8 +62,11 @@ public class OrderJsonParser {
 
 				addressPoints.add(OrderJsonParser.getPoint(destinationJson, order, index));
 			}
-		} catch (JSONException ex) {
-			return null;
+		} else {
+			boolean dest = jsonObject.optBoolean("destinations");
+			if (!dest) {
+				return null;
+			}
 		}
 
 		Set<Requirement> requirements = new HashSet<Requirement>();
