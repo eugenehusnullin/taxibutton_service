@@ -3,22 +3,28 @@ package tb2014.apidevice;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.hsqldb.lib.DataOutputStream;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import tb2014.domain.Broker;
+import tb2014.service.BrokerService;
 import tb2014.service.OrderService;
 import tb2014.service.exceptions.DeviceNotFoundException;
 import tb2014.service.exceptions.WrongData;
@@ -34,6 +40,8 @@ public class OrderController {
 
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+	private BrokerService brokerService;
 
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -192,11 +200,24 @@ public class OrderController {
 		}
 	}
 	
+	@RequestMapping(value = "/getbrokers", method = RequestMethod.GET)
+	@Transactional
 	public void getBrokers(HttpServletRequest request, HttpServletResponse response) {
 		try {
+			List<Broker> brokers = brokerService.getAll();
+			JSONArray jsonArray = new JSONArray();
+			for (Broker broker : brokers) {
+				jsonArray.put(broker.getUuid());
+				jsonArray.put(broker.getName());
+			}
 			
+			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
+			OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+			jsonArray.write(osw);
+			osw.flush();
+			osw.close();
 		} catch (Exception e) {
-			
+
 		}
 	}
 
