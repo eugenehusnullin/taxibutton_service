@@ -25,23 +25,26 @@ public class Sms48 {
 	private String sender;
 
 	public void send(String reciever, String msg) {
+		send(reciever, msg, sender);
+	}
+
+	public void send(String reciever, String msg, String customSender) {
 		String md5;
 		try {
 			md5 = md5(login + md5(pass) + reciever);
 
-			String requString = new String(request);
-			requString = requString.replace("[login]", login);
-			requString = requString.replace("[reciever]", urlEncode(reciever));
-			requString = requString.replace("[sender]", urlEncode(sender));
-			requString = requString.replace("[msg]", urlEncode(msg));
-			requString = requString.replace("[md5]", urlEncode(md5));
+			String apiSms = request;
+			apiSms = apiSms.replace("[login]", login).replace("[reciever]", urlEncode(reciever))
+					.replace("[sender]", urlEncode(customSender)).replace("[msg]", urlEncode(msg))
+					.replace("[md5]", urlEncode(md5));
 
-			URL url = new URL(requString);
+			URL url = new URL(apiSms);
 			URLConnection connection = url.openConnection();
 			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String inputLine;
-			while ((inputLine = in.readLine()) != null)
+			while ((inputLine = in.readLine()) != null) {
 				System.out.println(inputLine);
+			}
 			in.close();
 		} catch (Exception e) {
 			e.printStackTrace();

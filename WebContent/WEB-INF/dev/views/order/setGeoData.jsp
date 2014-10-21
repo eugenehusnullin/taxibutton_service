@@ -3,12 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Send order geo data</title>
-</head>
-<body>
+
 	<form method="POST">
 		<input type="hidden" name="orderId" value="${orderId}" /> Broker api
 		id <br /> <input type="text" name="apiId" /> <br /> Broker api url
@@ -19,5 +14,3 @@
 			name="speed" /> <br /> Category <br /> <input type="text"
 			name="category" /> <br /> <input type="submit" value="Set" />
 	</form>
-</body>
-</html>

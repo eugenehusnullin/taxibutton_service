@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import tb2014.service.DeviceService;
 import tb2014.utils.NetStreamUtils;
+import tb2014.utils.Sms48;
 
 @RequestMapping("/device")
 @Controller("apiDeviceRegistrationController")
@@ -25,6 +27,8 @@ public class RegistrationController {
 
 	@Autowired
 	private DeviceService deviceService;
+	@Autowired
+	private Sms48 sms48;
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public void register(HttpServletRequest request, HttpServletResponse response) {
@@ -61,6 +65,18 @@ public class RegistrationController {
 		} catch (IOException e) {
 			response.setStatus(500);
 			log.error("apiDeviceRegistrationController.confirm", e);
+		}
+	}
+	
+	@RequestMapping(value = "/simplesendsms", method = RequestMethod.POST)
+	public void simpleSendSms(HttpServletResponse response, @RequestParam("phone") String phone,
+			@RequestParam("key") int key, @RequestParam("sender") String sender) {
+		try {
+			sms48.send(phone, "Код: " + Integer.toString(key), sender);
+			response.setStatus(200);
+		} catch (Exception e) {
+			response.setStatus(500);
+			log.error("apiDeviceRegistrationController.simplesendsms", e);
 		}
 	}
 

@@ -3,17 +3,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Add broker</title>
-</head>
-<body>
+
 	<form method="post">
 		<br/>Name
 		<input type="text" name="name" value="Желтое такси" />
 		<br/>Apiurl
-		<input type="text" name="apiurl" value="http://localhost:8080/tb2014/test" />
+		<input type="text" name="apiurl" value="http://ip:port/GUID" />
 		<br/>Api id
 		<input type="text" name="apiId" value="1"/>
 		<br/>Api key
@@ -21,5 +16,3 @@
 		<br />
 		<input type="submit" value="save" />
 	</form>
-</body>
-</html>

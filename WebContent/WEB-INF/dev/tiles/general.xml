@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC 
+	"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" 
+	"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<definition name="default" template="/WEB-INF/dev/views/master.jsp">
+		<put-attribute name="title" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="menu" value="/WEB-INF/dev/views/menu.jsp" />
+	</definition>
+
+	<definition name="order/list" extends="default">
+		<put-attribute name="title" value="Orders list" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/order/list.jsp" />
+	</definition>
+
+	<definition name="order/create" extends="default">
+		<put-attribute name="title" value="Add order" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/create.jsp" />
+	</definition>
+
+	<definition name="order/alacrity" extends="default">
+		<put-attribute name="title" value="Send order alacrity" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/alacrity.jsp" />
+	</definition>
+	
+	<definition name="order/cancel" extends="default">
+		<put-attribute name="title" value="Cancelling order" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/cancel.jsp" />
+	</definition>
+	
+	<definition name="order/geoList" extends="default">
+		<put-attribute name="title" value="Orders list" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/geoList.jsp" />
+	</definition>
+	
+	<definition name="order/getGeoData" extends="default">
+		<put-attribute name="title" value="Get geo data" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/getGeoData.jsp" />
+	</definition>
+	
+	<definition name="order/getStatus" extends="default">
+		<put-attribute name="title" value="Get status" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/getStatus.jsp" />
+	</definition>
+	
+	<definition name="order/give" extends="default">
+		<put-attribute name="title" value="Give order to broker" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/give.jsp" />
+	</definition>
+	
+	<definition name="order/setGeoData" extends="default">
+		<put-attribute name="title" value="Send order geo data" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/setGeoData.jsp" />
+	</definition>
+	
+	<definition name="order/setStatus" extends="default">
+		<put-attribute name="title" value="Send order status" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/setStatus.jsp" />
+	</definition>
+	
+	<definition name="order/statusList" extends="default">
+		<put-attribute name="title" value="Status list" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/statusList.jsp" />
+	</definition>
+	
+	<definition name="order/view" extends="default">
+		<put-attribute name="title" value="Order view" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/order/view.jsp" />
+	</definition>
+	
+	
+	<definition name="broker/list" extends="default">
+		<put-attribute name="title" value="Brokers" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/broker/list.jsp" />
+	</definition>
+	
+	<definition name="broker/create" extends="default">
+		<put-attribute name="title" value="Add broker" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/broker/create.jsp" />
+	</definition>
+	
+	<definition name="broker/edit" extends="default">
+		<put-attribute name="title" value="Edit broker" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/broker/edit.jsp" />
+	</definition>
+	
+	<definition name="device/list" extends="default">
+		<put-attribute name="title" value="Devices" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/device/list.jsp" />
+	</definition>
+	
+	<definition name="device/create" extends="default">
+		<put-attribute name="title" value="Add device" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/device/create.jsp" />
+	</definition>
+	
+	<definition name="result" extends="default">
+		<put-attribute name="title" value="Result" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/result.jsp" />
+	</definition>
+	
+	<definition name="tariff/tariff" extends="default">
+		<put-attribute name="title" value="Add tariff" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/tariff/tariff.jsp" />
+	</definition>
+	
+</tiles-definitions>

@@ -1,13 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Orders list</title>
-</head>
 <link media="screen" href="<c:url value="/resources/css/main.css"/>"
 	type="text/css" rel="stylesheet" />
 <script type="text/javascript"
@@ -82,7 +76,7 @@
 				+ orderDirection + "&start=" + start + "&count=" + count;
 	}
 </script>
-<body>
+
 	<div class="tableSizeRow">
 		<input type="hidden" id="orderField" value="${orderField}"> <input
 			type="hidden" id="orderDirection" value="${orderDirection}">
@@ -159,5 +153,4 @@
 	</c:forEach>
 	<br />
 	<a href="create">Create</a>
-</body>
-</html>
+
