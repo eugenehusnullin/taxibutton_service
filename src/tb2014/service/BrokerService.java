@@ -8,13 +8,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tb2014.dao.IBrokerDao;
+import tb2014.dao.IMapAreaDao;
 import tb2014.domain.Broker;
+import tb2014.domain.maparea.MapArea;
 
 @Service
 public class BrokerService {
 
 	@Autowired
 	private IBrokerDao brokerDao;
+	@Autowired
+	private IMapAreaDao mapAreaDao;
+	
+	@Transactional
+	public void addMapArea(MapArea mapArea) {
+		mapAreaDao.add(mapArea);
+	}
 
 	@Transactional
 	public List<Broker> getAll() {

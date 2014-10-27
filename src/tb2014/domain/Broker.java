@@ -1,5 +1,9 @@
 package tb2014.domain;
 
+import java.util.Set;
+
+import tb2014.domain.maparea.MapArea;
+
 public class Broker {
 
 	private Long id;
@@ -8,6 +12,7 @@ public class Broker {
 	private String apiKey;
 	private String name;
 	private String apiurl;
+	private Set<MapArea> mapAreas;
 
 	public Long getId() {
 		return id;
@@ -55,5 +60,13 @@ public class Broker {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public Set<MapArea> getMapAreas() {
+		return mapAreas;
+	}
+
+	public void setMapAreas(Set<MapArea> mapAreas) {
+		this.mapAreas = mapAreas;
 	}
 }

@@ -13,5 +13,10 @@
 		<property name="apiKey" length="20" unique-key="broker_uk2" />
 		<property name="name" length="100" />
 		<property name="apiurl" length="100" />
+		
+		<set name="mapAreas" table="brokermapareas">
+			<key column="brokerid"></key>
+			<many-to-many column="mapareaid" class="tb2014.domain.maparea.MapArea"></many-to-many>
+		</set>
 	</class>
 </hibernate-mapping>

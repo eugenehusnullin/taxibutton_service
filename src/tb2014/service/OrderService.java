@@ -46,6 +46,7 @@ import tb2014.dao.IOrderDao;
 import tb2014.dao.IOrderStatusDao;
 import tb2014.domain.Broker;
 import tb2014.domain.Device;
+import tb2014.domain.maparea.MapArea;
 import tb2014.domain.order.Car;
 import tb2014.domain.order.Driver;
 import tb2014.domain.order.Feedback;
@@ -168,7 +169,8 @@ public class OrderService {
 			throw new DeviceNotFoundException(deviceApiid);
 		}
 
-		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
+		Order order = OrderJsonParser
+				.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
 		if (order == null) {
 			throw new ParseOrderException();
 		}
@@ -547,7 +549,28 @@ public class OrderService {
 		Document orderXml = OrderSerializer.OrderToXml(order);
 		boolean offered = false;
 
+		Collection<Broker> offerBrokers = new ArrayList<Broker>();
 		for (Broker currentBroker : brokers) {
+			boolean add = false;
+			if (currentBroker.getMapAreas() != null && currentBroker.getMapAreas().size() > 0) {
+				for (MapArea mapArea : currentBroker.getMapAreas()) {
+					if (mapArea.contains(order.getSource().getLat(), order.getSource().getLon()) )
+					{
+						add = true;
+						break;
+					}
+				}
+			} else {
+				add = true;
+			}
+			
+			if (add) {
+				offerBrokers.add(currentBroker);
+			}
+			
+		}
+
+		for (Broker currentBroker : offerBrokers) {
 
 			try {
 

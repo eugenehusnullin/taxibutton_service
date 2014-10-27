@@ -8,6 +8,20 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><tiles:insertAttribute name="title" ignore="true" /></title>
 <link media="screen" href="<c:url value="/admin/resources/css/main.css"/>" type="text/css" rel="stylesheet" />
+
+<link type="text/css" rel="stylesheet" href="<c:url value="/admin/resources/css/bootstrap.min.css"/>">
+<link type="text/css" rel="stylesheet" href="<c:url value="/admin/resources/css/dataTables.bootstrap.css"/>">
+<link type="text/css" rel="stylesheet" href="<c:url value="/admin/resources/css/datatables.colvis.min.css"/>">
+
+<script type="text/javascript" src="<c:url value="/admin/resources/js/jquery-1.11.0.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/admin/resources/js/jquery.dataTables.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/admin/resources/js/bootstrap.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/admin/resources/js/datatables.colvis.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/admin/resources/js/dataTables.bootstrap.js"/>"></script>
+
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing"></script>
+<script type="text/javascript" src="<c:url value="/admin/resources/js/mapzone.js"/>"></script>
+
 </head>
 <body>
 	<tiles:insertAttribute name="menu" ignore="true" />

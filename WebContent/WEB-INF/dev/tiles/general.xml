@@ -116,4 +116,9 @@
 		<put-attribute name="body" value="/WEB-INF/dev/views/tariff/tariff.jsp" />
 	</definition>
 	
+	<definition name="maparea/create" extends="default">
+		<put-attribute name="title" value="Map areas" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/maparea/create.jsp" />
+	</definition>
+	
 </tiles-definitions>

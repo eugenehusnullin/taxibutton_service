@@ -495,7 +495,8 @@ public class OrderController {
 			connection.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
-			wr.writeBytes(jsonResult);
+			wr.write(jsonResult.getBytes("UTF-8"));
+			//wr.writeBytes(jsonResult);
 			wr.flush();
 			wr.close();
 
