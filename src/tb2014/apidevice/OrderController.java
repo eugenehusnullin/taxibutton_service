@@ -207,8 +207,12 @@ public class OrderController {
 			List<Broker> brokers = brokerService.getAll();
 			JSONArray jsonArray = new JSONArray();
 			for (Broker broker : brokers) {
-				jsonArray.put(broker.getUuid());
-				jsonArray.put(broker.getName());
+				JSONObject jsonBroker = new JSONObject();
+				jsonBroker.put("uuid", broker.getUuid());
+				jsonBroker.put("name", broker.getName());
+				jsonArray.put(jsonBroker);
+				//jsonArray.put(broker.getUuid());
+				//jsonArray.put(broker.getName());
 			}
 			
 			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
