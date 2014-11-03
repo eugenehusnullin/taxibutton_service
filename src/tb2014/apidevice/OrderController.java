@@ -69,7 +69,7 @@ public class OrderController {
 			} catch (DeviceNotFoundException dnfe) {
 				response.setStatus(403);
 			} catch (ParseOrderException e) {
-				response.setStatus(404);
+				response.sendError(404, e.toString());
 			}
 		} catch (UnsupportedEncodingException e) {
 			log.error("apiDeviceOrderController.create", e);

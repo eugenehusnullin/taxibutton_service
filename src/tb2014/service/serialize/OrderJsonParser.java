@@ -18,10 +18,12 @@ import tb2014.domain.order.AddressPoint;
 import tb2014.domain.order.Order;
 import tb2014.domain.order.Requirement;
 import tb2014.domain.order.VehicleClass;
+import tb2014.service.exceptions.ParseOrderException;
 
 public class OrderJsonParser {
 
-	public static Order Json2Order(JSONObject jsonObject, String phone, IBrokerDao brokerDao) {
+	public static Order Json2Order(JSONObject jsonObject, String phone, IBrokerDao brokerDao)
+			throws ParseOrderException {
 
 		Order order = new Order();
 
@@ -35,9 +37,9 @@ public class OrderJsonParser {
 			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 			bookingDate = dateFormatter.parse(bookingDateStr);
 		} catch (JSONException ex) {
-			return null;
+			throw new ParseOrderException("bookingDate bad. " + ex.toString());
 		} catch (ParseException ex) {
-			return null;
+			throw new ParseOrderException("bookingDate format bad. " + ex.toString());
 		}
 
 		SortedSet<AddressPoint> addressPoints = new TreeSet<AddressPoint>();
@@ -45,7 +47,7 @@ public class OrderJsonParser {
 			JSONObject sourceJson = jsonObject.getJSONObject("source");
 			addressPoints.add(OrderJsonParser.getPoint(sourceJson, order, 0));
 		} catch (JSONException ex) {
-			return null;
+			throw new ParseOrderException("source bad. " + ex.toString());
 		}
 
 		JSONArray destinationsJson = jsonObject.optJSONArray("destinations");
@@ -57,7 +59,7 @@ public class OrderJsonParser {
 				try {
 					index = destinationJson.getInt("index");
 				} catch (JSONException ex) {
-					return null;
+					throw new ParseOrderException("destination index bad. " + ex.toString());
 				}
 
 				addressPoints.add(OrderJsonParser.getPoint(destinationJson, order, index));
@@ -65,7 +67,7 @@ public class OrderJsonParser {
 		} else {
 			boolean dest = jsonObject.optBoolean("destinations");
 			if (!dest) {
-				return null;
+				throw new ParseOrderException("destinations bad.");
 			}
 		}
 
@@ -84,10 +86,10 @@ public class OrderJsonParser {
 						name = requirementJson.getString("name");
 						value = requirementJson.getString("value");
 					} catch (JSONException ex) {
-						return null;
+						throw new ParseOrderException("requirement bad. " + ex.toString());
 					}
 
-					if (value.equals("yes") == false) {
+					if (!value.equals("yes")) {
 						currentRequirement.setOptions(value);
 					}
 
@@ -97,14 +99,14 @@ public class OrderJsonParser {
 				}
 			}
 		} catch (JSONException ex) {
-			return null;
+			throw new ParseOrderException("requirements bad. " + ex.toString());
 		}
 
 		try {
 			int vehicleClass = jsonObject.getInt("vehicleClass");
 			order.setOrderVehicleClass(VehicleClass.values()[vehicleClass]);
 		} catch (JSONException ex) {
-			return null;
+			throw new ParseOrderException("vehicleClass bad. " + ex.toString());
 		}
 
 		Set<Broker> offerBrokerList = new HashSet<Broker>();

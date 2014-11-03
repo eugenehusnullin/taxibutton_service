@@ -169,11 +169,7 @@ public class OrderService {
 			throw new DeviceNotFoundException(deviceApiid);
 		}
 
-		Order order = OrderJsonParser
-				.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
-		if (order == null) {
-			throw new ParseOrderException();
-		}
+		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
 		order.setDevice(device);
 		create(order);
 
@@ -181,14 +177,9 @@ public class OrderService {
 	}
 
 	private void create(Order order) throws ParseOrderException {
-
-		if (order == null) {
-			throw new ParseOrderException();
-		}
-
 		// check booking date
 		if (DatetimeUtil.isTimeoutExpired(order, createOrderLimit, new Date())) {
-			throw new ParseOrderException();
+			throw new ParseOrderException("bookingdate is out");
 		}
 
 		order.setUuid(UUID.randomUUID().toString());
