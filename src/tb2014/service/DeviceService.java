@@ -99,6 +99,7 @@ public class DeviceService {
 			model.setId(device.getId());
 			model.setApiId(device.getApiId());
 			model.setPhone(device.getPhone());
+			model.setConfirmKey(device.getConfirmKey());
 			models.add(model);
 		}
 

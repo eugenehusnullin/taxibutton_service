@@ -16,6 +16,7 @@
 				<th>#</th>
 				<th>Api id</th>
 				<th>Phone</th>
+				<th>Key</th>
 				<th>Action</th>
 			</tr>
 		</thead>
@@ -25,6 +26,7 @@
 					<td>${device.getId()}</td>
 					<td>${device.getApiId()}</td>
 					<td>${device.getPhone()}</td>
+					<td>${device.getConfirmKey()}</td>
 					<td><a href="tariffs?apiId=${device.getApiId()}">Tariffs</a></td>
 				</tr>
 			</c:forEach>

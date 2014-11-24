@@ -4,6 +4,7 @@ public class DeviceModel {
 	private Long id;
 	private String apiId;
 	private String phone;
+	private String confirmKey;
 
 	public Long getId() {
 		return id;
@@ -27,5 +28,13 @@ public class DeviceModel {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getConfirmKey() {
+		return confirmKey;
+	}
+
+	public void setConfirmKey(String confirmKey) {
+		this.confirmKey = confirmKey;
 	}
 }
