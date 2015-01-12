@@ -565,7 +565,7 @@ public class OrderService {
 
 			try {
 
-				offered = offerOrderHTTP(currentBroker, orderXml);
+				offered |= offerOrderHTTP(currentBroker, orderXml);
 
 				if (offered) {
 					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
