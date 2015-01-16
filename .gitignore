@@ -8,3 +8,4 @@ jdbc.settings
 log4j.properties
 WebContent/WEB-INF/settings/main.settings
 WebContent/WEB-INF/settings/sms48.settings
+.DS_Store
