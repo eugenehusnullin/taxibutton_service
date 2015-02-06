@@ -13,6 +13,9 @@
 		<input type="text" name="apiId" value="1"/>
 		<br/>Api key
 		<input type="text" name="apiKey" value="1"/>
+		<br/>
+		<input type="radio" name="smsMethod" value="0" checked /> sms48
+		<input type="radio" name="smsMethod" value="1" /> self
 		<br />
 		<input type="submit" value="save" />
 	</form>

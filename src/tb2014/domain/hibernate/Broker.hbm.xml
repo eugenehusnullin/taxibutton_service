@@ -18,5 +18,11 @@
 			<key column="brokerid"></key>
 			<many-to-many column="mapareaid" class="tb2014.domain.maparea.MapArea"></many-to-many>
 		</set>
+		
+		<property name="smsMethod">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">tb2014.domain.SmsMethod</param>
+			</type>
+		</property>
 	</class>
 </hibernate-mapping>

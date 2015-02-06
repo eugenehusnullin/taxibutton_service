@@ -14,14 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import tb2014.admin.model.DeviceModel;
 import tb2014.dao.IDeviceDao;
 import tb2014.domain.Device;
-import tb2014.utils.Sms48;
 
 @Service
 public class DeviceService {
 	@Autowired
 	private IDeviceDao deviceDao;
 	@Autowired
-	private Sms48 sms48;
+	private SmsService smsService;
 
 	@Transactional
 	public JSONObject register(JSONObject registerJson) {
@@ -48,11 +47,9 @@ public class DeviceService {
 		Random random = new Random();
 		int keyInt = random.nextInt(9999 - 1000) + 1000;
 		device.setConfirmKey(Integer.toString(keyInt));
-
-		sms48.send(phone, "Код: " + Integer.toString(keyInt));
-
 		deviceDao.save(device);
 
+		smsService.sendMessage(phone, "Код: " + Integer.toString(keyInt));
 		resultJson.put("result", "WAITSMS");
 		return resultJson;
 	}

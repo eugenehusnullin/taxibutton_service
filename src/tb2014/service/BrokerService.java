@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tb2014.dao.IBrokerDao;
 import tb2014.dao.IMapAreaDao;
 import tb2014.domain.Broker;
+import tb2014.domain.SmsMethod;
 import tb2014.domain.maparea.MapArea;
 
 @Service
@@ -48,13 +49,14 @@ public class BrokerService {
 	}
 
 	@Transactional
-	public void update(Long brokerId, String apiId, String apiKey, String name, String apiUrl) {
+	public void update(Long brokerId, String apiId, String apiKey, String name, String apiUrl, SmsMethod smsMethod) {
 		Broker broker = brokerDao.get(brokerId);
 
 		broker.setApiId(apiId);
 		broker.setApiKey(apiKey);
 		broker.setApiurl(apiUrl);
 		broker.setName(name);
+		broker.setSmsMethod(smsMethod);
 
 		brokerDao.saveOrUpdate(broker);
 	}

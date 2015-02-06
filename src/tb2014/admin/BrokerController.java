@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb2014.domain.Broker;
+import tb2014.domain.SmsMethod;
 import tb2014.service.BrokerService;
 import tb2014.service.TariffService;
 
@@ -36,13 +37,17 @@ public class BrokerController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String create(@RequestParam("name") String name, @RequestParam("apiurl") String apiurl,
-			@RequestParam("apiId") String apiId, @RequestParam("apiKey") String apiKey, Model model) {
+			@RequestParam("apiId") String apiId, @RequestParam("apiKey") String apiKey,
+			@RequestParam("smsMethod") String smsMethod, Model model) {
+		
+		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 
 		Broker broker = new Broker();
 		broker.setName(name);
 		broker.setApiurl(apiurl);
 		broker.setApiId(apiId);
 		broker.setApiKey(apiKey);
+		broker.setSmsMethod(smsM);
 		brokerService.add(broker);
 
 		return "redirect:list";
@@ -71,6 +76,7 @@ public class BrokerController {
 		model.addAttribute("apiKey", broker.getApiKey());
 		model.addAttribute("name", broker.getName());
 		model.addAttribute("apiUrl", broker.getApiurl());
+		model.addAttribute("smsMethod", broker.getSmsMethod() == null ? -1 : broker.getSmsMethod().ordinal());
 
 		return "broker/edit";
 	}
@@ -78,9 +84,10 @@ public class BrokerController {
 	@RequestMapping(value = "/edit", method = RequestMethod.POST)
 	public String edit(@RequestParam("brokerId") Long brokerId, @RequestParam("apiId") String apiId,
 			@RequestParam("apiKey") String apiKey, @RequestParam("name") String name,
-			@RequestParam("apiUrl") String apiUrl) {
+			@RequestParam("apiUrl") String apiUrl, @RequestParam("smsMethod") String smsMethod) {
+		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 
-		brokerService.update(brokerId, apiId, apiKey, name, apiUrl);
+		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM);
 		return "redirect:list";
 	}
 }

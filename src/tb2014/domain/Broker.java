@@ -13,6 +13,7 @@ public class Broker {
 	private String name;
 	private String apiurl;
 	private Set<MapArea> mapAreas;
+	private SmsMethod smsMethod;
 
 	public Long getId() {
 		return id;
@@ -68,5 +69,13 @@ public class Broker {
 
 	public void setMapAreas(Set<MapArea> mapAreas) {
 		this.mapAreas = mapAreas;
+	}
+
+	public SmsMethod getSmsMethod() {
+		return smsMethod;
+	}
+
+	public void setSmsMethod(SmsMethod smsMethod) {
+		this.smsMethod = smsMethod;
 	}
 }

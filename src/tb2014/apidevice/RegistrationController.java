@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import tb2014.service.DeviceService;
 import tb2014.utils.NetStreamUtils;
 import tb2014.utils.Sms48;
+import tb2014.utils.SmsSelf;
 
 @RequestMapping("/device")
 @Controller("apiDeviceRegistrationController")
@@ -29,6 +30,8 @@ public class RegistrationController {
 	private DeviceService deviceService;
 	@Autowired
 	private Sms48 sms48;
+	@Autowired
+	private SmsSelf smsSelf;
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public void register(HttpServletRequest request, HttpServletResponse response) {
@@ -67,7 +70,7 @@ public class RegistrationController {
 			log.error("apiDeviceRegistrationController.confirm", e);
 		}
 	}
-	
+
 	@RequestMapping(value = "/simplesendsms", method = RequestMethod.POST)
 	public void simpleSendSms(HttpServletResponse response, @RequestParam("phone") String phone,
 			@RequestParam("key") int key, @RequestParam("sender") String sender) {
@@ -77,6 +80,20 @@ public class RegistrationController {
 		} catch (Exception e) {
 			response.setStatus(500);
 			log.error("apiDeviceRegistrationController.simplesendsms", e);
+		}
+	}
+
+	@RequestMapping(value = "/getsms", method = RequestMethod.GET)
+	public void getSms(HttpServletResponse response) {
+		try {
+			String send = smsSelf.get4Send();
+			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
+			outputStream.writeBytes(send);
+			outputStream.flush();
+			outputStream.close();
+		} catch (Exception e) {
+			response.setStatus(500);
+			log.error("apiDeviceRegistrationController.getSms", e);
 		}
 	}
 
