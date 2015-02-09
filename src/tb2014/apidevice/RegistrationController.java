@@ -42,6 +42,7 @@ public class RegistrationController {
 
 			JSONObject responseJson = deviceService.register(requestJson);
 
+			response.setContentType("application/json; charset=UTF-8");
 			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 			outputStream.writeBytes(responseJson.toString());
 			outputStream.flush();
@@ -61,6 +62,7 @@ public class RegistrationController {
 
 			JSONObject responseJson = deviceService.confirm(requestJson);
 
+			response.setContentType("application/json; charset=UTF-8");
 			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 			outputStream.writeBytes(responseJson.toString());
 			outputStream.flush();
@@ -87,6 +89,8 @@ public class RegistrationController {
 	public void getSms(HttpServletResponse response) {
 		try {
 			String send = smsSelf.get4Send();
+			
+			response.setContentType("application/json; charset=UTF-8");
 			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 			outputStream.writeBytes(send);
 			outputStream.flush();
