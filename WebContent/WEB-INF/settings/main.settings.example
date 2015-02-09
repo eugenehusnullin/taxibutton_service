@@ -9,3 +9,6 @@ offerorder.wait.pause=5000
 cancelorder.threads.count=10
 
 createorder.limit=180000
+
+device.registration.smsmethod=self
+;device.registration.smsmethod=sms48
