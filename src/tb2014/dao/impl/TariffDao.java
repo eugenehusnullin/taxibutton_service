@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import tb2014.dao.ITariffDao;
 import tb2014.domain.Broker;
-import tb2014.domain.tariff.Tariff;
+import tb2014.domain.Tariff;
 
 @Repository("SimpleTariffDao")
 public class TariffDao implements ITariffDao {

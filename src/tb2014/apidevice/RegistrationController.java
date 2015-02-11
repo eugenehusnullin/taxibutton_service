@@ -1,11 +1,12 @@
 package tb2014.apidevice;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hsqldb.lib.DataOutputStream;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
@@ -88,11 +89,12 @@ public class RegistrationController {
 	@RequestMapping(value = "/getsms", method = RequestMethod.GET)
 	public void getSms(HttpServletResponse response) {
 		try {
-			String send = smsSelf.get4Send();
-			
+			String sms = smsSelf.get4Send();
+			byte[] bytes = sms.getBytes(Charset.forName("UTF-8"));
+
 			response.setContentType("application/json; charset=UTF-8");
 			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-			outputStream.writeBytes(send);
+			outputStream.write(bytes, 0, bytes.length);
 			outputStream.flush();
 			outputStream.close();
 		} catch (Exception e) {

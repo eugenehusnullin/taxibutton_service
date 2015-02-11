@@ -17,7 +17,7 @@ import tb2014.dao.IDeviceDao;
 import tb2014.dao.ITariffDao;
 import tb2014.domain.Broker;
 import tb2014.domain.Device;
-import tb2014.domain.tariff.Tariff;
+import tb2014.domain.Tariff;
 import tb2014.service.exceptions.DeviceNotFoundException;
 
 @Service

@@ -11,7 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import tb2014.domain.Broker;
-import tb2014.domain.tariff.Tariff;
+import tb2014.domain.Tariff;
 
 @Service
 public class TariffBuilder {

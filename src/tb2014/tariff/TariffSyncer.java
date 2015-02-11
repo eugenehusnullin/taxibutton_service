@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 import tb2014.dao.IBrokerDao;
 import tb2014.dao.ITariffDao;
 import tb2014.domain.Broker;
-import tb2014.domain.tariff.Tariff;
+import tb2014.domain.Tariff;
 
 @Service
 @EnableScheduling

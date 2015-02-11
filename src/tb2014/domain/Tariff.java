@@ -1,8 +1,6 @@
-package tb2014.domain.tariff;
+package tb2014.domain;
 
 import java.util.Date;
-
-import tb2014.domain.Broker;
 
 public class Tariff {
 

@@ -3,7 +3,7 @@ package tb2014.dao;
 import java.util.List;
 
 import tb2014.domain.Broker;
-import tb2014.domain.tariff.Tariff;
+import tb2014.domain.Tariff;
 
 public interface ITariffDao {
 

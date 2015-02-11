@@ -13,6 +13,8 @@
 		<property name="apiKey" length="20" unique-key="broker_uk1" />
 		<property name="name" length="100" />
 		<property name="apiurl" length="100" />
+		<property name="tariffUrl" length="100" />
+		<property name="driverUrl" length="100" />
 		
 		<set name="mapAreas" table="brokermapareas">
 			<key column="brokerid"></key>
