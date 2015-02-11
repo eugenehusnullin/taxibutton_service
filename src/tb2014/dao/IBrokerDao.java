@@ -15,6 +15,8 @@ public interface IBrokerDao {
 	Broker getByApiId(String apiId, String apiKey);
 
 	List<Broker> getAll();
+	
+	List<Broker> getActive();
 
 	void save(Broker broker);
 	

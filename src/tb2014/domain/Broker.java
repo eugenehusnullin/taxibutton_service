@@ -12,6 +12,7 @@ public class Broker {
 	private String apiKey;
 	private String name;
 	private String apiurl;
+	private String tariffUrl;
 	private Set<MapArea> mapAreas;
 	private SmsMethod smsMethod;
 
@@ -77,5 +78,13 @@ public class Broker {
 
 	public void setSmsMethod(SmsMethod smsMethod) {
 		this.smsMethod = smsMethod;
+	}
+
+	public String getTariffUrl() {
+		return tariffUrl;
+	}
+
+	public void setTariffUrl(String tariffUrl) {
+		this.tariffUrl = tariffUrl;
 	}
 }

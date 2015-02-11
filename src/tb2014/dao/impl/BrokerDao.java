@@ -64,4 +64,10 @@ public class BrokerDao implements IBrokerDao {
 	public void saveOrUpdate(Broker broker) {
 		sessionFactory.getCurrentSession().saveOrUpdate(broker);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Broker> getActive() {
+		return sessionFactory.getCurrentSession().createCriteria(Broker.class).list();
+	}
 }

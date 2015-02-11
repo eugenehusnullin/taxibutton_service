@@ -4,11 +4,15 @@
 		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="tb2014.domain.tariff">
-	<class name="SimpleTariff" table="tariffs">
+	<class name="Tariff" table="tariffs">
 		<id name="id">
 			<generator class="identity" />
 		</id>
-		<many-to-one name="broker" column="brokerid" unique-key="tariffs_uk1" />
-		<property name="tariffs" length="10000"/>
+		<many-to-one name="broker" column="brokerid"/>
+		<property name="tariffId" length="32"/>
+		<property name="name" length="64"/>
+		<property name="tariff" length="10000"/>
+		<property name="startDate"/>
+		<property name="endDate"/>
 	</class>
 </hibernate-mapping>

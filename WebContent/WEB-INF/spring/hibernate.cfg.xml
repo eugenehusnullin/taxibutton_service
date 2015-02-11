@@ -6,7 +6,7 @@
 <hibernate-configuration>
 	<session-factory>
 		<mapping resource="tb2014/domain/hibernate/Broker.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/SimpleTariff.hbm.xml" />
+<!-- 		<mapping resource="tb2014/domain/hibernate/Tariff.hbm.xml" /> -->
 		<mapping resource="tb2014/domain/hibernate/AddressPoint.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/Requirement.hbm.xml" />
 		<mapping resource="tb2014/domain/hibernate/Order.hbm.xml" />
