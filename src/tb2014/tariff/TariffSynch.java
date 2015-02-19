@@ -29,8 +29,8 @@ import tb2014.domain.Tariff;
 
 @Service
 @EnableScheduling
-public class TariffSyncer {
-	private static final Logger log = LoggerFactory.getLogger(TariffSyncer.class);
+public class TariffSynch {
+	private static final Logger log = LoggerFactory.getLogger(TariffSynch.class);
 	@Autowired
 	private IBrokerDao brokerDao;
 	@Autowired
@@ -40,7 +40,7 @@ public class TariffSyncer {
 
 	@Scheduled(cron = "0 01 * * * *")
 	@Transactional
-	public void sync() {
+	public void synch() {
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
 			try {
