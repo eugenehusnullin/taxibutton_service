@@ -8,7 +8,7 @@ hibernate.hbm2ddl.auto=create-drop
 
 ; HSQLDB in memory
 jdbc.driverClassName=org.hsqldb.jdbcDriver
-jdbc.url=jdbc:hsqldb:mem:tb2014
+jdbc.url=jdbc:hsqldb:mem:tb
 jdbc.username=sa
 jdbc.password=
 hibernate.dialect=org.hibernate.dialect.HSQLDialect
@@ -17,7 +17,7 @@ hibernate.hbm2ddl.auto=create-drop
 
 ; HSQLDB on disk
 jdbc.driverClassName=org.hsqldb.jdbcDriver
-jdbc.url=jdbc:hsqldb:file:D:/db_data/hsqldb/tb2014/tb2014
+jdbc.url=jdbc:hsqldb:file:D:/db_data/hsqldb/tb/tb
 jdbc.username=sa
 jdbc.password=
 hibernate.dialect=org.hibernate.dialect.HSQLDialect
@@ -27,9 +27,9 @@ hibernate.hbm2ddl.auto=create-drop
 
 ; POSTGRES
 jdbc.driverClassName=org.postgresql.Driver
-jdbc.url=jdbc:postgresql://localhost:5432/tb2014
-jdbc.username=tb2014
-jdbc.password=tb2014
+jdbc.url=jdbc:postgresql://localhost:5432/tb
+jdbc.username=tb
+jdbc.password=tb
 hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect
 hibernate.show_sql=true
 hibernate.hbm2ddl.auto=create-drop

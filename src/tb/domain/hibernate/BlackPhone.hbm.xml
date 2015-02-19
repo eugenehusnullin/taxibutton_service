@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb.domain.phone">
+	<class name="BlackPhone" table="blacklist">
+		<id name="id">
+			<generator class="identity" />
+		</id>
+		<many-to-one name="broker" column="brokerid" unique-key="blacklist_uk1" />
+		<property name="number" length="20" />
+	</class>
+</hibernate-mapping>

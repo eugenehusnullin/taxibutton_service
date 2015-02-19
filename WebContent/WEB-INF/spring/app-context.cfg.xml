@@ -13,7 +13,7 @@
 	<util:properties id="mainSettings" location="WEB-INF\settings\main.settings"></util:properties>
 	<util:properties id="sms48Settings" location="WEB-INF\settings\sms48.settings"></util:properties>
 
-	<bean id="tb2014DS"
+	<bean id="tbDS"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
@@ -31,8 +31,8 @@
 				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
 			</props>
 		</property>
-		<property name="dataSource" ref="tb2014DS" />
-		<property name="packagesToScan" value="tb2014.domain" />
+		<property name="dataSource" ref="tbDS" />
+		<property name="packagesToScan" value="tb.domain" />
 	</bean>
 
 	<bean id="transactionManager"
@@ -41,15 +41,15 @@
 	</bean>
 	<tx:annotation-driven />
 
-	<bean id="runner" class="tb2014.Run" init-method="start"
+	<bean id="runner" class="tb.Run" init-method="start"
 		destroy-method="stop">
 	</bean>
 
-	<context:component-scan base-package="tb2014" />
+	<context:component-scan base-package="tb" />
 	<context:annotation-config />
 
 
-	<bean id="tariffService" class="tb2014.service.TariffService" />
+	<bean id="tariffService" class="tb.service.TariffService" />
 	<task:scheduled-tasks scheduler="tariffsProcessingScheduler">
 		<task:scheduled ref="tariffService" method="pullBrokersTariffs"
 			fixed-delay="3600000" />

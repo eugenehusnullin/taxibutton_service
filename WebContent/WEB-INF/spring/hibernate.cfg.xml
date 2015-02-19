@@ -5,18 +5,18 @@
 
 <hibernate-configuration>
 	<session-factory>
-		<mapping resource="tb2014/domain/hibernate/Broker.hbm.xml" />
-<!-- 		<mapping resource="tb2014/domain/hibernate/Tariff.hbm.xml" /> -->
-		<mapping resource="tb2014/domain/hibernate/AddressPoint.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/Requirement.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/Order.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/OrderAcceptAlacrity.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/OrderStatus.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/GeoData.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/OrderCancel.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/Device.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/OfferedOrderBroker.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/Feedback.hbm.xml" />
-		<mapping resource="tb2014/domain/hibernate/MapArea.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/Broker.hbm.xml" />
+<!-- 		<mapping resource="tb/domain/hibernate/Tariff.hbm.xml" /> -->
+		<mapping resource="tb/domain/hibernate/AddressPoint.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/Requirement.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/Order.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/OrderAcceptAlacrity.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/OrderStatus.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/GeoData.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/OrderCancel.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/Device.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/OfferedOrderBroker.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/Feedback.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/MapArea.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb.domain.maparea">
+	<typedef name="PointArray" class="tb.domain.maparea.PointArrayType"></typedef>
+	<class name="MapArea" table="maparea">
+		<id name="id">
+			<generator class="identity" />
+		</id>
+		<discriminator column="area_type" type="string"></discriminator>
+		
+		<property name="name" length="128"></property>
+		<property name="about" length="1024"></property>
+		
+		<subclass name="Polygon" discriminator-value="polygon">
+			<property name="points" type="PointArray" length="10240"></property>
+		</subclass>
+	</class>
+</hibernate-mapping>

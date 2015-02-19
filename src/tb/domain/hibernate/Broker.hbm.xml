@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb.domain">
+	<class name="Broker" table="brokers">
+		<id name="id">
+			<generator class="identity" />
+		</id>
+		<property name="uuid" unique-key="broker_uk3" />
+		<property name="apiId" length="20" unique-key="broker_uk1" />
+		<property name="apiKey" length="20" unique-key="broker_uk1" />
+		<property name="name" length="100" />
+		<property name="apiurl" length="100" />
+		<property name="tariffUrl" length="100" />
+		<property name="driverUrl" length="100" />
+		
+		<set name="mapAreas" table="brokermapareas">
+			<key column="brokerid"></key>
+			<many-to-many column="mapareaid" class="tb.domain.maparea.MapArea"></many-to-many>
+		</set>
+		
+		<property name="smsMethod">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">tb.domain.SmsMethod</param>
+			</type>
+		</property>
+	</class>
+</hibernate-mapping>

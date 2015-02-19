@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb.domain.order">
+	<class name="Requirement" table="requirement">
+		<id name="id">
+			<generator class="identity" />
+		</id>
+		<many-to-one name="order" class="tb.domain.order.Order">
+			<column name="orderId" not-null="true" />
+		</many-to-one>
+		<property name="type" length="40" />
+		<property name="options" length="100" />
+	</class>
+</hibernate-mapping>
