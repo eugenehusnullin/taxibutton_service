@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Cars>
+  <Car>
+    <Uuid>uuid01</Uuid>
+    <RealClid>rc651</RealClid>
+    <RealName>Старое Черное Такси</RealName>
+    <RealWeb>http://oldblacktaxi.ru</RealWeb>
+    <RealScid>450</RealScid>
+    <Tariff>t1</Tariff>
+    <Tariff>t2</Tariff>
+    <Tariff>t3</Tariff>
+    <DriverDetails>
+      <DisplayName>Иванов Иван Иванович</DisplayName>
+      <Phone>+79022617513</Phone>
+      <Age>1965</Age>
+      <DriverLicense>9900123456</DriverLicense>
+      <Permit>00708</Permit>
+    </DriverDetails>
+    <CarDetails>
+      <Model>Mercedes Grand Vitara</Model>
+      <Age>1998</Age>
+      <Color>черный</Color>
+      <CarNumber>К221РТ150</CarNumber>
+      <Permit>00708</Permit>
+      <Require name="has_conditioner">yes</Require>
+      <Require name="no_smoking">no</Require>
+      <Require name="child_chair">0.6-4</Require>
+      <Require name="animal_transport">yes</Require>
+      <Require name="universal">no</Require>
+      <Require name="check">no</Require>
+    </CarDetails>
+  </Car>
+  <Car>
+    <Uuid>uuid02</Uuid>
+    <RealClid>rc651</RealClid>
+    <RealName>Старое Черное Такси</RealName>
+    <RealWeb>http://oldblacktaxi.ru</RealWeb>
+    <RealScid>450</RealScid>
+    <Tariff>t1</Tariff>
+    <Tariff>t2</Tariff>
+    <Tariff>t3</Tariff>
+    <DriverDetails>
+      <DisplayName>Иванов Иван Иванович</DisplayName>
+      <Phone>+79022617513</Phone>
+      <Age>1965</Age>
+      <DriverLicense>9900123456</DriverLicense>
+      <Permit>00708</Permit>
+    </DriverDetails>
+    <CarDetails>
+      <Model>Mercedes Grand Vitara</Model>
+      <Age>1998</Age>
+      <Color>черный</Color>
+      <CarNumber>К221РТ150</CarNumber>
+      <Permit>00708</Permit>
+      <Require name="has_conditioner">yes</Require>
+      <Require name="no_smoking">no</Require>
+      <Require name="child_chair">0.6-4</Require>
+      <Require name="animal_transport">yes</Require>
+      <Require name="universal">no</Require>
+      <Require name="check">no</Require>
+    </CarDetails>
+  </Car>
+  <Car>
+    <Uuid>uuid03</Uuid>
+    <RealClid>rc651</RealClid>
+    <RealName>Старое Черное Такси</RealName>
+    <RealWeb>http://oldblacktaxi.ru</RealWeb>
+    <RealScid>450</RealScid>
+    <Tariff>t1</Tariff>
+    <Tariff>t2</Tariff>
+    <DriverDetails>
+      <DisplayName>Иванов Иван Иванович</DisplayName>
+      <Phone>+79022617513</Phone>
+      <Age>1965</Age>
+      <DriverLicense>9900123456</DriverLicense>
+      <Permit>00708</Permit>
+    </DriverDetails>
+    <CarDetails>
+      <Model>Mercedes Grand Vitara</Model>
+      <Age>1998</Age>
+      <Color>черный</Color>
+      <CarNumber>К221РТ150</CarNumber>
+      <Permit>00708</Permit>
+      <Require name="has_conditioner">yes</Require>
+    </CarDetails>
+  </Car>
+  <Car>
+    <Uuid>uuid04</Uuid>
+    <RealClid>rc651</RealClid>
+    <RealName>Старое Черное Такси</RealName>
+    <RealWeb>http://oldblacktaxi.ru</RealWeb>
+    <RealScid>450</RealScid>
+    <Tariff>t1</Tariff>
+    <DriverDetails>
+      <DisplayName>Иванов Иван Иванович</DisplayName>
+      <Phone>+79022617513</Phone>
+      <Age>1965</Age>
+      <DriverLicense>9900123456</DriverLicense>
+      <Permit>00708</Permit>
+    </DriverDetails>
+    <CarDetails>
+      <Model>Mercedes Grand Vitara</Model>
+      <Age>1998</Age>
+      <Color>черный</Color>
+      <CarNumber>К221РТ150</CarNumber>
+      <Permit>00708</Permit>
+    </CarDetails>
+  </Car>
+
+</Cars>

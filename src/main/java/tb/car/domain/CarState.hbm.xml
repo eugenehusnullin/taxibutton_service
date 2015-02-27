@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb.car.domain">
+	<class name="CarState" table="carstates">
+		<composite-id>
+			<key-property name="brokerId"></key-property>
+			<key-property name="uuid" length="32"></key-property>
+		</composite-id>
+		<property name="state">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">tb.car.domain.CarStateEnum</param>
+			</type>
+		</property>
+		<property name="date"></property>
+		<property name="latitude"></property>
+		<property name="longitude"></property>
+	</class>
+</hibernate-mapping>

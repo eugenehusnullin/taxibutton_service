@@ -8,8 +8,8 @@
 		<thead>
 			<tr>
 				<th>#</th>
-				<th>Longitude</th>
 				<th>Latitude</th>
+				<th>Longitude</th>
 				<th>Date</th>
 			</tr>
 		</thead>
@@ -17,8 +17,8 @@
 			<c:forEach items="${geoList}" var="geo">
 				<tr class="infoTr">
 					<td>${geo.getId()}</td>
-					<td>${geo.getLon()}</td>
 					<td>${geo.getLat()}</td>
+					<td>${geo.getLon()}</td>
 					<td>${geo.getDate()}</td>
 				</tr>
 			</c:forEach>

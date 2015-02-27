@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="tb.car.domain">
+	<class name="Car" table="cars">
+		<composite-id>
+			<key-property name="brokerId"></key-property>
+			<key-property name="uuid" length="32"></key-property>
+		</composite-id>
+		<property name="realClid" length="32"></property>
+		<property name="realName" length="100"></property>
+		<property name="realWeb" length="100"></property>
+		<property name="realScid" length="50"></property>
+		<set name="tariffList" table="carTariffs">
+			<key>
+				<column name="brokerId"></column>
+				<column name="uuid"></column>
+			</key>
+			<element column="tariff" type="string" length="32"></element>
+		</set>
+
+		<property name="driverDisplayName" length="100"></property>
+		<property name="driverPhone" length="20"></property>
+		<property name="driverAge"></property>
+		<property name="driverLicense" length="60"></property>
+		<property name="driverPermit" length="60"></property>
+		
+		<property name="carModel" length="40"></property>
+		<property name="carAge"></property>
+		<property name="carColor" length="12"></property>
+		<property name="carNumber" length="12"></property>
+		<property name="carPermit" length="12"></property>
+
+		<map name="carRequires" table="carRequires">
+			<key>
+				<column name="brokerId"></column>
+				<column name="uuid"></column>
+			</key>
+			<map-key column="name" type="string" length="32"></map-key>
+			<element column="value" type="string" length="32"></element>
+		</map>
+	</class>
+</hibernate-mapping>
