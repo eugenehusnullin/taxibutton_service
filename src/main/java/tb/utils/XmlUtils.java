@@ -1,0 +1,75 @@
+package tb.utils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+public class XmlUtils {
+
+	public static String xmlToString(Document document) {
+		String xmlString = null;
+		try {
+
+			Source source = new DOMSource(document);
+			StringWriter stringWriter = new StringWriter();
+			Result result = new StreamResult(stringWriter);
+
+			TransformerFactory trFactory = TransformerFactory.newInstance();
+			Transformer transformer = trFactory.newTransformer();
+			transformer.transform(source, result);
+
+			xmlString = stringWriter.getBuffer().toString();
+		} catch (Exception ex) {
+
+			return null;
+		}
+		return xmlString;
+	}
+
+	public static Document buildDomDocument(InputStream xmlInputStream) throws ParserConfigurationException, SAXException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(xmlInputStream);
+		return doc;
+	}
+	
+	public static Document buildDomDocument(String data) throws ParserConfigurationException, SAXException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(data);
+		return doc;
+	}
+	
+	public static String getElementContent(Element element, String elementName) {
+		NodeList nodeList = element.getElementsByTagName(elementName);
+		if (nodeList != null && nodeList.getLength() > 0) {
+			return nodeList.item(0).getFirstChild().getNodeValue();
+		} else {
+			return null;
+		}
+	}
+
+	public static Element getOneElement(Element element, String elementName) {
+		NodeList nodeList = element.getElementsByTagName(elementName);
+		if (nodeList != null && nodeList.getLength() == 1) {
+			return (Element) nodeList.item(0);
+		} else {
+			return null;
+		}
+	}
+}

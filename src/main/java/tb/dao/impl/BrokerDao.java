@@ -7,6 +7,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import tb.dao.IBrokerDao;
 import tb.domain.Broker;
@@ -40,6 +41,7 @@ public class BrokerDao implements IBrokerDao {
 		sessionFactory.getCurrentSession().save(broker);
 	}
 
+	@Transactional
 	@Override
 	public Broker getByApiId(String id) {
 		return (Broker) sessionFactory.getCurrentSession().createCriteria(Broker.class)

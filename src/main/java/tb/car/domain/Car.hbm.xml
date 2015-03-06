@@ -13,7 +13,7 @@
 		<property name="realName" length="100"></property>
 		<property name="realWeb" length="100"></property>
 		<property name="realScid" length="50"></property>
-		<set name="tariffList" table="carTariffs">
+		<set name="tariffs" table="carTariffs">
 			<key>
 				<column name="brokerId"></column>
 				<column name="uuid"></column>

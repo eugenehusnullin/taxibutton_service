@@ -23,7 +23,7 @@ public class Order {
 	private Set<GeoData> geoData;
 	private Set<Broker> offerBrokerList;
 	private VehicleClass orderVehicleClass;
-	private Broker brokerCreator;
+	private Broker brokerCreator;	
 
 	// don't persistent fields
 	private Date startOffer;

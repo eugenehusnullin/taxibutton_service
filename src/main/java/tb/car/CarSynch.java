@@ -8,11 +8,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import tb.car.dao.CarDao;
 import tb.car.domain.Car;
 import tb.dao.IBrokerDao;
 import tb.domain.Broker;
+import tb.utils.XmlUtils;
 
 @Service
 @EnableScheduling
@@ -43,10 +38,10 @@ public class CarSynch {
 		for (Broker broker : brokers) {
 			try {
 				InputStream carsInputStream = fetchCarsInputStream(broker);
-				Document doc = buildDomDocument(carsInputStream);
+				Document doc = XmlUtils.buildDomDocument(carsInputStream);
 				if (doc != null) {
 					Date loadDate = new Date();
-					Map<String, Car> cars = carBuilder.createCars(doc, broker, loadDate);
+					List<Car> cars = carBuilder.createCars(doc, broker, loadDate);
 					updateCars(cars, broker, loadDate);
 				}
 			} catch (Exception ex) {
@@ -55,7 +50,7 @@ public class CarSynch {
 		}
 	}
 
-	private void updateCars(Map<String, Car> cars, Broker broker, Date loadDate) {
+	private void updateCars(List<Car> cars, Broker broker, Date loadDate) {
 		carDao.updateCars(cars, broker, loadDate);
 	}
 
@@ -69,7 +64,7 @@ public class CarSynch {
 			if (conn.getResponseCode() == 200) {
 				return conn.getInputStream();
 			} else {
-				log.warn(String.format("Disp - %s don't response to CARS request. Error code: %d", broker.getName(),
+				log.warn(String.format("Disp - %s return error to CARS request. Error code: %d", broker.getName(),
 						conn.getResponseCode()));
 			}
 		} catch (MalformedURLException e) {
@@ -78,22 +73,6 @@ public class CarSynch {
 			log.error("url creation error.", e);
 		} catch (IOException e) {
 			log.error("open connection error.", e);
-		}
-		return null;
-	}
-
-	public Document buildDomDocument(InputStream xmlInputStream) {
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(xmlInputStream);
-			return doc;
-		} catch (IOException e) {
-			log.error("open connection error.", e);
-		} catch (ParserConfigurationException e) {
-			log.error("create xml builder error.", e);
-		} catch (SAXException e) {
-			log.error("parse xml error.", e);
 		}
 		return null;
 	}

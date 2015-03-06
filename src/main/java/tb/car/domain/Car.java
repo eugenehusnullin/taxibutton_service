@@ -16,7 +16,7 @@ public class Car implements Serializable {
 	private String realName;
 	private String realWeb;
 	private String realScid;
-	private List<String> tariffList;
+	private List<String> tariffs;
 
 	private String driverDisplayName;
 	private String driverPhone;
@@ -32,7 +32,7 @@ public class Car implements Serializable {
 	private Map<String, String> carRequires;
 
 	public Car() {
-		tariffList = new ArrayList<String>();
+		tariffs = new ArrayList<String>();
 		carRequires = new HashMap<String, String>();
 	}
 
@@ -140,12 +140,12 @@ public class Car implements Serializable {
 		this.uuid = uuid;
 	}
 
-	public List<String> getTariffList() {
-		return tariffList;
+	public List<String> getTariffs() {
+		return tariffs;
 	}
 
-	public void setTariffList(List<String> tariffList) {
-		this.tariffList = tariffList;
+	public void setTariffs(List<String> tariffList) {
+		this.tariffs = tariffList;
 	}
 
 	public String getDriverDisplayName() {

@@ -1,8 +1,8 @@
 package tb.car;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -12,12 +12,13 @@ import org.w3c.dom.NodeList;
 
 import tb.car.domain.Car;
 import tb.domain.Broker;
+import tb.utils.XmlUtils;
 
 @Service
 public class CarBuilder {
 
-	public Map<String, Car> createCars(Document doc, Broker broker, Date loadDate) {
-		Map<String, Car> map = new HashMap<String, Car>();
+	public List<Car> createCars(Document doc, Broker broker, Date loadDate) {
+		List<Car> list = new ArrayList<Car>();
 
 		doc.getDocumentElement().normalize();
 		NodeList carNodeList = doc.getElementsByTagName("Car");
@@ -28,35 +29,35 @@ public class CarBuilder {
 			Node carNode = carNodeList.item(i);
 			Element carElement = (Element) carNode;
 
-			car.setUuid(getElementContent(carElement, "Uuid"));
-			car.setRealClid(getElementContent(carElement, "RealClid"));
-			car.setRealName(getElementContent(carElement, "RealName"));
-			car.setRealWeb(getElementContent(carElement, "RealWeb"));
-			car.setRealScid(getElementContent(carElement, "RealScid"));
+			car.setUuid(XmlUtils.getElementContent(carElement, "Uuid"));
+			car.setRealClid(XmlUtils.getElementContent(carElement, "RealClid"));
+			car.setRealName(XmlUtils.getElementContent(carElement, "RealName"));
+			car.setRealWeb(XmlUtils.getElementContent(carElement, "RealWeb"));
+			car.setRealScid(XmlUtils.getElementContent(carElement, "RealScid"));
 
 			NodeList tariffNodeList = carElement.getElementsByTagName("Tariff");
 			for (int j = 0; j < tariffNodeList.getLength(); j++) {
 				Node tariffNode = tariffNodeList.item(j);
 				Element tariffElement = (Element) tariffNode;
-				car.getTariffList().add(tariffElement.getFirstChild().getNodeValue());
+				car.getTariffs().add(tariffElement.getFirstChild().getNodeValue());
 			}
 
-			Element driverDetailsElement = getOneElement(carElement, "DriverDetails");
+			Element driverDetailsElement = XmlUtils.getOneElement(carElement, "DriverDetails");
 			if (driverDetailsElement != null) {
-				car.setDriverDisplayName(getElementContent(driverDetailsElement, "DisplayName"));
-				car.setDriverPhone(getElementContent(driverDetailsElement, "Phone"));
-				car.setDriverAge(Integer.parseInt(getElementContent(driverDetailsElement, "Age")));
-				car.setDriverLicense(getElementContent(driverDetailsElement, "DriverLicense"));
-				car.setDriverPermit(getElementContent(driverDetailsElement, "Permit"));
+				car.setDriverDisplayName(XmlUtils.getElementContent(driverDetailsElement, "DisplayName"));
+				car.setDriverPhone(XmlUtils.getElementContent(driverDetailsElement, "Phone"));
+				car.setDriverAge(Integer.parseInt(XmlUtils.getElementContent(driverDetailsElement, "Age")));
+				car.setDriverLicense(XmlUtils.getElementContent(driverDetailsElement, "DriverLicense"));
+				car.setDriverPermit(XmlUtils.getElementContent(driverDetailsElement, "Permit"));
 			}
 
-			Element carDetailsElement = getOneElement(carElement, "CarDetails");
-			car.setCarModel(getElementContent(carDetailsElement, "Model"));
-			String carAge = getElementContent(carDetailsElement, "Age");
+			Element carDetailsElement = XmlUtils.getOneElement(carElement, "CarDetails");
+			car.setCarModel(XmlUtils.getElementContent(carDetailsElement, "Model"));
+			String carAge = XmlUtils.getElementContent(carDetailsElement, "Age");
 			car.setCarAge(carAge == null ? null : Integer.parseInt(carAge));
-			car.setCarColor(getElementContent(carDetailsElement, "Color"));
-			car.setCarNumber(getElementContent(carDetailsElement, "CarNumber"));
-			car.setCarPermit(getElementContent(carDetailsElement, "Permit"));
+			car.setCarColor(XmlUtils.getElementContent(carDetailsElement, "Color"));
+			car.setCarNumber(XmlUtils.getElementContent(carDetailsElement, "CarNumber"));
+			car.setCarPermit(XmlUtils.getElementContent(carDetailsElement, "Permit"));
 
 			NodeList carRequireNodeList = carDetailsElement.getElementsByTagName("Require");
 			for (int j = 0; j < carRequireNodeList.getLength(); j++) {
@@ -65,26 +66,10 @@ public class CarBuilder {
 				car.getCarRequires().put(requireName, requireValue);
 			}
 
-			map.put(car.getUuid(), car);
+			list.add(car);
 		}
-		return map;
+		return list;
 	}
 
-	private String getElementContent(Element element, String elementName) {
-		NodeList nodeList = element.getElementsByTagName(elementName);
-		if (nodeList != null && nodeList.getLength() > 0) {
-			return nodeList.item(0).getFirstChild().getNodeValue();
-		} else {
-			return null;
-		}
-	}
-
-	private Element getOneElement(Element element, String elementName) {
-		NodeList nodeList = element.getElementsByTagName(elementName);
-		if (nodeList != null && nodeList.getLength() == 1) {
-			return (Element) nodeList.item(0);
-		} else {
-			return null;
-		}
-	}
+	
 }

@@ -63,6 +63,19 @@
     <servlet-name>brokerSideWebServlet</servlet-name>
     <url-pattern>/test/*</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>apiyandexWebServlet</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>/WEB-INF/spring/apiyandexWebServlet.cfg.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>apiyandexWebServlet</servlet-name>
+    <url-pattern>/1.x/*</url-pattern>
+  </servlet-mapping>
   <filter>
     <filter-name>encoding-filter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>

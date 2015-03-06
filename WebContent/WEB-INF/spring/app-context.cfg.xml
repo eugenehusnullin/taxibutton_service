@@ -54,14 +54,14 @@
 	<task:scheduler id="tariffsProcessingScheduler" pool-size="10" />
 	
 	
-	<bean id="inmemorydbDS" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	<bean id="inmemDbDs" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="${jdbc2.driverClassName}" />
 		<property name="url" value="${jdbc2.url}" />
 		<property name="username" value="${jdbc2.username}" />
 		<property name="password" value="${jdbc2.password}" />
 	</bean>
 
-	<bean id="inmemorydbSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+	<bean id="inmemDbSf" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 		<property name="configLocation" value="/WEB-INF/spring/hibernate2.cfg.xml" />
 		<property name="hibernateProperties">
 			<props>
@@ -70,11 +70,11 @@
 				<prop key="hibernate.hbm2ddl.auto">${hibernate2.hbm2ddl.auto}</prop>
 			</props>
 		</property>
-		<property name="dataSource" ref="inmemorydbDS" />
+		<property name="dataSource" ref="inmemDbDs" />
 	</bean>
 	
-	<bean id="inmemorydbTransactionManager"
+	<bean id="inmemDbTm"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-		<property name="sessionFactory" ref="inmemorydbSessionFactory"></property>
+		<property name="sessionFactory" ref="inmemDbSf"></property>
 	</bean>
 </beans>

@@ -8,8 +8,6 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
@@ -26,6 +24,7 @@ import tb.dao.IBrokerDao;
 import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Tariff;
+import tb.utils.XmlUtils;
 
 @Service
 @EnableScheduling
@@ -53,10 +52,9 @@ public class TariffSynch {
 			} catch (Exception ex) {
 				log.info("Get XML tariffs error: " + ex.toString());
 			}
-
 		}
 	}
-	
+
 	private void updateTariffs(List<Tariff> tariffs, Broker broker, Date loadDate) {
 		for (Tariff tariff : tariffs) {
 			Tariff storedTariff = tariffDao.getActive(broker, tariff.getTariffId());
@@ -80,9 +78,7 @@ public class TariffSynch {
 			conn.setRequestProperty("Accept", "application/xml");
 
 			if (conn.getResponseCode() == 200) {
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(conn.getInputStream());
+				Document doc = XmlUtils.buildDomDocument(conn.getInputStream());
 				return doc;
 			} else {
 				log.warn(String.format("Disp - %s don't response to tariff request. Error code: %d", broker.getName(),

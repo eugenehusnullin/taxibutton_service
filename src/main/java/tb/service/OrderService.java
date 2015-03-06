@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 import tb.admin.model.AlacrityModel;
 import tb.admin.model.OrderModel;
 import tb.admin.model.OrderStatusModel;
+import tb.car.domain.Car4Request;
 import tb.dao.IBrokerDao;
 import tb.dao.IDeviceDao;
 import tb.dao.IGeoDataDao;
@@ -44,8 +45,10 @@ import tb.dao.IOrderAcceptAlacrityDao;
 import tb.dao.IOrderCancelDao;
 import tb.dao.IOrderDao;
 import tb.dao.IOrderStatusDao;
+import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Device;
+import tb.domain.Tariff;
 import tb.domain.maparea.MapArea;
 import tb.domain.order.Car;
 import tb.domain.order.Driver;
@@ -60,15 +63,15 @@ import tb.domain.order.OrderStatus;
 import tb.domain.order.OrderStatusType;
 import tb.service.exceptions.BrokerNotFoundException;
 import tb.service.exceptions.DeviceNotFoundException;
-import tb.service.exceptions.WrongData;
 import tb.service.exceptions.NotValidOrderStatusException;
 import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
+import tb.service.exceptions.WrongData;
 import tb.service.processing.CancelOrderProcessing;
 import tb.service.processing.GeoDataProcessing;
 import tb.service.processing.OfferOrderProcessing;
 import tb.service.serialize.OrderJsonParser;
-import tb.service.serialize.OrderSerializer;
+import tb.service.serialize.YandexOrderSerializer;
 import tb.utils.DatetimeUtil;
 
 @Service
@@ -100,6 +103,8 @@ public class OrderService {
 	private GeoDataProcessing geoDataProcessing;
 	@Autowired
 	private IOrderAcceptAlacrityDao orderAlacrityDao;
+	@Autowired
+	private ITariffDao tariffDao;
 
 	@Value("#{mainSettings['offerorder.wait.pause']}")
 	private Integer waitPause;
@@ -537,7 +542,7 @@ public class OrderService {
 		} else {
 			brokers = order.getOfferBrokerList();
 		}
-		Document orderXml = OrderSerializer.OrderToXml(order);
+		
 		boolean offered = false;
 
 		Collection<Broker> offerBrokers = new ArrayList<Broker>();
@@ -562,9 +567,10 @@ public class OrderService {
 		}
 
 		for (Broker currentBroker : offerBrokers) {
-
 			try {
-
+				List<Tariff> tariffs = tariffDao.getActive(currentBroker);
+				List<Car4Request> cars = null;
+				Document orderXml = YandexOrderSerializer.OrderToXml(order, tariffs, cars, true);
 				offered |= offerOrderHTTP(currentBroker, orderXml);
 
 				if (offered) {
@@ -773,7 +779,7 @@ public class OrderService {
 		if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {
 			return null;
 		}
-
+		
 		// do offer
 		return offerOrder(order);
 	}
