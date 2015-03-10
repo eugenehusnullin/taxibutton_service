@@ -2,10 +2,14 @@ package tb.service.serialize;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,115 +27,19 @@ public class YandexOrderSerializer {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
-	public static Document OrderToXml(Order order, List<Tariff> tariffs, List<Car4Request> cars, boolean notlater) {
+	public static Document orderToSetcarXml(Order order, Car4Request car, boolean notlater, String clientPhone) {
 		try {
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-			Document doc = docBuilder.newDocument();
-
+			Document doc = createDoc();
 			Element requestElement = doc.createElement("Request");
 			doc.appendChild(requestElement);
-
-			Element orderIdElement = doc.createElement("Orderid");
-			orderIdElement.appendChild(doc.createTextNode(order.getUuid()));
-			requestElement.appendChild(orderIdElement);
-
-			if (tariffs != null && tariffs.size() > 0) {
-				Element tariffsElement = doc.createElement("Tariffs");
-				requestElement.appendChild(tariffsElement);
-				for (Tariff tariff : tariffs) {
-					Element tariffElement = doc.createElement("Tariff");
-					tariffElement.appendChild(doc.createTextNode(tariff.getTariffId()));
-					tariffsElement.appendChild(tariffElement);
-				}
-			}
-
-			Element carsElement = doc.createElement("Cars");
-			requestElement.appendChild(carsElement);
-			for (Car4Request car : cars) {
-				Element carElement = doc.createElement("Car");
-				carsElement.appendChild(carElement);
-
-				Element uuidElement = doc.createElement("Uuid");
-				uuidElement.appendChild(doc.createTextNode(car.getUuid()));
-				carElement.appendChild(uuidElement);
-
-				Element distElement = doc.createElement("Dist");
-				distElement.appendChild(doc.createTextNode(Integer.toString(car.getDist())));
-				carElement.appendChild(distElement);
-
-				Element timeElement = doc.createElement("Time");
-				timeElement.appendChild(doc.createTextNode(Integer.toString(car.getTime())));
-				carElement.appendChild(timeElement);
-
-				Element tariffElement = doc.createElement("Tariff");
-				tariffElement.appendChild(doc.createTextNode(car.getTariff()));
-				carElement.appendChild(tariffElement);
-
-				Element maphrefElement = doc.createElement("MapHref");
-				maphrefElement.appendChild(doc.createTextNode(""));
-				carElement.appendChild(maphrefElement);
-			}
-
-			Element recipient = doc.createElement("Recipient");
-			recipient.setAttribute("blacklisted", "no");
-			recipient.setAttribute("loyal", "yes");
-			requestElement.appendChild(recipient);
-
-			Element source = doc.createElement("Source");
-			requestElement.appendChild(source);
-			insertAddressPoint(doc, source, order.getSource());
-
-			// destinations
-			Element destinations = doc.createElement("Destinations");
-			requestElement.appendChild(destinations);
-			int i = 0;
-			for (AddressPoint currentDestination : order.getDestinations()) {
-				if (currentDestination.getIndexNumber() == 0) {
-					continue;
-				}
-				i++;
-
-				Element destination = doc.createElement("Destination");
-				destinations.appendChild(destination);
-				destination.setAttribute("order", Integer.toString(i));
-				insertAddressPoint(doc, destination, currentDestination);
-			}
-
-			Element bookingTime = doc.createElement("BookingTime");
-			requestElement.appendChild(bookingTime);
-			bookingTime.setAttribute("type", notlater ? "notlater" : "exact");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-			bookingTime.appendChild(doc.createTextNode(df.format(order.getBookingDate())));
-
+			requestElement.appendChild(createOrderId(doc, order.getUuid()));
+			requestElement.appendChild(createSetCar(doc, car));
+			requestElement.appendChild(createContactInfo(doc, clientPhone));
+			requestElement.appendChild(createSource(doc, order.getSource()));
+			requestElement.appendChild(createDestinations(doc, order.getDestinations()));
+			requestElement.appendChild(createBooking(doc, notlater, order.getBookingDate()));
 			if (order.getRequirements() != null && order.getRequirements().size() > 0) {
-				Element requirements = doc.createElement("Requirements");
-				requestElement.appendChild(requirements);
-				for (Requirement requirement : order.getRequirements()) {
-					Element requireElement = doc.createElement("Require");
-					requireElement.setAttribute("name", defineRequireName(requirement.getType()));
-					if (requirement.getOptions() != null) {
-						if (requirement.getOptions().trim() != "") {
-							requireElement.appendChild(doc.createTextNode(requirement.getOptions()));
-						}
-					}
-					requirements.appendChild(requireElement);
-				}
-			}
-
-			if (order.getDestinations() != null && order.getDestinations().size() > 0) {
-				Element routeInfo = doc.createElement("RouteInfo");
-				requestElement.appendChild(routeInfo);
-
-				Element time = doc.createElement("Time");
-				routeInfo.appendChild(time);
-				time.setAttribute("unit", "second");
-				time.appendChild(doc.createTextNode("0"));
-
-				Element distance = doc.createElement("Distance");
-				routeInfo.appendChild(distance);
-				distance.setAttribute("unit", "meter");
-				distance.appendChild(doc.createTextNode("0"));
+				requestElement.appendChild(createRequirements(doc, order.getRequirements()));
 			}
 
 			return doc;
@@ -139,6 +47,196 @@ public class YandexOrderSerializer {
 			log.info("Creating XML document from order object exception: " + ex.toString());
 			return null;
 		}
+	}
+
+	public static Document orderToRequestXml(Order order, List<Tariff> tariffs, List<Car4Request> cars, boolean notlater) {
+		try {
+			Document doc = createDoc();
+			Element requestElement = doc.createElement("Request");
+			doc.appendChild(requestElement);
+			requestElement.appendChild(createOrderId(doc, order.getUuid()));
+			if (tariffs != null && tariffs.size() > 0) {
+				requestElement.appendChild(createTariffs(doc, tariffs));
+			}
+			requestElement.appendChild(createRequestCars(doc, cars));
+			requestElement.appendChild(createRecipient(doc));
+			requestElement.appendChild(createSource(doc, order.getSource()));
+			requestElement.appendChild(createDestinations(doc, order.getDestinations()));
+			requestElement.appendChild(createBooking(doc, notlater, order.getBookingDate()));
+			if (order.getRequirements() != null && order.getRequirements().size() > 0) {
+				requestElement.appendChild(createRequirements(doc, order.getRequirements()));
+			}
+			if (order.getDestinations() != null && order.getDestinations().size() > 0) {
+				requestElement.appendChild(createRouteInfo(doc));
+			}
+
+			return doc;
+		} catch (Exception ex) {
+			log.info("Creating XML document from order object exception: " + ex.toString());
+			return null;
+		}
+	}
+
+	private static Element createRouteInfo(Document doc) {
+		Element routeInfo = doc.createElement("RouteInfo");
+
+		Element time = doc.createElement("Time");
+		routeInfo.appendChild(time);
+		time.setAttribute("unit", "second");
+		time.appendChild(doc.createTextNode("0"));
+
+		Element distance = doc.createElement("Distance");
+		routeInfo.appendChild(distance);
+		distance.setAttribute("unit", "meter");
+		distance.appendChild(doc.createTextNode("0"));
+
+		return routeInfo;
+	}
+
+	private static Element createRecipient(Document doc) {
+		Element recipient = doc.createElement("Recipient");
+		recipient.setAttribute("blacklisted", "no");
+		recipient.setAttribute("loyal", "yes");
+		return recipient;
+	}
+
+	private static Element createTariffs(Document doc, List<Tariff> tariffs) {
+		Element tariffsElement = doc.createElement("Tariffs");
+		for (Tariff tariff : tariffs) {
+			Element tariffElement = doc.createElement("Tariff");
+			tariffElement.appendChild(doc.createTextNode(tariff.getTariffId()));
+			tariffsElement.appendChild(tariffElement);
+		}
+		return tariffsElement;
+	}
+
+	private static Element createContactInfo(Document doc, String clientPhone) {
+		Element contactInfo = doc.createElement("ContactInfo");
+
+		Element phones = doc.createElement("Phones");
+		contactInfo.appendChild(phones);
+
+		Element phone4Driver = doc.createElement("Phone");
+		phones.appendChild(phone4Driver);
+		phone4Driver.appendChild(doc.createTextNode(clientPhone));
+		phone4Driver.setAttribute("for", "driver");
+
+		Element phone4Dispatch = doc.createElement("Phone");
+		phones.appendChild(phone4Dispatch);
+		phone4Dispatch.appendChild(doc.createTextNode(clientPhone));
+		phone4Dispatch.setAttribute("for", "dispatch");
+
+		return contactInfo;
+	}
+
+	private static Element createRequirements(Document doc, Set<Requirement> set) {
+		Element requirements = doc.createElement("Requirements");
+		for (Requirement requirement : set) {
+			Element requireElement = doc.createElement("Require");
+			requireElement.setAttribute("name", defineRequireName(requirement.getType()));
+			if (requirement.getOptions() != null) {
+				if (requirement.getOptions().trim() != "") {
+					requireElement.appendChild(doc.createTextNode(requirement.getOptions()));
+				}
+			}
+			requirements.appendChild(requireElement);
+		}
+
+		return requirements;
+	}
+
+	private static Element createBooking(Document doc, boolean notlater, Date date) {
+		Element bookingTime = doc.createElement("BookingTime");
+		bookingTime.setAttribute("type", notlater ? "notlater" : "exact");
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+		bookingTime.appendChild(doc.createTextNode(df.format(date)));
+		return bookingTime;
+	}
+
+	private static Element createDestinations(Document doc, SortedSet<AddressPoint> list) {
+		Element destinations = doc.createElement("Destinations");
+		int i = 0;
+		for (AddressPoint currentDestination : list) {
+			if (currentDestination.getIndexNumber() == 0) {
+				continue;
+			}
+			i++;
+
+			Element destination = doc.createElement("Destination");
+			destinations.appendChild(destination);
+			destination.setAttribute("order", Integer.toString(i));
+			insertAddressPoint(doc, destination, currentDestination);
+		}
+		return destinations;
+	}
+
+	private static Element createSource(Document doc, AddressPoint address) {
+		Element source = doc.createElement("Source");
+		insertAddressPoint(doc, source, address);
+		return source;
+	}
+
+	private static Element createOrderId(Document doc, String orderId) {
+		Element orderIdElement = doc.createElement("Orderid");
+		orderIdElement.appendChild(doc.createTextNode(orderId));
+		return orderIdElement;
+	}
+
+	private static Document createDoc() throws ParserConfigurationException {
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+		return docBuilder.newDocument();
+	}
+
+	private static Element createSetCar(Document doc, Car4Request car) {
+		Element carsElement = doc.createElement("Cars");
+
+		Element carElement = doc.createElement("Car");
+		carsElement.appendChild(carElement);
+
+		Element uuidElement = doc.createElement("Uuid");
+		uuidElement.appendChild(doc.createTextNode(car.getUuid()));
+		carElement.appendChild(uuidElement);
+
+		Element tariffElement = doc.createElement("Tariff");
+		tariffElement.appendChild(doc.createTextNode(car.getTariff()));
+		carElement.appendChild(tariffElement);
+
+		Element maphrefElement = doc.createElement("MapHref");
+		maphrefElement.appendChild(doc.createTextNode(""));
+		carElement.appendChild(maphrefElement);
+
+		return carsElement;
+	}
+
+	private static Element createRequestCars(Document doc, List<Car4Request> cars) {
+		Element carsElement = doc.createElement("Cars");
+		for (Car4Request car : cars) {
+			Element carElement = doc.createElement("Car");
+			carsElement.appendChild(carElement);
+
+			Element uuidElement = doc.createElement("Uuid");
+			uuidElement.appendChild(doc.createTextNode(car.getUuid()));
+			carElement.appendChild(uuidElement);
+
+			Element distElement = doc.createElement("Dist");
+			distElement.appendChild(doc.createTextNode(Integer.toString(car.getDist())));
+			carElement.appendChild(distElement);
+
+			Element timeElement = doc.createElement("Time");
+			timeElement.appendChild(doc.createTextNode(Integer.toString(car.getTime())));
+			carElement.appendChild(timeElement);
+
+			Element tariffElement = doc.createElement("Tariff");
+			tariffElement.appendChild(doc.createTextNode(car.getTariff()));
+			carElement.appendChild(tariffElement);
+
+			Element maphrefElement = doc.createElement("MapHref");
+			maphrefElement.appendChild(doc.createTextNode(""));
+			carElement.appendChild(maphrefElement);
+		}
+
+		return carsElement;
 	}
 
 	private static String defineRequireName(String old) {

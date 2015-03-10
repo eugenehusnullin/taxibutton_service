@@ -174,7 +174,8 @@ public class OrderService {
 			throw new DeviceNotFoundException(deviceApiid);
 		}
 
-		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
+		Order order = OrderJsonParser
+				.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
 		order.setDevice(device);
 		create(order);
 
@@ -542,7 +543,7 @@ public class OrderService {
 		} else {
 			brokers = order.getOfferBrokerList();
 		}
-		
+
 		boolean offered = false;
 
 		Collection<Broker> offerBrokers = new ArrayList<Broker>();
@@ -550,8 +551,7 @@ public class OrderService {
 			boolean add = false;
 			if (currentBroker.getMapAreas() != null && currentBroker.getMapAreas().size() > 0) {
 				for (MapArea mapArea : currentBroker.getMapAreas()) {
-					if (mapArea.contains(order.getSource().getLat(), order.getSource().getLon()) )
-					{
+					if (mapArea.contains(order.getSource().getLat(), order.getSource().getLon())) {
 						add = true;
 						break;
 					}
@@ -559,19 +559,19 @@ public class OrderService {
 			} else {
 				add = true;
 			}
-			
+
 			if (add) {
 				offerBrokers.add(currentBroker);
 			}
-			
 		}
 
 		for (Broker currentBroker : offerBrokers) {
 			try {
 				List<Tariff> tariffs = tariffDao.getActive(currentBroker);
 				List<Car4Request> cars = null;
-				Document orderXml = YandexOrderSerializer.OrderToXml(order, tariffs, cars, true);
-				offered |= offerOrderHTTP(currentBroker, orderXml);
+				Document orderXml = YandexOrderSerializer.orderToRequestXml(order, tariffs, cars, true);
+				String url = currentBroker.getApiurl() + "/offer";
+				offered |= postDocumentOverHttp(orderXml, url);
 
 				if (offered) {
 					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
@@ -588,11 +588,8 @@ public class OrderService {
 		return offered;
 	}
 
-	// offer order via HTTP protocol
-	private boolean offerOrderHTTP(Broker broker, Document document) throws IOException,
+	private boolean postDocumentOverHttp(Document document, String url) throws IOException,
 			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
-
-		String url = broker.getApiurl() + "/offer";
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -611,14 +608,7 @@ public class OrderService {
 		wr.flush();
 		wr.close();
 
-		int responceCode = connection.getResponseCode();
-
-		if (responceCode != 200) {
-			log.info("Error offering order to broker (code: " + responceCode + "): " + broker.getId().toString());
-			return false;
-		} else {
-			return true;
-		}
+		return connection.getResponseCode() == 200;
 	}
 
 	// assign order executer
@@ -779,7 +769,7 @@ public class OrderService {
 		if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {
 			return null;
 		}
-		
+
 		// do offer
 		return offerOrder(order);
 	}
