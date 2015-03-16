@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -482,9 +483,12 @@ public class OrderController {
 
 		String jsonResult = createOrderJson.toString();
 
-		try {
-
-			String url = "http://localhost:8080/tb/apidevice/order/create";
+		try {			
+			URI uri = new URI(request.getRequestURI());
+			String url = request.getRequestURI();
+			int index = url.indexOf(uri.getPath());
+			url = url.substring(0, index - 1);
+			url.concat("/tb/apidevice/order/create");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 

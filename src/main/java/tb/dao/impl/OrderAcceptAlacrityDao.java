@@ -20,9 +20,12 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 	private SessionFactory sessionFactory;
 
 	@Override
-	public OrderAcceptAlacrity get(Order order, Broker broker) {
+	public OrderAcceptAlacrity get(Order order, Broker broker, String uuid) {
 		return (OrderAcceptAlacrity) sessionFactory.getCurrentSession().createCriteria(OrderAcceptAlacrity.class)
-				.add(Restrictions.eq("order", order)).add(Restrictions.eq("broker", broker)).uniqueResult();
+				.add(Restrictions.eq("order", order))
+				.add(Restrictions.eq("broker", broker))
+				.add(Restrictions.eq("uuid", uuid))
+				.uniqueResult();
 	}
 
 	@Override
@@ -38,17 +41,15 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 	}
 
 	@Override
-	public Broker getWinner(Order order) {
+	public OrderAcceptAlacrity getWinner(Order order) {
 
 		OrderAcceptAlacrity winnerAlacrity = (OrderAcceptAlacrity) sessionFactory.getCurrentSession()
-				.createCriteria(OrderAcceptAlacrity.class).add(Restrictions.eq("order", order))
-				.addOrder(org.hibernate.criterion.Order.asc("date")).setMaxResults(1).uniqueResult();
+				.createCriteria(OrderAcceptAlacrity.class)
+				.add(Restrictions.eq("order", order))
+				.addOrder(org.hibernate.criterion.Order.asc("date"))
+				.setMaxResults(1)
+				.uniqueResult();
 
-		Broker winner = null;
-		if (winnerAlacrity != null) {
-			winner = winnerAlacrity.getBroker();
-		}
-
-		return winner;
+		return winnerAlacrity;
 	}
 }

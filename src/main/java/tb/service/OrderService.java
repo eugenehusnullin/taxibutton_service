@@ -1,6 +1,5 @@
 package tb.service;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -9,19 +8,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,6 +28,8 @@ import org.w3c.dom.Document;
 import tb.admin.model.AlacrityModel;
 import tb.admin.model.OrderModel;
 import tb.admin.model.OrderStatusModel;
+import tb.car.dao.CarDao;
+import tb.car.domain.Car;
 import tb.car.domain.Car4Request;
 import tb.dao.IBrokerDao;
 import tb.dao.IDeviceDao;
@@ -48,10 +42,6 @@ import tb.dao.IOrderStatusDao;
 import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Device;
-import tb.domain.Tariff;
-import tb.domain.maparea.MapArea;
-import tb.domain.order.Car;
-import tb.domain.order.Driver;
 import tb.domain.order.Feedback;
 import tb.domain.order.GeoData;
 import tb.domain.order.OfferedOrderBroker;
@@ -72,7 +62,8 @@ import tb.service.processing.GeoDataProcessing;
 import tb.service.processing.OfferOrderProcessing;
 import tb.service.serialize.OrderJsonParser;
 import tb.service.serialize.YandexOrderSerializer;
-import tb.utils.DatetimeUtil;
+import tb.utils.DatetimeUtils;
+import tb.utils.HttpUtils;
 
 @Service
 public class OrderService {
@@ -105,6 +96,8 @@ public class OrderService {
 	private IOrderAcceptAlacrityDao orderAlacrityDao;
 	@Autowired
 	private ITariffDao tariffDao;
+	@Autowired
+	private CarDao carDao;
 
 	@Value("#{mainSettings['offerorder.wait.pause']}")
 	private Integer waitPause;
@@ -184,7 +177,7 @@ public class OrderService {
 
 	private void create(Order order) throws ParseOrderException {
 		// check booking date
-		if (DatetimeUtil.isTimeoutExpired(order, createOrderLimit, new Date())) {
+		if (DatetimeUtils.checkTimeout(order.getBookingDate(), createOrderLimit, new Date())) {
 			throw new ParseOrderException("bookingdate is out");
 		}
 
@@ -201,7 +194,8 @@ public class OrderService {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, waitPause);
 		order.setStartOffer(cal.getTime());
-		offerOrderProcessing.addOrder(order);
+		OrderExecHolder orderExecHolder = new OrderExecHolder(order);
+		offerOrderProcessing.addOrder(orderExecHolder);
 	}
 
 	@Transactional
@@ -280,16 +274,13 @@ public class OrderService {
 
 		if (order.getBroker() != null) {
 			statusJson.put("executor", order.getBroker().getName());
-
-			OrderAcceptAlacrity oaa = alacrityDao.get(order, order.getBroker());
-			Driver driver = oaa.getDriver();
-			statusJson.put("driver_name", driver.getName());
-			statusJson.put("driver_phone", driver.getPhone());
-			Car car = oaa.getCar();
-			statusJson.put("car_color", car.getColor());
-			statusJson.put("car_mark", car.getMark());
-			statusJson.put("car_model", car.getModel());
-			statusJson.put("car_number", car.getNumber());
+			Car car = carDao.getCar(order.getBroker().getId(), order.getCarUuid());
+			statusJson.put("driver_name", car.getDriverDisplayName());
+			statusJson.put("driver_phone", car.getDriverPhone());
+			statusJson.put("car_color", car.getCarColor());
+			statusJson.put("car_mark", car.getCarModel());
+			statusJson.put("car_model", car.getCarModel());
+			statusJson.put("car_number", car.getCarNumber());
 		}
 		return statusJson;
 	}
@@ -345,7 +336,7 @@ public class OrderService {
 	}
 
 	@Transactional
-	public void alacrity(String brokerApiId, String brokerApiKey, String orderUuid, Driver driver, Car car)
+	public void alacrity(String brokerApiId, String brokerApiKey, String orderUuid, String uuid)
 			throws BrokerNotFoundException, OrderNotFoundException {
 
 		Broker broker = brokerDao.getByApiId(brokerApiId);
@@ -362,19 +353,40 @@ public class OrderService {
 			throw new OrderNotFoundException(orderUuid);
 		}
 
-		// проверка того, был-ли данный запрос на готовность выполнить от
-		// данного брокера по данному заказу
-		if (alacrityDao.get(order, broker) != null) {
+		if (alacrityDao.get(order, broker, uuid) != null) {
 			return;
 		}
 
 		OrderAcceptAlacrity alacrity = new OrderAcceptAlacrity();
 		alacrity.setBroker(broker);
 		alacrity.setOrder(order);
-		alacrity.setDriver(driver);
-		alacrity.setCar(car);
+		alacrity.setUuid(uuid);
 		alacrity.setDate(new Date());
 		alacrityDao.save(alacrity);
+	}
+	
+	@Transactional
+	public void setNewcar(String brokerApiId, String brokerApiKey, String orderUuid, String newcar) throws BrokerNotFoundException, OrderNotFoundException {
+		Broker broker = brokerDao.getByApiId(brokerApiId);
+		if (broker == null) {
+			throw new BrokerNotFoundException(brokerApiId);
+		}
+
+		if (!broker.getApiKey().equals(brokerApiKey)) {
+			throw new BrokerNotFoundException(brokerApiId);
+		}
+
+		Order order = orderDao.get(orderUuid);
+		if (order == null) {
+			throw new OrderNotFoundException(orderUuid);
+		}
+
+		if (!order.getBroker().getId().equals(broker.getId())) {
+			throw new OrderNotFoundException(orderUuid);
+		}
+		
+		order.setCarUuid(newcar);
+		orderDao.saveOrUpdate(order);
 	}
 
 	@Transactional
@@ -401,13 +413,48 @@ public class OrderService {
 		OrderStatus status = new OrderStatus();
 		status.setOrder(order);
 		status.setDate(new Date());
-		status.setStatus(OrderStatusType.valueOf(newStatus));
+		status.setStatus(defineOrderStatusType(newStatus));
 		status.setStatusDescription(statusParams);
 		orderStatusDao.save(status);
 
 		if (OrderStatusType.EndProcessingStatus(status.getStatus())) {
 			geoDataProcessing.removeActual(status.getOrder().getId());
 		}
+	}
+	
+	private OrderStatusType defineOrderStatusType(String status) {
+		OrderStatusType orderStatusType;
+		switch (status) {
+		case "driving":
+			orderStatusType = OrderStatusType.Driving;
+			break;
+			
+		case "waiting":
+			orderStatusType = OrderStatusType.Waiting;
+			break;
+			
+		case "transporting":
+			orderStatusType = OrderStatusType.Transporting;
+			break;
+			
+		case "complete":
+			orderStatusType = OrderStatusType.Completed;
+			break;
+			
+		case "cancelled":
+			orderStatusType = OrderStatusType.Cancelled;
+			break;
+			
+		case "failed":
+			orderStatusType = OrderStatusType.Failed;
+			break;
+
+		default:
+			orderStatusType = null;
+			break;
+		}
+		
+		return orderStatusType;
 	}
 
 	@Transactional
@@ -466,7 +513,7 @@ public class OrderService {
 			model.setLastStatus(order.getLastStatus().getStatus().toString());
 			model.setPhone(order.getPhone());
 			model.setSourceShortAddress(order.getSource().getShortAddress());
-			model.setUrgent(order.getUrgent());
+			model.setUrgent(order.getNotlater());
 			model.setUuid(order.getUuid());
 			if (order.getBroker() != null) {
 				model.setBrokerName(order.getBroker().getName());
@@ -506,7 +553,7 @@ public class OrderService {
 		model.setLastStatus(order.getLastStatus().getStatus().toString());
 		model.setPhone(order.getPhone());
 		model.setSourceShortAddress(order.getSource().getShortAddress());
-		model.setUrgent(order.getUrgent());
+		model.setUrgent(order.getNotlater());
 		model.setUuid(order.getUuid());
 		if (order.getBroker() != null) {
 			model.setBrokerName(order.getBroker().getName());
@@ -532,108 +579,27 @@ public class OrderService {
 		return models;
 	}
 
-	// offer order to all connected brokers (need to apply any rules to share
-	// order between bounded set of brokers)
-	@Transactional
-	public boolean offerOrder(Order order) {
-
-		Collection<Broker> brokers;
-		if (order.getOfferBrokerList() == null || order.getOfferBrokerList().size() == 0) {
-			brokers = brokerDao.getAll();
-		} else {
-			brokers = order.getOfferBrokerList();
-		}
-
-		boolean offered = false;
-
-		Collection<Broker> offerBrokers = new ArrayList<Broker>();
-		for (Broker currentBroker : brokers) {
-			boolean add = false;
-			if (currentBroker.getMapAreas() != null && currentBroker.getMapAreas().size() > 0) {
-				for (MapArea mapArea : currentBroker.getMapAreas()) {
-					if (mapArea.contains(order.getSource().getLat(), order.getSource().getLon())) {
-						add = true;
-						break;
-					}
-				}
-			} else {
-				add = true;
-			}
-
-			if (add) {
-				offerBrokers.add(currentBroker);
-			}
-		}
-
-		for (Broker currentBroker : offerBrokers) {
-			try {
-				List<Tariff> tariffs = tariffDao.getActive(currentBroker);
-				List<Car4Request> cars = null;
-				Document orderXml = YandexOrderSerializer.orderToRequestXml(order, tariffs, cars, true);
-				String url = currentBroker.getApiurl() + "/offer";
-				offered |= postDocumentOverHttp(orderXml, url);
-
-				if (offered) {
-					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
-					offeredOrderBroker.setOrder(order);
-					offeredOrderBroker.setBroker(currentBroker);
-					offeredOrderBroker.setTimestamp(new Date());
-					offeredOrderBrokerDao.save(offeredOrderBroker);
-				}
-			} catch (Exception ex) {
-				log.error("Offer order to broker " + currentBroker.getId() + " error: " + ex.toString());
-			}
-		}
-
-		return offered;
-	}
-
-	private boolean postDocumentOverHttp(Document document, String url) throws IOException,
-			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
-		URL obj = new URL(url);
-		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type", "application/xml");
-		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		connection.setReadTimeout(0);
-
-		connection.setDoOutput(true);
-		DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-
-		Source source = new DOMSource(document);
-		Result result = new StreamResult(wr);
-
-		TransformerFactory.newInstance().newTransformer().transform(source, result);
-		wr.flush();
-		wr.close();
-
-		return connection.getResponseCode() == 200;
-	}
-
 	// assign order executer
 	@Transactional
-	public boolean giveOrder(Long orderId, Long brokerId) {
+	public boolean giveOrder(Long orderId, OrderAcceptAlacrity winnerAlacrity) {
+		Order order = orderDao.get(orderId);
 
-		boolean result = true;
-		Broker broker = brokerDao.get(brokerId);
+		Car car = carDao.getCar(winnerAlacrity.getBroker().getId(), winnerAlacrity.getUuid());
+		Car4Request car4Request = new Car4Request();
+		car4Request.setUuid(car.getUuid());
+		car4Request.setTariff(carDao.getFirstTariff(winnerAlacrity.getBroker().getId(), winnerAlacrity.getUuid()));
+
+		Document doc = YandexOrderSerializer.orderToSetcarXml(order, car4Request, order.getPhone());
+		String url = winnerAlacrity.getBroker().getApiurl() + "/1.x/setcar";
+
 		try {
-			Order order = orderDao.get(orderId);
-
-			String url = broker.getApiurl() + "/give";
-			url += "?orderId=" + order.getUuid();
-			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-			connection.setRequestMethod("GET");
-
-			int responceCode = connection.getResponseCode();
-
-			if (responceCode != 200) {
-				result = false;
-				log.info("Error giving order to broker (code: " + responceCode + "): " + broker.getId().toString());
+			boolean posted = HttpUtils.postDocumentOverHttp(doc, url);
+			if (!posted) {
+				log.info("Error giving order to broker: " + winnerAlacrity.getBroker().getId().toString());
+				return false;
 			} else {
-				order.setBroker(broker);
+				order.setBroker(winnerAlacrity.getBroker());
+				order.setCarUuid(winnerAlacrity.getUuid());
 				orderDao.saveOrUpdate(order);
 
 				OrderStatus orderStatus = new OrderStatus();
@@ -641,40 +607,31 @@ public class OrderService {
 				orderStatus.setOrder(order);
 				orderStatus.setStatus(OrderStatusType.Taked);
 				orderStatusDao.save(orderStatus);
-			}
-		} catch (Exception ex) {
-			result = false;
-			log.error("Giving order for broker " + broker.getId() + " error: " + ex.toString());
-		}
 
-		return result;
+				return true;
+			}
+		} catch (IOException | TransformerException | TransformerFactoryConfigurationError e) {
+			log.error(e.toString());
+			return false;
+		}
 	}
 
 	// cancel order to prepared broker
 	@Transactional
-	public Boolean cancelOfferedOrder(CancelOrderProcessing.OrderCancelHolder orderCancelHolder) {
+	public void cancelOfferedOrder(CancelOrderProcessing.OrderCancelHolder orderCancelHolder) {
 		orderCancelHolder.setOrder(orderDao.get(orderCancelHolder.getOrder().getId()));
-
-		Boolean result = true;
 		List<OfferedOrderBroker> offeredBrokerList = offeredOrderBrokerDao.get(orderCancelHolder.getOrder());
 		String reason = orderCancelHolder.getOrderCancelType().toString();
-
-		String params = "orderId=" + orderCancelHolder.getOrder().getUuid() + "&reason=" + reason;
+		String params = "orderid=" + orderCancelHolder.getOrder().getUuid() + "&reason=" + reason;
 
 		for (OfferedOrderBroker currentOffer : offeredBrokerList) {
 			if (orderCancelHolder.getOrderCancelType() == OrderCancelType.Assigned
 					&& orderCancelHolder.getOrder().getBroker().getId().equals(currentOffer.getBroker().getId())) {
 				continue;
 			}
-			String url = currentOffer.getBroker().getApiurl() + "/cancel";
-			int resultCode = sendHttpGet(url, params);
-
-			if (resultCode != 200) {
-				result = false;
-			}
+			String url = currentOffer.getBroker().getApiurl() + "/1.x/cancelrequest";
+			sendHttpGet(url, params);
 		}
-
-		return result;
 	}
 
 	// sending HTTP GET request
@@ -719,10 +676,10 @@ public class OrderService {
 			return null;
 		}
 
-		Broker winner = alacrityDao.getWinner(order);
+		OrderAcceptAlacrity winnerAlacrity = alacrityDao.getWinner(order);
 		boolean success = false;
-		if (winner != null) {
-			success = giveOrder(order.getId(), winner.getId());
+		if (winnerAlacrity != null) {
+			success = giveOrder(order.getId(), winnerAlacrity);
 		}
 
 		if (!success) {
@@ -744,7 +701,7 @@ public class OrderService {
 
 	@Transactional
 	public CancelOrderProcessing.OrderCancelHolder checkExpired(Order order, int cancelOrderTimeout, Date checkTime) {
-		if (DatetimeUtil.isTimeoutExpired(order, cancelOrderTimeout, new Date())) {
+		if (DatetimeUtils.checkTimeout(order.getBookingDate(), cancelOrderTimeout, new Date())) {
 			OrderStatus failedStatus = new OrderStatus();
 			failedStatus.setDate(new Date());
 			failedStatus.setOrder(order);
@@ -758,19 +715,5 @@ public class OrderService {
 		} else {
 			return null;
 		}
-	}
-
-	@Transactional
-	public Boolean offerOrderProcessing(Long orderId) {
-		Order order = orderDao.get(orderId);
-
-		// check right status
-		OrderStatus orderStatus = orderStatusDao.getLast(order);
-		if (!OrderStatusType.IsValidForOffer(orderStatus.getStatus())) {
-			return null;
-		}
-
-		// do offer
-		return offerOrder(order);
 	}
 }

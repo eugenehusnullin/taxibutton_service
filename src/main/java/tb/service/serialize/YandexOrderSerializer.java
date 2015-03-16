@@ -18,7 +18,6 @@ import org.w3c.dom.Element;
 
 import tb.Run;
 import tb.car.domain.Car4Request;
-import tb.domain.Tariff;
 import tb.domain.order.AddressPoint;
 import tb.domain.order.Order;
 import tb.domain.order.Requirement;
@@ -27,7 +26,7 @@ public class YandexOrderSerializer {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
-	public static Document orderToSetcarXml(Order order, Car4Request car, boolean notlater, String clientPhone) {
+	public static Document orderToSetcarXml(Order order, Car4Request car, String clientPhone) {
 		try {
 			Document doc = createDoc();
 			Element requestElement = doc.createElement("Request");
@@ -37,7 +36,7 @@ public class YandexOrderSerializer {
 			requestElement.appendChild(createContactInfo(doc, clientPhone));
 			requestElement.appendChild(createSource(doc, order.getSource()));
 			requestElement.appendChild(createDestinations(doc, order.getDestinations()));
-			requestElement.appendChild(createBooking(doc, notlater, order.getBookingDate()));
+			requestElement.appendChild(createBooking(doc, order.getNotlater(), order.getBookingDate()));
 			if (order.getRequirements() != null && order.getRequirements().size() > 0) {
 				requestElement.appendChild(createRequirements(doc, order.getRequirements()));
 			}
@@ -49,7 +48,7 @@ public class YandexOrderSerializer {
 		}
 	}
 
-	public static Document orderToRequestXml(Order order, List<Tariff> tariffs, List<Car4Request> cars, boolean notlater) {
+	public static Document orderToRequestXml(Order order, List<String> tariffs, List<Car4Request> cars) {
 		try {
 			Document doc = createDoc();
 			Element requestElement = doc.createElement("Request");
@@ -58,11 +57,13 @@ public class YandexOrderSerializer {
 			if (tariffs != null && tariffs.size() > 0) {
 				requestElement.appendChild(createTariffs(doc, tariffs));
 			}
-			requestElement.appendChild(createRequestCars(doc, cars));
+			if (cars != null && cars.size() > 0) {
+				requestElement.appendChild(createRequestCars(doc, cars));
+			}
 			requestElement.appendChild(createRecipient(doc));
 			requestElement.appendChild(createSource(doc, order.getSource()));
 			requestElement.appendChild(createDestinations(doc, order.getDestinations()));
-			requestElement.appendChild(createBooking(doc, notlater, order.getBookingDate()));
+			requestElement.appendChild(createBooking(doc, order.getNotlater(), order.getBookingDate()));
 			if (order.getRequirements() != null && order.getRequirements().size() > 0) {
 				requestElement.appendChild(createRequirements(doc, order.getRequirements()));
 			}
@@ -100,11 +101,11 @@ public class YandexOrderSerializer {
 		return recipient;
 	}
 
-	private static Element createTariffs(Document doc, List<Tariff> tariffs) {
+	private static Element createTariffs(Document doc, List<String> tariffs) {
 		Element tariffsElement = doc.createElement("Tariffs");
-		for (Tariff tariff : tariffs) {
+		for (String tariff : tariffs) {
 			Element tariffElement = doc.createElement("Tariff");
-			tariffElement.appendChild(doc.createTextNode(tariff.getTariffId()));
+			tariffElement.appendChild(doc.createTextNode(tariff));
 			tariffsElement.appendChild(tariffElement);
 		}
 		return tariffsElement;

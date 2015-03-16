@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import tb.domain.order.Order;
+import tb.service.OfferingOrder;
+import tb.service.OrderExecHolder;
 import tb.service.OrderService;
 import tb.utils.ThreadFactorySecuenceNaming;
 
@@ -37,7 +38,7 @@ public class OfferOrderProcessing {
 		public void run() {
 			while (processing) {
 				try {
-					Order order = null;
+					OrderExecHolder orderExecHolder = null;
 					synchronized (queue) {
 						if (queue.isEmpty()) {
 							try {
@@ -46,11 +47,11 @@ public class OfferOrderProcessing {
 								break;
 							}
 						}
-						order = queue.poll();
+						orderExecHolder = queue.poll();
 					}
 
-					if (order != null) {
-						OfferOrderRunnable offerOrderRunnable = new OfferOrderRunnable(order);
+					if (orderExecHolder != null) {
+						OfferOrderRunnable offerOrderRunnable = new OfferOrderRunnable(orderExecHolder);
 						executor.execute(offerOrderRunnable);
 					}
 				} catch (Exception e) {
@@ -61,10 +62,10 @@ public class OfferOrderProcessing {
 	}
 
 	class OfferOrderRunnable implements Runnable {
-		private Order order;
+		private OrderExecHolder orderExecHolder;
 
-		public OfferOrderRunnable(Order order) {
-			this.order = order;
+		public OfferOrderRunnable(OrderExecHolder orderExecHolder) {
+			this.orderExecHolder = orderExecHolder;
 		}
 
 		@Override
@@ -72,8 +73,8 @@ public class OfferOrderProcessing {
 			try {
 				// do pause before offer, maybe client canceled order
 				Date currentDatetime = new Date();
-				if (order.getStartOffer().after(currentDatetime)) {
-					long diff = order.getStartOffer().getTime() - currentDatetime.getTime();
+				if (orderExecHolder.getOrder().getStartOffer().after(currentDatetime)) {
+					long diff = orderExecHolder.getOrder().getStartOffer().getTime() - currentDatetime.getTime();
 					try {
 						Thread.sleep(diff);
 					} catch (InterruptedException e) {
@@ -81,20 +82,20 @@ public class OfferOrderProcessing {
 					}
 				}
 
-				Boolean offered = orderService.offerOrderProcessing(order.getId());
+				Boolean offered = offeringOrder.offer(orderExecHolder.getOrder().getId(), orderExecHolder.getAttemptCount());
 
 				if (offered != null) {
 					if (offered) {
-						chooseWinnerProcessing.addOrder(order);
+						chooseWinnerProcessing.addOrder(orderExecHolder);
 					} else {
-						CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderService.checkExpired(order,
-								cancelOrderTimeout, new Date());
+						CancelOrderProcessing.OrderCancelHolder orderCancelHolder =
+								orderService.checkExpired(orderExecHolder.getOrder(), cancelOrderTimeout, new Date());
 						if (orderCancelHolder != null) {
 							cancelOrderProcessing.addOrderCancel(orderCancelHolder);
 						} else {
 							try {
 								Thread.sleep(repeatPause);
-								addOrder(order);
+								addOrder(orderExecHolder);
 							} catch (InterruptedException e) {
 							}
 						}
@@ -103,14 +104,14 @@ public class OfferOrderProcessing {
 			} catch (Exception ex) {
 				try {
 					Thread.sleep(repeatPause);
-					addOrder(order);
+					addOrder(orderExecHolder);
 				} catch (InterruptedException e) {
 				}
 			}
 		}
 	}
 
-	private Queue<Order> queue;
+	private Queue<OrderExecHolder> queue;
 	private Thread mainThread;
 	private volatile boolean processing = true;
 	private ExecutorService executor;
@@ -120,9 +121,11 @@ public class OfferOrderProcessing {
 	private ChooseWinnerProcessing chooseWinnerProcessing;
 	@Autowired
 	private CancelOrderProcessing cancelOrderProcessing;
+	@Autowired
+	private OfferingOrder offeringOrder;
 
 	public OfferOrderProcessing() {
-		queue = new ArrayDeque<Order>();
+		queue = new ArrayDeque<OrderExecHolder>();
 	}
 
 	@PostConstruct
@@ -147,9 +150,9 @@ public class OfferOrderProcessing {
 		}
 	}
 
-	public void addOrder(Order order) {
+	public void addOrder(OrderExecHolder orderExecHolder) {
 		synchronized (queue) {
-			queue.add(order);
+			queue.add(orderExecHolder);
 			queue.notifyAll();
 		}
 	}

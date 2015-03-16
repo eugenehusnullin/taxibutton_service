@@ -10,9 +10,8 @@ public class OrderAcceptAlacrity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Broker broker;
 	private Order order;
-	private Date date;
-	private Driver driver;
-	private Car car;
+	private String uuid;
+	private Date date;	
 
 	public Broker getBroker() {
 		return broker;
@@ -38,19 +37,11 @@ public class OrderAcceptAlacrity implements Serializable {
 		this.date = date;
 	}
 
-	public Driver getDriver() {
-		return driver;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setDriver(Driver driver) {
-		this.driver = driver;
-	}
-
-	public Car getCar() {
-		return car;
-	}
-
-	public void setCar(Car car) {
-		this.car = car;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }

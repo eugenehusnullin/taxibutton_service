@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tb.domain.order.Order;
+import tb.service.OrderExecHolder;
 import tb.service.OrderService;
 import tb.utils.ThreadFactorySecuenceNaming;
 
@@ -36,7 +37,7 @@ public class ChooseWinnerProcessing {
 		public void run() {
 			while (processing) {
 				try {
-					Order order = null;
+					OrderExecHolder orderExecHolder = null;
 					synchronized (queue) {
 						if (queue.isEmpty()) {
 							try {
@@ -45,11 +46,11 @@ public class ChooseWinnerProcessing {
 								break;
 							}
 						}
-						order = queue.poll();
+						orderExecHolder = queue.poll();
 					}
 
-					if (order != null) {
-						ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(order);
+					if (orderExecHolder != null) {
+						ChooseWinnerRunnable chooseWinnerRunnable = new ChooseWinnerRunnable(orderExecHolder);
 						executor.execute(chooseWinnerRunnable);
 					}
 				} catch (Exception e) {
@@ -60,22 +61,28 @@ public class ChooseWinnerProcessing {
 	}
 
 	class ChooseWinnerRunnable implements Runnable {
-		private Order order;
+		private OrderExecHolder orderExecHolder;
 
-		public ChooseWinnerRunnable(Order order) {
-			this.order = order;
+		public ChooseWinnerRunnable(OrderExecHolder orderExecHolder) {
+			this.orderExecHolder = orderExecHolder;
 		}
 
 		@Override
 		public void run() {
-			Object object = orderService.chooseWinnerProcessing(order, cancelorderTimeout);
+			try {
+				Thread.sleep(repeatPause);
+			} catch (InterruptedException e) {
+				return;
+			}
 
+			Object object = orderService.chooseWinnerProcessing(orderExecHolder.getOrder(), cancelorderTimeout);
 			if (object != null) {
 				if (object.getClass().equals(Order.class)) {
-					try {
-						Thread.sleep(repeatPause);
-						addOrder((Order) object);
-					} catch (InterruptedException e) {
+					if (orderExecHolder.getAttemptCount() >= 4) {
+						addOrder(orderExecHolder);
+					} else {
+						orderExecHolder.incrementAttempt();
+						offerOrderProcessing.addOrder(orderExecHolder);
 					}
 				} else {
 					cancelOrderProcessing.addOrderCancel((CancelOrderProcessing.OrderCancelHolder) object);
@@ -84,7 +91,7 @@ public class ChooseWinnerProcessing {
 		}
 	}
 
-	private Queue<Order> queue;
+	private Queue<OrderExecHolder> queue;
 	private Thread mainThread;
 	private volatile boolean processing = true;
 	private ExecutorService executor;
@@ -92,9 +99,11 @@ public class ChooseWinnerProcessing {
 	private OrderService orderService;
 	@Autowired
 	private CancelOrderProcessing cancelOrderProcessing;
+	@Autowired
+	private OfferOrderProcessing offerOrderProcessing;
 
 	public ChooseWinnerProcessing() {
-		queue = new ArrayDeque<Order>();
+		queue = new ArrayDeque<OrderExecHolder>();
 	}
 
 	@PostConstruct
@@ -119,9 +128,9 @@ public class ChooseWinnerProcessing {
 		}
 	}
 
-	public void addOrder(Order order) {
+	public void addOrder(OrderExecHolder orderExecHolder) {
 		synchronized (queue) {
-			queue.add(order);
+			queue.add(orderExecHolder);
 			queue.notifyAll();
 		}
 	}

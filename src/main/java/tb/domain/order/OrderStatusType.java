@@ -24,4 +24,8 @@ public enum OrderStatusType {
 	public static boolean IsValidForOffer(OrderStatusType status) {
 		return status == OrderStatusType.Created;
 	}
+	
+	public static boolean IsValidForTake(OrderStatusType status) {
+		return status == OrderStatusType.Created;
+	}
 }

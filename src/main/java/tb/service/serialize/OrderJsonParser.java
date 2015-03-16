@@ -18,6 +18,7 @@ import tb.domain.order.AddressPoint;
 import tb.domain.order.Order;
 import tb.domain.order.Requirement;
 import tb.domain.order.VehicleClass;
+import tb.service.OfferingOrder;
 import tb.service.exceptions.ParseOrderException;
 
 public class OrderJsonParser {
@@ -26,8 +27,6 @@ public class OrderJsonParser {
 			throws ParseOrderException {
 
 		Order order = new Order();
-
-		Boolean urgent = jsonObject.optBoolean("urgent", true);
 
 		String recipientPhone = phone != null ? phone : jsonObject.optString("recipientPhone");
 
@@ -119,7 +118,7 @@ public class OrderJsonParser {
 			}
 		}
 
-		order.setUrgent(urgent);
+		order.setNotlater(OfferingOrder.defineNotlater(bookingDate));
 		order.setPhone(recipientPhone);
 		order.setBookingDate(bookingDate);
 		order.setDestinations(addressPoints);

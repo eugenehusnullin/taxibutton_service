@@ -12,10 +12,10 @@ public class Order {
 	private Long id;
 	private String uuid;
 	private Device device;
-	private Boolean urgent;
 	private String phone;
 	private Date bookingDate;
 	private Broker broker;
+	private String carUuid;
 	private SortedSet<AddressPoint> destinations;
 	private Set<Requirement> requirements;
 	private Set<OrderStatus> statuses;
@@ -23,7 +23,8 @@ public class Order {
 	private Set<GeoData> geoData;
 	private Set<Broker> offerBrokerList;
 	private VehicleClass orderVehicleClass;
-	private Broker brokerCreator;	
+	private Broker brokerCreator;
+	private Boolean notlater;
 
 	// don't persistent fields
 	private Date startOffer;
@@ -121,14 +122,6 @@ public class Order {
 		this.geoData = geoData;
 	}
 
-	public Boolean getUrgent() {
-		return urgent;
-	}
-
-	public void setUrgent(Boolean urgent) {
-		this.urgent = urgent;
-	}
-
 	public VehicleClass getOrderVehicleClass() {
 		return orderVehicleClass;
 	}
@@ -167,5 +160,21 @@ public class Order {
 
 	public void setBrokerCreator(Broker brokerCreator) {
 		this.brokerCreator = brokerCreator;
+	}
+
+	public Boolean getNotlater() {
+		return notlater;
+	}
+
+	public void setNotlater(Boolean notlater) {
+		this.notlater = notlater;
+	}
+
+	public String getCarUuid() {
+		return carUuid;
+	}
+
+	public void setCarUuid(String carUuid) {
+		this.carUuid = carUuid;
 	}
 }
