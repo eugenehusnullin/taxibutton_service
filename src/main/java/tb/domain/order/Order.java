@@ -26,9 +26,6 @@ public class Order {
 	private Broker brokerCreator;
 	private Boolean notlater;
 
-	// don't persistent fields
-	private Date startOffer;
-
 	public Long getId() {
 		return id;
 	}
@@ -136,14 +133,6 @@ public class Order {
 
 	public void setOfferBrokerList(Set<Broker> offerBrokerList) {
 		this.offerBrokerList = offerBrokerList;
-	}
-
-	public Date getStartOffer() {
-		return startOffer;
-	}
-
-	public void setStartOffer(Date startOffer) {
-		this.startOffer = startOffer;
 	}
 
 	public Date getBookingDate() {

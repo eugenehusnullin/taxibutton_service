@@ -193,8 +193,7 @@ public class OrderService {
 
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MILLISECOND, waitPause);
-		order.setStartOffer(cal.getTime());
-		OrderExecHolder orderExecHolder = new OrderExecHolder(order);
+		OrderExecHolder orderExecHolder = new OrderExecHolder(order, cal.getTime());
 		offerOrderProcessing.addOrder(orderExecHolder);
 	}
 
