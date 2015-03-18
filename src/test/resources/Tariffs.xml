@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Tariffs>
+  <Tariff>
+    <Id>1</Id>
+    <Name Lang="ru">Супер-Эконом Плюс</Name>
+    <Intervals>
+      <TariffChoice>start</TariffChoice>
+      <Interval>
+        <Schedule>
+          <Span>
+            <Days>
+              <Item>Monday</Item>
+              <Item>Tuesday</Item>
+              <Item>Wednesday</Item>
+            </Days>
+            <TimeInterval>
+              <Start>09:00</Start>
+              <End>20:59</End>
+            </TimeInterval>
+          </Span>
+<!--           ... -->
+        </Schedule>
+        <FreeRoute>
+          <Services>
+			<Service Type="taximeter" CalcRule="sum">
+              <TaximeterCalc>
+                <MinPrice Type="once">400</MinPrice>
+                <StopSpeed Unit="km/h">5</StopSpeed>
+                <Meter Type="distance">
+                  <Areas>
+                    <Item>suburb</Item>
+                  </Areas>
+                  <Price>5</Price>
+                  <Per Unit="kilometer">1</Per>
+                </Meter>
+                <Meter Type="idle_time">
+                  <Price>13</Price>
+                  <Per Unit="minute">1</Per>
+                </Meter>
+<!--                 ... -->
+              </TaximeterCalc>
+<!--               ... -->
+            </Service>
+            <Service Type="continue_transfer">
+              <TransferLocations>
+                <Item>nao</Item>
+                <Item>neao</Item>
+                <Item>eao</Item>
+                <Item>seao</Item>
+              </TransferLocations>
+              <TaximeterCalc>
+                <Condition>
+                  <Meter Type="city_remoteness">
+                    <Value When="lt" Unit="kilometer">10</Value>
+                  </Meter>
+                </Condition>
+                <Meter Type="distance">
+                  <Areas>
+                    <Item>suburb</Item>
+                  </Areas>
+                  <Price>15</Price>
+                  <Per Unit="kilometer">1</Per>
+                </Meter>
+              </TaximeterCalc>
+              <TaximeterCalc>
+                <Condition>
+                  <Meter Type="city_remoteness">
+                    <Value When="gte" Unit="kilometer">10</Value>
+                  </Meter>
+                </Condition>
+                <Meter Type="distance">
+                  <Areas>
+                    <Item>suburb</Item>
+                  </Areas>
+                  <Price>25</Price>
+                  <Per Unit="kilometer">1</Per>
+                </Meter>
+              </TaximeterCalc>
+<!--               ... -->
+            </Service>
+            <Service Type="other">
+              <Name Lang="ru">Помощь в переносе багажа, за единицу</Name>
+              <MinPrice>50</MinPrice>
+            </Service>
+            <Service Type="child_chair">
+              <MinPrice>100</MinPrice>
+            </Service>
+            <Service Type="waiting">
+              <FreeTime Unit="minute">5</FreeTime>
+            </Service>
+<!--             ... -->
+          </Services>
+          <Comment Lang="ru">Перевозка животных осуществляется только при наличии специально оборудованной сумки.</Comment>
+        </FreeRoute>
+        <FixedRoutes>
+          <FixedRoute>
+            <Routes>
+              <Route>
+                <Area Type="source">svo</Area>
+                <Area Type="destination">cao</Area>
+                <MinPrice>1250</MinPrice>
+              </Route>
+<!--               ... -->
+            </Routes>
+            <Services>
+              <Service Type="taximeter" CalcRule="sum">
+                <TaximeterCalc>
+                  <Meter Type="time">
+                    <Prepaid Unit="second">7200</Prepaid>
+                    <Price>12</Price>
+                    <Per Unit="second">60</Per>
+                  </Meter>
+                  ...
+                </TaximeterCalc>
+              </Service>
+<!--               ... -->
+            </Services>
+            <Comment Lang="ru">При встрече в зале аэропорта с табличкой, стоянка оплачивается отдельно клиентом и не включается в стоимость поездки!</Comment>
+          </FixedRoute>
+        </FixedRoutes>
+      </Interval>
+<!--       ... -->
+    </Intervals>
+  </Tariff>
+<!--   ... -->
+</Tariffs>

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +33,7 @@ import tb.admin.model.OrderStatusModel;
 import tb.service.BrokerService;
 import tb.service.GeodataService;
 import tb.service.OrderService;
+import tb.utils.HttpUtils;
 
 @RequestMapping("/order")
 @Controller("devTestOrderController")
@@ -107,30 +108,23 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/alacrity", method = RequestMethod.POST)
-	public String alacrity(HttpServletRequest request) throws IOException {
+	public String alacrity(HttpServletRequest request) throws IOException, URISyntaxException {
 
-		String url = "http://localhost:8080/tb/apibroker/order/alacrity";
+		String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/1.x/carack");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-		
+
 		OrderModel orderModel = orderService.getOrder(Long.parseLong(request.getParameter("orderId")));
 
-		String params = "orderId=" + orderModel.getUuid() + "&apiId=" + request.getParameter("apiId")
-				+ "&apiKey=" + request.getParameter("apiKey") + "&driverName=" + request.getParameter("driverName")
-				+ "&driverSecondName=" + request.getParameter("driverSecondName") + "&driverThirdName="
-				+ request.getParameter("driverThirdName") + "&driverPhone=" + request.getParameter("driverPhone")
-				+ "&carNumber=" + request.getParameter("carNumber") + "&carColor=" + request.getParameter("carColor")
-				+ "&carMark=" + request.getParameter("carMark") + "&carModel=" + request.getParameter("carModel");
+		String params = "orderid=" + orderModel.getUuid() + "&clid=" + request.getParameter("apiId")
+				+ "&apikey=" + request.getParameter("apiKey") + "&uuid=" + request.getParameter("uuid");
 
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 		connection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
-
 		connection.setDoOutput(true);
-
 		DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
 		outputStream.writeBytes(params);
 		outputStream.flush();
 		outputStream.close();
@@ -148,16 +142,18 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/setStatus", method = RequestMethod.POST)
-	public String sendStatus(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey, @RequestParam("status") String status) throws IOException {
+	public String sendStatus(HttpServletRequest request, @RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId,
+			@RequestParam("apiKey") String apiKey, @RequestParam("status") String status) throws IOException,
+			URISyntaxException {
 
 		OrderModel orderModel = orderService.getOrder(orderId);
 
-		String url = "http://localhost:8080/tb/apibroker/order/setStatus";
+		String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/1.x/setStatus");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-		String params = "orderId=" + orderModel.getUuid() + "&apiId=" + apiId + "&apiKey=" + apiKey + "&status="
+		String params = "orderid=" + orderModel.getUuid() + "&clid=" + apiId + "&apikey=" + apiKey + "&status="
 				+ status;
 
 		connection.setRequestMethod("POST");
@@ -187,9 +183,9 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
-	public String setGeoData(HttpServletRequest request) throws IOException {
+	public String setGeoData(HttpServletRequest request) throws IOException, URISyntaxException {
 
-		String url = "http://localhost:8080/tb/apibroker/order/setGeoData";
+		String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apibroker/order/setGeoData");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -236,7 +232,8 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getStatus", method = RequestMethod.POST)
-	public String getStatus(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
+	public String getStatus(HttpServletRequest request,
+			@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
 
 		OrderModel orderModel = orderService.getOrder(orderId);
 		JSONObject getStatusJson = new JSONObject();
@@ -245,8 +242,7 @@ public class OrderController {
 		getStatusJson.put("orderId", orderModel.getUuid());
 
 		try {
-
-			String url = "http://localhost:8080/tb/apidevice/order/status";
+			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/status");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -285,7 +281,8 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getGeoData", method = RequestMethod.POST)
-	public String getGeoData(@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId,
+	public String getGeoData(HttpServletRequest request, @RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId,
 			@RequestParam("lastDate") String lastDate, Model model) {
 
 		OrderModel orderModel = orderService.getOrder(orderId);
@@ -296,8 +293,7 @@ public class OrderController {
 		getGeoDataJson.put("lastDate", lastDate);
 
 		try {
-
-			String url = "http://localhost:8080/tb/apidevice/order/geodata";
+			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/geodata");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -364,8 +360,7 @@ public class OrderController {
 		int responseCode = 0;
 
 		try {
-
-			String url = "http://localhost:8080/tb/apidevice/order/cancel";
+			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/cancel");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -396,7 +391,7 @@ public class OrderController {
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public String create(Model model) {
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-		long t = Calendar.getInstance().getTime().getTime() + (10*60000);
+		long t = Calendar.getInstance().getTime().getTime() + (10 * 60000);
 		model.addAttribute("now_time", df.format(new Date(t)));
 		model.addAttribute("brokers", brokerService.getAll());
 		return "order/create";
@@ -457,17 +452,17 @@ public class OrderController {
 		String[] formRequirements = request.getParameterValues("requirements");
 		if (formRequirements != null) {
 			for (String currentRequirementName : formRequirements) {
-	
+
 				JSONObject currentRequirementJson = new JSONObject();
-	
+
 				currentRequirementJson.put("name", currentRequirementName);
-	
+
 				if (currentRequirementName.trim().equals("isChildChair")) {
 					currentRequirementJson.put("value", request.getParameter("childAge"));
 				} else {
 					currentRequirementJson.put("value", "yes");
 				}
-	
+
 				requirementsJson.put(currentRequirementJson);
 			}
 		}
@@ -483,15 +478,10 @@ public class OrderController {
 
 		String jsonResult = createOrderJson.toString();
 
-		try {			
-			URI uri = new URI(request.getRequestURI());
-			String url = request.getRequestURI();
-			int index = url.indexOf(uri.getPath());
-			url = url.substring(0, index - 1);
-			url.concat("/tb/apidevice/order/create");
+		try {
+			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/create");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
@@ -534,7 +524,7 @@ public class OrderController {
 		}
 
 		return "result";
-	}
+	}	
 
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String delete(@RequestParam("id") Long orderId) {

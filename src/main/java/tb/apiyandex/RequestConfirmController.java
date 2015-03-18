@@ -13,6 +13,7 @@ import tb.service.exceptions.OrderNotFoundException;
 
 @Controller("apiyandexRequestConfirmController")
 @RequestMapping("requestconfirm")
+// Обновление статуса заказа
 public class RequestConfirmController {
 	@Autowired
 	private OrderService orderService;

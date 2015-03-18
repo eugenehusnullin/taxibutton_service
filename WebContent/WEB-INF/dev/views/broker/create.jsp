@@ -9,13 +9,17 @@
 		<input type="text" name="name" value="Желтое такси" />
 		<br/>Apiurl
 		<input type="text" name="apiurl" value="http://ip:port/GUID" />
-		<br/>Api id
+		<br/>clid
 		<input type="text" name="apiId" value="1"/>
-		<br/>Api key
+		<br/>apikey
 		<input type="text" name="apiKey" value="1"/>
 		<br/>
 		<input type="radio" name="smsMethod" value="0" checked /> sms48
 		<input type="radio" name="smsMethod" value="1" /> self
-		<br />
+		<br/>Tariff url
+		<input type="text" name="tariffurl" value="http://"/>
+		<br/>Driver url
+		<input type="text" name="driverurl" value="http://"/>
+		<br />		
 		<input type="submit" value="save" />
 	</form>

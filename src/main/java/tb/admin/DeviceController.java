@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb.service.DeviceService;
+import tb.utils.HttpUtils;
 import tb.utils.NetStreamUtils;
 
 @RequestMapping("/device")
@@ -38,14 +41,14 @@ public class DeviceController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(@RequestParam("phone") String phone, Model model) {
+	public String create(HttpServletRequest request, @RequestParam("phone") String phone, Model model) {
 
 		JSONObject createDeviceObject = new JSONObject();
 
 		createDeviceObject.put("phone", phone);
 
 		try {
-			String url = "http://localhost:8080/tb/apidevice/device/register";
+			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/device/register");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -80,13 +83,13 @@ public class DeviceController {
 	}
 
 	@RequestMapping(value = "/tariffs", method = RequestMethod.GET)
-	public String getTariffs(@RequestParam("apiId") String apiId, Model model) {
+	public String getTariffs(HttpServletRequest request, @RequestParam("apiId") String apiId, Model model) {
 
 		try {
 			JSONObject requestJson = new JSONObject();
 			requestJson.put("apiId", apiId);
 
-			String url = "http://localhost:8080/tb/apidevice/tariff/get";
+			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/tariff/get");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 

@@ -13,13 +13,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@RequestMapping("/tariff")
-@Controller("brokerSideTariffController")
-public class TariffController {
+@RequestMapping("/car")
+@Controller("brokerSideCarController")
+public class CarController {
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public void index(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		URL url = getClass().getResource("/Tariffs.xml");
+		URL url = getClass().getResource("/Cars.xml");
 		File file = new File(url.getFile());
 		FileInputStream fis = new FileInputStream(file);
 		IOUtils.copy(fis, response.getOutputStream());

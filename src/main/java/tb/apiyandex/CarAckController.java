@@ -14,6 +14,7 @@ import tb.service.exceptions.OrderNotFoundException;
 
 @Controller("apiyandexCarAckController")
 @RequestMapping("/carack")
+// —ообщение о готовности водител€ выполнить заказ
 public class CarAckController {
 	@Autowired
 	private OrderService orderService;

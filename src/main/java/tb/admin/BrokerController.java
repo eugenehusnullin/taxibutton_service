@@ -38,8 +38,9 @@ public class BrokerController {
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String create(@RequestParam("name") String name, @RequestParam("apiurl") String apiurl,
 			@RequestParam("apiId") String apiId, @RequestParam("apiKey") String apiKey,
-			@RequestParam("smsMethod") String smsMethod, Model model) {
-		
+			@RequestParam("smsMethod") String smsMethod, @RequestParam("tariffurl") String tariffUrl,
+			@RequestParam("driverurl") String driverUrl, Model model) {
+
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 
 		Broker broker = new Broker();
@@ -48,6 +49,8 @@ public class BrokerController {
 		broker.setApiId(apiId);
 		broker.setApiKey(apiKey);
 		broker.setSmsMethod(smsM);
+		broker.setTariffUrl(tariffUrl);
+		broker.setDriverUrl(driverUrl);
 		brokerService.add(broker);
 
 		return "redirect:list";

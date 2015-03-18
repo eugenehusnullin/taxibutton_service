@@ -3,6 +3,7 @@ package tb.utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.xml.transform.Result;
@@ -39,6 +40,11 @@ public class HttpUtils {
 		wr.close();
 
 		return connection.getResponseCode() == 200;
+	}
+	
+	public static String getApplicationUrl(String uriString) throws URISyntaxException {
+		int index = uriString.indexOf("/admin");
+		return uriString.substring(0, index);
 	}
 
 }

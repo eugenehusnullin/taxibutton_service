@@ -13,7 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
 import tb.car.dao.CarDao;
@@ -33,6 +35,8 @@ public class CarSynch {
 	@Autowired
 	private CarDao carDao;
 
+	@Transactional
+	@Scheduled(cron = "0 58 * * * *")
 	public void synch() {
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
@@ -45,7 +49,7 @@ public class CarSynch {
 					updateCars(cars, broker, loadDate);
 				}
 			} catch (Exception ex) {
-				log.info("Get XML cars error: " + ex.toString());
+				log.error("carsynch", ex);
 			}
 		}
 	}

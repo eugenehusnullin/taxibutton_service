@@ -13,13 +13,14 @@
 		<property name="realName" length="100"></property>
 		<property name="realWeb" length="100"></property>
 		<property name="realScid" length="50"></property>
-		<set name="tariffs" table="carTariffs">
+		<list name="tariffs" table="carTariffs">
 			<key>
 				<column name="brokerId"></column>
 				<column name="uuid"></column>
 			</key>
+			<index column="idx"></index>
 			<element column="tariff" type="string" length="32"></element>
-		</set>
+		</list>
 
 		<property name="driverDisplayName" length="100"></property>
 		<property name="driverPhone" length="20"></property>
