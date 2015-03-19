@@ -5,14 +5,11 @@
 
 <hibernate-mapping package="tb.domain">
 	<class name="Tariff" table="tariffs">
-		<id name="id">
-			<generator class="identity" />
-		</id>
-		<many-to-one name="broker" column="brokerid"/>
-		<property name="tariffId" length="32"/>
+		<composite-id>
+			<key-many-to-one name="broker" column="brokerid"></key-many-to-one>
+			<key-property name="tariffId" length="32"></key-property>
+		</composite-id>
 		<property name="name" length="64"/>
 		<property name="tariff" length="10000"/>
-		<property name="startDate"/>
-		<property name="endDate"/>
 	</class>
 </hibernate-mapping>

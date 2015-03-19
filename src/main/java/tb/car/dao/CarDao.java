@@ -32,7 +32,8 @@ public class CarDao {
 			session.saveOrUpdate(car);
 
 			CarState carState = (CarState) session.createCriteria(CarState.class)
-					.add(Restrictions.eq("brokerId", broker.getId())).add(Restrictions.eq("uuid", car.getUuid()))
+					.add(Restrictions.eq("brokerId", broker.getId()))
+					.add(Restrictions.eq("uuid", car.getUuid()))
 					.uniqueResult();
 
 			if (carState == null) {

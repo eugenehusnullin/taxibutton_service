@@ -7,13 +7,9 @@ import tb.domain.Tariff;
 
 public interface ITariffDao {
 
-	Tariff get(Long id);
-
 	Tariff getActive(Broker broker, String tariffId);
 
 	List<Tariff> getActive(Broker broker);
-
-	void save(Tariff tariff);
 
 	void saveOrUpdate(Tariff tariff);
 	

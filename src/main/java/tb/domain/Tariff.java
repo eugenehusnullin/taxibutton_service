@@ -1,16 +1,13 @@
 package tb.domain;
 
-import java.util.Date;
+import java.io.Serializable;
 
-public class Tariff {
-
-	private int id;
+public class Tariff implements Serializable {
+	private static final long serialVersionUID = 1038637471754719518L;
 	private Broker broker;
 	private String tariffId;
 	private String name;
 	private String tariff;
-	private Date startDate;
-	private Date endDate;
 
 	public Broker getBroker() {
 		return broker;
@@ -28,41 +25,12 @@ public class Tariff {
 		this.tariff = tariff;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public String getTariffId() {
 		return tariffId;
 	}
 
 	public void setTariffId(String tariffId) {
 		this.tariffId = tariffId;
-	}
-
-	public boolean isSame(Tariff other) {
-		return this.tariffId.equals(other.tariffId) && this.tariff.equals(other.tariff)
-				&& this.name.equals(other.name);
-	}
-
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
 	}
 
 	public String getName() {

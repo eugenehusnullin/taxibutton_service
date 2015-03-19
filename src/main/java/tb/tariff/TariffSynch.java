@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,31 +44,24 @@ public class TariffSynch {
 	public void synch() {
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
-			try {
-				Document doc = fetchTariffs(broker);
-				if (doc != null) {
-					Date loadDate = new Date();
-					List<Tariff> tariffs = tariffBuilder.createTariffs(doc, broker, loadDate);
+			Document doc = fetchTariffs(broker);
+			if (doc != null) {
+				Date loadDate = new Date();
+				List<Tariff> tariffs;
+				try {
+					tariffs = tariffBuilder.createTariffs(doc, broker, loadDate);
 					updateTariffs(tariffs, broker, loadDate);
+				} catch (TransformerFactoryConfigurationError | TransformerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			} catch (Exception ex) {
-				log.info("Get XML tariffs error: " + ex.toString());
 			}
 		}
 	}
 
 	private void updateTariffs(List<Tariff> tariffs, Broker broker, Date loadDate) {
 		for (Tariff tariff : tariffs) {
-			Tariff storedTariff = tariffDao.getActive(broker, tariff.getTariffId());
-			if (storedTariff == null) {
-				tariffDao.save(tariff);
-			} else {
-				if (!storedTariff.isSame(tariff)) {
-					storedTariff.setEndDate(loadDate);
-					tariffDao.save(storedTariff);
-					tariffDao.save(tariff);
-				}
-			}
+			tariffDao.saveOrUpdate(tariff);
 		}
 	}
 

@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import tb.car.dao.CarDao;
 import tb.car.domain.Car;
@@ -36,20 +39,22 @@ public class CarSynch {
 	private CarDao carDao;
 
 	@Transactional
-	@Scheduled(cron = "0 58 * * * *")
+	@Scheduled(cron = "0 01 * * * *")
 	public void synch() {
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
+			InputStream carsInputStream = fetchCarsInputStream(broker);
+			Document doc = null;
 			try {
-				InputStream carsInputStream = fetchCarsInputStream(broker);
-				Document doc = XmlUtils.buildDomDocument(carsInputStream);
-				if (doc != null) {
-					Date loadDate = new Date();
-					List<Car> cars = carBuilder.createCars(doc, broker, loadDate);
-					updateCars(cars, broker, loadDate);
-				}
-			} catch (Exception ex) {
-				log.error("carsynch", ex);
+				doc = XmlUtils.buildDomDocument(carsInputStream);
+			} catch (ParserConfigurationException | SAXException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (doc != null) {
+				Date loadDate = new Date();
+				List<Car> cars = carBuilder.createCars(doc, broker, loadDate);
+				updateCars(cars, broker, loadDate);
 			}
 		}
 	}

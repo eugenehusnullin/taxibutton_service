@@ -7,54 +7,42 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XmlUtils {
-
-	public static String xmlToString(Document document) {
-		String xmlString = null;
-		try {
-
-			Source source = new DOMSource(document);
-			StringWriter stringWriter = new StringWriter();
-			Result result = new StreamResult(stringWriter);
-
-			TransformerFactory trFactory = TransformerFactory.newInstance();
-			Transformer transformer = trFactory.newTransformer();
-			transformer.transform(source, result);
-
-			xmlString = stringWriter.getBuffer().toString();
-		} catch (Exception ex) {
-
-			return null;
-		}
-		return xmlString;
+	public static String nodeToString(Node node) throws TransformerFactoryConfigurationError, TransformerException {
+		StringWriter writer = new StringWriter();
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		transformer.transform(new DOMSource(node), new StreamResult(writer));
+		return writer.toString();
 	}
 
-	public static Document buildDomDocument(InputStream xmlInputStream) throws ParserConfigurationException, SAXException, IOException {
+	public static Document buildDomDocument(InputStream xmlInputStream) throws ParserConfigurationException,
+			SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document doc = builder.parse(xmlInputStream);
 		return doc;
 	}
-	
+
 	public static Document buildDomDocument(String data) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document doc = builder.parse(data);
 		return doc;
 	}
-	
+
 	public static String getElementContent(Element element, String elementName) {
 		NodeList nodeList = element.getElementsByTagName(elementName);
 		if (nodeList != null && nodeList.getLength() > 0) {

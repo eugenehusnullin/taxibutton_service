@@ -19,8 +19,8 @@ public class CarBuilder {
 
 	public List<Car> createCars(Document doc, Broker broker, Date loadDate) {
 		List<Car> list = new ArrayList<Car>();
-
 		doc.getDocumentElement().normalize();
+
 		NodeList carNodeList = doc.getElementsByTagName("Car");
 		for (int i = 0; i < carNodeList.getLength(); i++) {
 			Car car = new Car();
@@ -71,5 +71,4 @@ public class CarBuilder {
 		return list;
 	}
 
-	
 }

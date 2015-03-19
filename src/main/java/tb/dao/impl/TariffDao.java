@@ -19,20 +19,10 @@ public class TariffDao implements ITariffDao {
 	@Qualifier("sessionFactory")
 	private SessionFactory sessionFactory;
 
-	@Override
-	public Tariff get(Long id) {
-		return (Tariff) sessionFactory.getCurrentSession().get(Tariff.class, id);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Tariff> getAll() {
 		return sessionFactory.getCurrentSession().createCriteria(Tariff.class).list();
-	}
-
-	@Override
-	public void save(Tariff tariff) {
-		sessionFactory.getCurrentSession().save(tariff);
 	}
 
 	@SuppressWarnings("unchecked")
