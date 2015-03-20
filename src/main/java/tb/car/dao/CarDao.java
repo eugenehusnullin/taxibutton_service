@@ -101,13 +101,14 @@ public class CarDao {
 		Session session = sessionFactory.getCurrentSession();
 		Date date = new Date((new Date()).getTime() - 300000);
 		String q = " from CarState cs "
-				+ " where cs.state=0 and cs.date>=:date "
+				+ " where cs.state=0 "
+				+ " and cs.date>=:date "
 				+ " and (abs(:lat-cs.latitude) + abs(:lon-cs.longitude)) <= :diff "				
 				+ " order by abs(:lat-cs.latitude) + abs(:lon-cs.longitude) ";
 
 		@SuppressWarnings("unchecked")
 		List<CarState> list = (List<CarState>) session.createQuery(q)
-				.setDate("date", date)
+				.setTimestamp("date", date)
 				.setDouble("lat", lat)
 				.setDouble("lon", lon)
 				.setDouble("diff", diff)

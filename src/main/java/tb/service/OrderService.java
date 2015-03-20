@@ -181,7 +181,7 @@ public class OrderService {
 			throw new ParseOrderException("bookingdate is out");
 		}
 
-		order.setUuid(UUID.randomUUID().toString());
+		order.setUuid(UUID.randomUUID().toString().replace("-", ""));
 		orderDao.save(order);
 
 		// create new order status (Created)

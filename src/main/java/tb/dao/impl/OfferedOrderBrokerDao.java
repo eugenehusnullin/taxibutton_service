@@ -22,7 +22,7 @@ public class OfferedOrderBrokerDao implements IOfferedOrderBrokerDao {
 
 	@Override
 	public void save(OfferedOrderBroker offeredOrderBroker) {
-		sessionFactory.getCurrentSession().save(offeredOrderBroker);
+		sessionFactory.getCurrentSession().saveOrUpdate(offeredOrderBroker);
 	}
 
 	@SuppressWarnings("unchecked")

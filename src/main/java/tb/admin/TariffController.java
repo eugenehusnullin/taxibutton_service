@@ -18,7 +18,7 @@ import tb.service.TariffService;
 
 @RequestMapping("/tariff")
 @Controller
-public class SimpleTariffController {
+public class TariffController {
 
 	@Autowired
 	private BrokerService brokerService;

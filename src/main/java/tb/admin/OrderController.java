@@ -33,6 +33,7 @@ import tb.admin.model.OrderStatusModel;
 import tb.service.BrokerService;
 import tb.service.GeodataService;
 import tb.service.OrderService;
+import tb.utils.DatetimeUtils;
 import tb.utils.HttpUtils;
 
 @RequestMapping("/order")
@@ -392,7 +393,8 @@ public class OrderController {
 	public String create(Model model) {
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		long t = Calendar.getInstance().getTime().getTime() + (10 * 60000);
-		model.addAttribute("now_time", df.format(new Date(t)));
+		model.addAttribute("now_time", 
+				df.format(DatetimeUtils.localTimeToOtherTimeZone(new Date(t), DatetimeUtils.TIMEZONEID_UTC)));
 		model.addAttribute("brokers", brokerService.getAll());
 		return "order/create";
 	}

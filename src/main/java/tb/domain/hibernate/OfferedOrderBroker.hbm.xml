@@ -5,15 +5,14 @@
 
 <hibernate-mapping package="tb.domain.order">
 	<class name="OfferedOrderBroker" table="offeredorderbrokers">
-		<id name="id">
-			<generator class="identity" />
-		</id>
-		<many-to-one name="order" class="tb.domain.order.Order" cascade="delete">
-			<column name="orderId" />
-		</many-to-one>
-		<many-to-one name="broker" class="tb.domain.Broker" cascade="delete">
-			<column name="brokerId" />
-		</many-to-one>
+		<composite-id>
+			<key-many-to-one name="broker" class="tb.domain.Broker">
+				<column name="brokerId" />
+			</key-many-to-one>
+			<key-many-to-one name="order" class="tb.domain.order.Order">
+				<column name="orderId" />
+			</key-many-to-one>		
+		</composite-id>
 		<property name="timestamp"></property>
 	</class>
 </hibernate-mapping>

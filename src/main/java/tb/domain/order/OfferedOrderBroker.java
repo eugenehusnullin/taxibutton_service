@@ -1,11 +1,12 @@
 package tb.domain.order;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import tb.domain.Broker;
 
-public class OfferedOrderBroker {
-	private Long id;
+public class OfferedOrderBroker implements Serializable {
+	private static final long serialVersionUID = 1679325554802755364L;
 	private Order order;
 	private Broker broker;
 	private Date timestamp;
@@ -32,13 +33,5 @@ public class OfferedOrderBroker {
 
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 }

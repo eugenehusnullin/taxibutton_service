@@ -141,9 +141,9 @@ public class OfferingOrder {
 			for (CarState carState : filteredCarStates) {
 				Car4Request car4Request = new Car4Request();
 				car4Request.setUuid(carState.getUuid());
-				int dist = (int) calcDistance(lat, carState.getLatitude(), lon, carState.getLongitude());
+				int dist = (int) calcDistance(lat, lon, carState.getLatitude(), carState.getLongitude());
 				car4Request.setDist(dist);
-				car4Request.setTime(dist / SPEED * MINUTE_IN_HOUR);
+				car4Request.setTime((dist * MINUTE_IN_HOUR) / SPEED );
 				car4Request.setTariff(carDao.getFirstTariff(carState.getBrokerId(), carState.getUuid()));
 
 				car4RequestList.add(car4Request);

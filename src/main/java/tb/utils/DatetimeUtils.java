@@ -5,6 +5,14 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class DatetimeUtils {
+	
+	public static final String TIMEZONEID_UTC = "UTC";
+
+	public static Date localTimeToOtherTimeZone(Date date, String timeZoneId) {
+		return new Date(date.getTime()
+				- TimeZone.getDefault().getOffset(date.getTime())
+				+ TimeZone.getTimeZone(timeZoneId).getOffset(date.getTime()));
+	}
 
 	public static boolean checkTimeout(Date utcDate, int timeoutMilisecond, Date checkDateLocalTimezone) {
 		Calendar booking = utcToLocal(utcDate);
