@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
@@ -42,9 +43,10 @@ public class HttpUtils {
 		return connection.getResponseCode() == 200;
 	}
 	
-	public static String getApplicationUrl(String uriString) throws URISyntaxException {
-		int index = uriString.indexOf("/admin");
-		return uriString.substring(0, index);
+	public static String getApplicationUrl(HttpServletRequest request) throws URISyntaxException {
+		String url = request.getRequestURL().toString();
+		int index = url.indexOf("/admin");
+		return url.substring(0, index);
 	}
 
 }

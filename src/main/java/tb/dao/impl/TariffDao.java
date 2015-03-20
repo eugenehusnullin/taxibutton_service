@@ -27,24 +27,14 @@ public class TariffDao implements ITariffDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Tariff> getActive(Broker broker) {
+	public List<Tariff> get(Broker broker) {
 		return sessionFactory.getCurrentSession().createCriteria(Tariff.class)
 				.add(Restrictions.eq("broker", broker))
-				.add(Restrictions.isNull("endDate"))
 				.list();
 	}
 
 	@Override
 	public void saveOrUpdate(Tariff tariff) {
 		sessionFactory.getCurrentSession().saveOrUpdate(tariff);
-	}
-
-	@Override
-	public Tariff getActive(Broker broker, String tariffId) {
-		return (Tariff) sessionFactory.getCurrentSession().createCriteria(Tariff.class)
-				.add(Restrictions.eq("broker", broker))
-				.add(Restrictions.eq("tariffId", tariffId))
-				.add(Restrictions.isNull("endDate"))
-				.uniqueResult();
 	}
 }

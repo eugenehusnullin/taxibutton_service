@@ -102,8 +102,7 @@ public class CarDao {
 		Date date = new Date((new Date()).getTime() - 300000);
 		String q = " from CarState cs "
 				+ " where cs.state=0 and cs.date>=:date "
-				+ " and (abs(:lat-cs.latitude) + abs(:lon-cs.longitude)) <= :diff "
-				+ " and cs.brokerid"
+				+ " and (abs(:lat-cs.latitude) + abs(:lon-cs.longitude)) <= :diff "				
 				+ " order by abs(:lat-cs.latitude) + abs(:lon-cs.longitude) ";
 
 		@SuppressWarnings("unchecked")

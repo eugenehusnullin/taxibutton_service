@@ -24,9 +24,7 @@ public class OrderController {
 	public void offer(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 
-		DataInputStream inputStream = new DataInputStream(
-				request.getInputStream());
-
+		DataInputStream inputStream = new DataInputStream(request.getInputStream());
 		try {
 			Source source = new StreamSource(inputStream);
 			Result outputTarget = new StreamResult(System.out);

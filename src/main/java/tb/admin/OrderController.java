@@ -110,7 +110,7 @@ public class OrderController {
 	@RequestMapping(value = "/alacrity", method = RequestMethod.POST)
 	public String alacrity(HttpServletRequest request) throws IOException, URISyntaxException {
 
-		String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/1.x/carack");
+		String url = HttpUtils.getApplicationUrl(request).concat("/1.x/carack");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -149,7 +149,7 @@ public class OrderController {
 
 		OrderModel orderModel = orderService.getOrder(orderId);
 
-		String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/1.x/setStatus");
+		String url = HttpUtils.getApplicationUrl(request).concat("/1.x/setStatus");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -185,7 +185,7 @@ public class OrderController {
 	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
 	public String setGeoData(HttpServletRequest request) throws IOException, URISyntaxException {
 
-		String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apibroker/order/setGeoData");
+		String url = HttpUtils.getApplicationUrl(request).concat("/apibroker/order/setGeoData");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -242,7 +242,7 @@ public class OrderController {
 		getStatusJson.put("orderId", orderModel.getUuid());
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/status");
+			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/status");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -293,7 +293,7 @@ public class OrderController {
 		getGeoDataJson.put("lastDate", lastDate);
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/geodata");
+			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/geodata");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -360,7 +360,7 @@ public class OrderController {
 		int responseCode = 0;
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/cancel");
+			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/cancel");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -479,7 +479,7 @@ public class OrderController {
 		String jsonResult = createOrderJson.toString();
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/order/create");
+			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/create");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 			connection.setRequestMethod("POST");

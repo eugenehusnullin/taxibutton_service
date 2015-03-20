@@ -23,7 +23,7 @@ import tb.service.exceptions.DeviceNotFoundException;
 @Service
 public class TariffService {
 	@Autowired
-	private ITariffDao simpleTariffDao;
+	private ITariffDao tariffDao;
 	@Autowired
 	private IDeviceDao deviceDao;
 	@Autowired
@@ -38,7 +38,7 @@ public class TariffService {
 			throw new DeviceNotFoundException(apiId);
 		}
 
-		List<Tariff> tariffs = simpleTariffDao.getAll();
+		List<Tariff> tariffs = tariffDao.getAll();
 		JSONArray tariffsJsonArray = new JSONArray();
 		for (Tariff simoleTariff : tariffs) {
 			JSONObject tariffJson = new JSONObject();
@@ -52,7 +52,7 @@ public class TariffService {
 	@Transactional
 	public String getTariff(Long brokerId) {
 		Broker broker = brokerDao.get(brokerId);
-		Tariff simpleTariff = simpleTariffDao.getActive(broker).get(0);
+		Tariff simpleTariff = tariffDao.get(broker).get(0);
 		return simpleTariff.getTariff();
 	}
 

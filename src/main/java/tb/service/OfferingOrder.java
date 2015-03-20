@@ -118,7 +118,7 @@ public class OfferingOrder {
 		List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct().collect(Collectors.toList());
 		for (Long brokerId : brokerIdsList) {
 			Broker broker = brokerDao.get(brokerId);
-			List<Tariff> tariffs = tariffDao.getActive(broker);
+			List<Tariff> tariffs = tariffDao.get(broker);
 			List<String> tariffIds = tariffs.stream().map(p -> p.getTariffId()).collect(Collectors.toList());
 			Document doc = YandexOrderSerializer.orderToRequestXml(order, tariffIds, null);
 

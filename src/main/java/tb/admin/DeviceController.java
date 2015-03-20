@@ -48,7 +48,7 @@ public class DeviceController {
 		createDeviceObject.put("phone", phone);
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/device/register");
+			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/device/register");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -89,7 +89,7 @@ public class DeviceController {
 			JSONObject requestJson = new JSONObject();
 			requestJson.put("apiId", apiId);
 
-			String url = HttpUtils.getApplicationUrl(request.getRequestURI()).concat("/apidevice/tariff/get");
+			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/tariff/get");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 

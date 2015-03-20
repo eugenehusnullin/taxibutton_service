@@ -1,6 +1,7 @@
 package tb.service.processing;
 
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,7 +79,8 @@ public class ChooseWinnerProcessing {
 			Object object = orderService.chooseWinnerProcessing(orderExecHolder.getOrder(), cancelorderTimeout);
 			if (object != null) {
 				if (object.getClass().equals(Order.class)) {
-					if (orderExecHolder.getAttemptCount() >= 4) {
+					if (orderExecHolder.getAttemptCount() >= 4
+							|| (new Date()).getTime() - orderExecHolder.getStartChooseWinner().getTime() <= (1*60*1000) ) {
 						addOrder(orderExecHolder);
 					} else {
 						orderExecHolder.incrementAttempt();

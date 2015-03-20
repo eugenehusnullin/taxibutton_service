@@ -86,6 +86,7 @@ public class OfferOrderProcessing {
 
 				if (offered != null) {
 					if (offered) {
+						orderExecHolder.setStartChooseWinner(new Date());
 						chooseWinnerProcessing.addOrder(orderExecHolder);
 					} else {
 						CancelOrderProcessing.OrderCancelHolder orderCancelHolder =

@@ -8,6 +8,7 @@ public class OrderExecHolder {
 	private Order order;
 	private int attemptCount;
 	private Date startOffer;
+	private Date startChooseWinner;
 
 	public OrderExecHolder(Order order, Date startOffer) {
 		this(order, 1, startOffer);
@@ -34,5 +35,13 @@ public class OrderExecHolder {
 
 	public Date getStartOffer() {
 		return startOffer;
+	}
+
+	public Date getStartChooseWinner() {
+		return startChooseWinner;
+	}
+
+	public void setStartChooseWinner(Date startChooseWinner) {
+		this.startChooseWinner = startChooseWinner;
 	}
 }
