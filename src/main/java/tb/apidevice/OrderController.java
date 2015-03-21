@@ -3,7 +3,6 @@ package tb.apidevice;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hsqldb.lib.DataOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -27,10 +26,10 @@ import tb.domain.Broker;
 import tb.service.BrokerService;
 import tb.service.OrderService;
 import tb.service.exceptions.DeviceNotFoundException;
-import tb.service.exceptions.WrongData;
 import tb.service.exceptions.NotValidOrderStatusException;
 import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
+import tb.service.exceptions.WrongData;
 
 @RequestMapping("/order")
 @Controller("apiDeviceOrderController")
@@ -60,12 +59,7 @@ public class OrderController {
 				responseJson.put("status", "ok");
 				responseJson.put("orderId", orderUuid);
 				response.setStatus(200);
-
-				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-				outputStream.writeBytes(responseJson.toString());
-				outputStream.flush();
-				outputStream.close();
-
+				IOUtils.write(responseJson.toString(), response.getOutputStream(), "UTF-8");
 			} catch (DeviceNotFoundException dnfe) {
 				response.setStatus(403);
 				log.error(dnfe.toString());
@@ -94,11 +88,7 @@ public class OrderController {
 				JSONObject responseJson = new JSONObject();
 				response.setStatus(200);
 				responseJson.put("status", "success");
-
-				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-				outputStream.writeBytes(responseJson.toString());
-				outputStream.flush();
-				outputStream.close();
+				IOUtils.write(responseJson.toString(), response.getOutputStream(), "UTF-8");
 
 			} catch (DeviceNotFoundException e) {
 				response.setStatus(403);
@@ -126,12 +116,7 @@ public class OrderController {
 
 			try {
 				JSONObject statusJson = orderService.getStatus(getStatusObject);
-
-				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-				byte[] bytes = statusJson.toString().getBytes("UTF-8");
-				outputStream.write(bytes);
-				outputStream.flush();
-				outputStream.close();
+				IOUtils.write(statusJson.toString(), response.getOutputStream(), "UTF-8");
 
 			} catch (DeviceNotFoundException e) {
 				response.setStatus(403);
@@ -157,11 +142,7 @@ public class OrderController {
 
 			try {
 				JSONObject geoDataJson = orderService.getGeodata(jsonObject);
-				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-
-				outputStream.writeBytes(geoDataJson.toString());
-				outputStream.flush();
-				outputStream.close();
+				IOUtils.write(geoDataJson.toString(), response.getOutputStream(), "UTF-8");
 			} catch (DeviceNotFoundException e1) {
 				response.setStatus(403);
 			} catch (OrderNotFoundException e1) {
@@ -201,7 +182,7 @@ public class OrderController {
 			response.setStatus(404);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getbrokers", method = RequestMethod.GET)
 	@Transactional
 	public void getBrokers(HttpServletRequest request, HttpServletResponse response) {
@@ -213,15 +194,8 @@ public class OrderController {
 				jsonBroker.put("uuid", broker.getUuid());
 				jsonBroker.put("name", broker.getName());
 				jsonArray.put(jsonBroker);
-				//jsonArray.put(broker.getUuid());
-				//jsonArray.put(broker.getName());
 			}
-			
-			DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
-			OutputStreamWriter osw = new OutputStreamWriter(outputStream);
-			jsonArray.write(osw);
-			osw.flush();
-			osw.close();
+			IOUtils.write(jsonArray.toString(), response.getOutputStream(), "UTF-8");
 		} catch (Exception e) {
 
 		}

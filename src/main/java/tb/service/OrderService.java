@@ -1,11 +1,7 @@
 package tb.service;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,7 +29,6 @@ import tb.car.domain.Car;
 import tb.car.domain.Car4Request;
 import tb.dao.IBrokerDao;
 import tb.dao.IDeviceDao;
-import tb.dao.IGeoDataDao;
 import tb.dao.IOfferedOrderBrokerDao;
 import tb.dao.IOrderAcceptAlacrityDao;
 import tb.dao.IOrderCancelDao;
@@ -43,7 +38,6 @@ import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Device;
 import tb.domain.order.Feedback;
-import tb.domain.order.GeoData;
 import tb.domain.order.OfferedOrderBroker;
 import tb.domain.order.Order;
 import tb.domain.order.OrderAcceptAlacrity;
@@ -58,7 +52,6 @@ import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
 import tb.service.exceptions.WrongData;
 import tb.service.processing.CancelOrderProcessing;
-import tb.service.processing.GeoDataProcessing;
 import tb.service.processing.OfferOrderProcessing;
 import tb.service.serialize.OrderJsonParser;
 import tb.service.serialize.YandexOrderSerializer;
@@ -87,11 +80,7 @@ public class OrderService {
 	@Autowired
 	private CancelOrderProcessing cancelorderProcessing;
 	@Autowired
-	private IGeoDataDao geoDataDao;
-	@Autowired
 	private IOrderAcceptAlacrityDao alacrityDao;
-	@Autowired
-	private GeoDataProcessing geoDataProcessing;
 	@Autowired
 	private IOrderAcceptAlacrityDao orderAlacrityDao;
 	@Autowired
@@ -287,50 +276,12 @@ public class OrderService {
 	@Transactional
 	public JSONObject getGeodata(JSONObject getGeodataJsonObject) throws DeviceNotFoundException,
 			OrderNotFoundException, ParseException {
-		String apiId = getGeodataJsonObject.optString("apiId");
-		Device device = deviceDao.get(apiId);
-		if (device == null) {
-			throw new DeviceNotFoundException(apiId);
-		}
-
 		String orderUuid = getGeodataJsonObject.optString("orderId");
-		Order order = orderDao.get(orderUuid);
-		if (order == null) {
-			throw new OrderNotFoundException(orderUuid);
-		}
-
-		if (!order.getDevice().getApiId().equals(apiId)) {
-			throw new OrderNotFoundException(orderUuid);
-		}
-
-		String lastDate = getGeodataJsonObject.optString("lastDate");
-		List<GeoData> geoDataList = null;
-
-		if (lastDate.isEmpty()) {
-			geoDataList = geoDataDao.getAll(order);
-		} else {
-			Date date = null;
-			date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(lastDate);
-			geoDataList = geoDataDao.getAll(order, date);
-		}
-
 		JSONObject geoDataJson = new JSONObject();
-		geoDataJson.put("orderId", order.getUuid());
+		geoDataJson.put("orderId", orderUuid);
 
 		JSONArray geoPointsArrayJson = new JSONArray();
-		for (GeoData currentPoint : geoDataList) {
-
-			JSONObject currentPointJson = new JSONObject();
-			currentPointJson.put("lat", currentPoint.getLat());
-			currentPointJson.put("lon", currentPoint.getLon());
-			currentPointJson.put("direction", currentPoint.getDirection());
-			currentPointJson.put("speed", currentPoint.getSpeed());
-			currentPointJson.put("category", currentPoint.getCategory());
-			currentPointJson.put("date", currentPoint.getDate());
-			geoPointsArrayJson.put(currentPointJson);
-		}
 		geoDataJson.put("points", geoPointsArrayJson);
-
 		return geoDataJson;
 	}
 
@@ -363,9 +314,10 @@ public class OrderService {
 		alacrity.setDate(new Date());
 		alacrityDao.save(alacrity);
 	}
-	
+
 	@Transactional
-	public void setNewcar(String brokerApiId, String brokerApiKey, String orderUuid, String newcar) throws BrokerNotFoundException, OrderNotFoundException {
+	public void setNewcar(String brokerApiId, String brokerApiKey, String orderUuid, String newcar)
+			throws BrokerNotFoundException, OrderNotFoundException {
 		Broker broker = brokerDao.getByApiId(brokerApiId);
 		if (broker == null) {
 			throw new BrokerNotFoundException(brokerApiId);
@@ -383,7 +335,7 @@ public class OrderService {
 		if (!order.getBroker().getId().equals(broker.getId())) {
 			throw new OrderNotFoundException(orderUuid);
 		}
-		
+
 		order.setCarUuid(newcar);
 		orderDao.saveOrUpdate(order);
 	}
@@ -415,35 +367,31 @@ public class OrderService {
 		status.setStatus(defineOrderStatusType(newStatus));
 		status.setStatusDescription(statusParams);
 		orderStatusDao.save(status);
-
-		if (OrderStatusType.EndProcessingStatus(status.getStatus())) {
-			geoDataProcessing.removeActual(status.getOrder().getId());
-		}
 	}
-	
+
 	private OrderStatusType defineOrderStatusType(String status) {
 		OrderStatusType orderStatusType;
 		switch (status) {
 		case "driving":
 			orderStatusType = OrderStatusType.Driving;
 			break;
-			
+
 		case "waiting":
 			orderStatusType = OrderStatusType.Waiting;
 			break;
-			
+
 		case "transporting":
 			orderStatusType = OrderStatusType.Transporting;
 			break;
-			
+
 		case "complete":
 			orderStatusType = OrderStatusType.Completed;
 			break;
-			
+
 		case "cancelled":
 			orderStatusType = OrderStatusType.Cancelled;
 			break;
-			
+
 		case "failed":
 			orderStatusType = OrderStatusType.Failed;
 			break;
@@ -452,51 +400,8 @@ public class OrderService {
 			orderStatusType = null;
 			break;
 		}
-		
+
 		return orderStatusType;
-	}
-
-	@Transactional
-	public void setGeoData(String brokerApiId, String brokerApiKey, String orderUuid, String category,
-			String direction, String lat, String lon, String speed) throws BrokerNotFoundException,
-			OrderNotFoundException {
-		Broker broker = brokerDao.getByApiId(brokerApiId);
-		if (broker == null) {
-			throw new BrokerNotFoundException(brokerApiId);
-		}
-
-		if (!broker.getApiKey().equals(brokerApiKey)) {
-			throw new BrokerNotFoundException(brokerApiId);
-		}
-
-		Order order = orderDao.get(orderUuid);
-		if (order == null) {
-			throw new OrderNotFoundException(orderUuid);
-		}
-
-		if (!order.getBroker().getId().equals(broker.getId())) {
-			throw new OrderNotFoundException(orderUuid);
-		}
-
-		GeoData geoData = new GeoData();
-		geoData.setOrder(order);
-		geoData.setDate(new Date());
-		geoData.setLat(Double.parseDouble(lat.replace(',', '.')));
-		geoData.setLon(Double.parseDouble(lon.replace(',', '.')));
-
-		if (category != null && !category.isEmpty()) {
-			geoData.setCategory(category);
-		}
-
-		if (direction != null && !direction.isEmpty()) {
-			geoData.setDirection(Integer.parseInt(direction));
-		}
-
-		if (speed != null && !speed.isEmpty()) {
-			geoData.setSpeed(Double.parseDouble(speed.replace(',', '.')));
-		}
-
-		geoDataProcessing.addGeoData(geoData);
 	}
 
 	@Transactional
@@ -629,42 +534,8 @@ public class OrderService {
 				continue;
 			}
 			String url = currentOffer.getBroker().getApiurl() + "/1.x/cancelrequest";
-			sendHttpGet(url, params);
+			HttpUtils.sendHttpGet(url, params);
 		}
-	}
-
-	// sending HTTP GET request
-	private int sendHttpGet(String url, String params) {
-
-		String protocol = url.split(":")[0];
-		String[] fullAddress = url.split("//")[1].split("/", 2);
-		String address = fullAddress[0];
-		String path = "/" + fullAddress[1];
-
-		int responseCode = 0;
-
-		try {
-			URI uriObject = new URI(protocol, address, path, params, null);
-
-			URL obj = uriObject.toURL();
-			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-			connection.setRequestMethod("GET");
-
-			responseCode = connection.getResponseCode();
-		} catch (Exception ex) {
-
-			System.out.println("Sending HTTP GET to: " + url + " FAILED, error: " + ex.toString());
-			responseCode = -1;
-		}
-
-		return responseCode;
-	}
-
-	@Transactional
-	public void deleteOrder(Long orderId) {
-		Order order = orderDao.get(orderId);
-		orderDao.delete(order);
 	}
 
 	@Transactional

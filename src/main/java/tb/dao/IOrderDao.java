@@ -15,8 +15,6 @@ public interface IOrderDao {
 
 	void save(Order order);
 
-	void delete(Order order);
-
 	void saveOrUpdate(Order order);
 
 	Long getAllOrdersCount();

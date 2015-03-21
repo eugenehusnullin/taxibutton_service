@@ -3,7 +3,6 @@ package tb.admin;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
@@ -16,6 +15,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -27,11 +27,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb.admin.model.AlacrityModel;
-import tb.admin.model.GeodataModel;
 import tb.admin.model.OrderModel;
 import tb.admin.model.OrderStatusModel;
 import tb.service.BrokerService;
-import tb.service.GeodataService;
 import tb.service.OrderService;
 import tb.utils.DatetimeUtils;
 import tb.utils.HttpUtils;
@@ -44,57 +42,27 @@ public class OrderController {
 	private OrderService orderService;
 	@Autowired
 	private BrokerService brokerService;
-	@Autowired
-	private GeodataService geodataService;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(HttpServletRequest request, Model model) {
-
-		String orderField = null;
-		String orderDirection = null;
 		int start = 0;
-		int count = 0;
-
-		if (request.getParameter("orderField") == null) {
-			orderField = "bookingDate";
-		} else {
-			orderField = request.getParameter("orderField");
-		}
-
-		if (request.getParameter("orderDirection") == null) {
-			orderDirection = "desc";
-		} else {
-			orderDirection = request.getParameter("orderDirection");
-		}
-
 		if (request.getParameter("start") == null) {
 			start = 0;
 		} else {
 			start = Integer.parseInt(request.getParameter("start"));
 		}
 
-		if (request.getParameter("count") == null) {
-			count = 10;
-		} else {
-			count = Integer.parseInt(request.getParameter("count"));
-		}
-
-		List<OrderModel> orderList = orderService.listByPage(orderField, orderDirection, start, count);
+		List<OrderModel> orderList = orderService.listByPage("id", "desc", start, 10);
 		Long allOrdersCount = orderService.getAllCount();
-
-		int pagesCount = (int) Math.ceil(allOrdersCount / (double) count);
+		int pagesCount = (int) Math.ceil(allOrdersCount / (double) 10);
 		int[] pages = new int[pagesCount];
-
 		for (int i = 0; i < pagesCount; i++) {
-			pages[i] = i + 1;
+			pages[i] = 10 * i + 1;
 		}
 
 		model.addAttribute("orders", orderList);
 		model.addAttribute("pages", pages);
-		model.addAttribute("orderField", orderField);
-		model.addAttribute("orderDirection", orderDirection);
 		model.addAttribute("start", start);
-		model.addAttribute("count", count);
 		return "order/list";
 	}
 
@@ -176,55 +144,6 @@ public class OrderController {
 		return "redirect:list";
 	}
 
-	@RequestMapping(value = "/setGeoData", method = RequestMethod.GET)
-	public String setGeoData(@RequestParam("id") Long orderId, Model model) {
-
-		model.addAttribute("orderId", orderId);
-		return "order/setGeoData";
-	}
-
-	@RequestMapping(value = "/setGeoData", method = RequestMethod.POST)
-	public String setGeoData(HttpServletRequest request) throws IOException, URISyntaxException {
-
-		String url = HttpUtils.getApplicationUrl(request).concat("/apibroker/order/setGeoData");
-		URL obj = new URL(url);
-		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-		String params = "orderId=" + request.getParameter("orderId") + "&apiId=" + request.getParameter("apiId")
-				+ "&apiKey=" + request.getParameter("apiKey") + "&lon=" + request.getParameter("lon") + "&lat="
-				+ request.getParameter("lat");
-
-		if (request.getParameter("direction") != null) {
-			params += "&direction=" + request.getParameter("direction");
-		}
-
-		if (request.getParameter("speed") != null) {
-			params += "&speed=" + request.getParameter("speed");
-		}
-
-		if (request.getParameter("category") != null) {
-			params += "&category=" + request.getParameter("category");
-		}
-
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		connection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
-
-		connection.setDoOutput(true);
-
-		DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
-		outputStream.writeBytes(params);
-		outputStream.flush();
-		outputStream.close();
-
-		@SuppressWarnings("unused")
-		int responseCode = connection.getResponseCode();
-
-		return "redirect:list";
-	}
-
 	@RequestMapping(value = "/getStatus", method = RequestMethod.GET)
 	public String getStatus(@RequestParam("id") Long orderId, Model model) {
 
@@ -262,9 +181,9 @@ public class OrderController {
 
 			if (responceCode != 200) {
 				model.addAttribute("result",
-						"Error sending order to server: " + getStringFromInputStream(connection.getInputStream()));
+						"Error sending order to server: " + IOUtils.toString(connection.getInputStream()));
 			} else {
-				model.addAttribute("result", getStringFromInputStream(connection.getInputStream()));
+				model.addAttribute("result", IOUtils.toString(connection.getInputStream()));
 			}
 
 		} catch (Exception ex) {
@@ -274,70 +193,12 @@ public class OrderController {
 		return "result";
 	}
 
-	@RequestMapping(value = "/getGeoData", method = RequestMethod.GET)
-	public String getGeoData(@RequestParam("id") Long orderId, Model model) {
-
-		model.addAttribute("orderId", orderId);
-		return "order/getGeoData";
-	}
-
-	@RequestMapping(value = "/getGeoData", method = RequestMethod.POST)
-	public String getGeoData(HttpServletRequest request, @RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId,
-			@RequestParam("lastDate") String lastDate, Model model) {
-
-		OrderModel orderModel = orderService.getOrder(orderId);
-		JSONObject getGeoDataJson = new JSONObject();
-
-		getGeoDataJson.put("apiId", apiId);
-		getGeoDataJson.put("orderId", orderModel.getUuid());
-		getGeoDataJson.put("lastDate", lastDate);
-
-		try {
-			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/geodata");
-			URL obj = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-			connection.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-
-			wr.writeBytes(getGeoDataJson.toString());
-			wr.flush();
-			wr.close();
-
-			int responceCode = connection.getResponseCode();
-
-			if (responceCode != 200) {
-				System.out.println("Error sending order to server");
-			}
-
-			model.addAttribute("result", getStringFromInputStream(connection.getInputStream()));
-
-		} catch (Exception ex) {
-			System.out.println("Error getting order status: " + ex.toString());
-		}
-
-		return "result";
-	}
-
-	@RequestMapping(value = "/showStatus", method = RequestMethod.GET)
-	public String showStatus(@RequestParam("id") Long orderId, Model model) {
+	@RequestMapping(value = "/showStatuses", method = RequestMethod.GET)
+	public String showStatuses(@RequestParam("id") Long orderId, Model model) {
 		List<OrderStatusModel> statusList = orderService.getStatuses(orderId);
 		model.addAttribute("statusList", statusList);
 
 		return "order/statusList";
-	}
-
-	@RequestMapping(value = "/showGeoData", method = RequestMethod.GET)
-	public String showGeoData(@RequestParam("id") Long orderId, Model model) {
-
-		List<GeodataModel> list = geodataService.getGeodata(orderId);
-		model.addAttribute("geoList", list);
-		return "order/geoList";
 	}
 
 	@RequestMapping(value = "/cancel", method = RequestMethod.GET)
@@ -393,7 +254,7 @@ public class OrderController {
 	public String create(Model model) {
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		long t = Calendar.getInstance().getTime().getTime() + (10 * 60000);
-		model.addAttribute("now_time", 
+		model.addAttribute("now_time",
 				df.format(DatetimeUtils.localTimeToOtherTimeZone(new Date(t), DatetimeUtils.TIMEZONEID_UTC)));
 		model.addAttribute("brokers", brokerService.getAll());
 		return "order/create";
@@ -526,30 +387,5 @@ public class OrderController {
 		}
 
 		return "result";
-	}	
-
-	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public String delete(@RequestParam("id") Long orderId) {
-		orderService.deleteOrder(orderId);
-		return "redirect:list";
-	}
-
-	private String getStringFromInputStream(InputStream stream) {
-
-		StringBuffer stringBuffer = new StringBuffer();
-		String line = null;
-
-		try {
-
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
-
-			while ((line = bufferedReader.readLine()) != null) {
-				stringBuffer.append(line);
-			}
-		} catch (Exception ex) {
-			System.out.println("Error greating string from input stream: " + ex.toString());
-		}
-
-		return stringBuffer.toString();
 	}
 }

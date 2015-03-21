@@ -35,11 +35,6 @@ public class OrderDao implements IOrderDao {
 	}
 
 	@Override
-	public void delete(Order order) {
-		sessionFactory.getCurrentSession().delete(order);
-	}
-
-	@Override
 	public Order get(String uuid) {
 		return (Order) sessionFactory.getCurrentSession().createCriteria(Order.class)
 				.add(Restrictions.eq("uuid", uuid)).uniqueResult();
@@ -56,8 +51,12 @@ public class OrderDao implements IOrderDao {
 			orderBy = org.hibernate.criterion.Order.desc(orderField);
 		}
 
-		return sessionFactory.getCurrentSession().createCriteria(Order.class).addOrder(orderBy).setFirstResult(start)
-				.setMaxResults(count).list();
+		return sessionFactory.getCurrentSession()
+				.createCriteria(Order.class)
+				.addOrder(orderBy)
+				.setFirstResult(start)
+				.setMaxResults(count)
+				.list();
 	}
 
 	@Override
