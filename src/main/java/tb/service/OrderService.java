@@ -357,7 +357,7 @@ public class OrderService {
 			throw new OrderNotFoundException(orderUuid);
 		}
 
-		if (!order.getBroker().getId().equals(broker.getId())) {
+		if (order.getBroker() == null || !order.getBroker().getId().equals(broker.getId())) {
 			throw new OrderNotFoundException(orderUuid);
 		}
 

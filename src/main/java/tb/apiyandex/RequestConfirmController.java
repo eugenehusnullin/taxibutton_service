@@ -19,6 +19,7 @@ public class RequestConfirmController {
 	private OrderService orderService;
 
 	@RequestMapping(value = "")
+	//, method = RequestMethod.POST)
 	public void index(HttpServletRequest request, HttpServletResponse response) {
 		String clid = request.getParameter("clid");
 		String apikey = request.getParameter("apikey");

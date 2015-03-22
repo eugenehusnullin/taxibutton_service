@@ -32,34 +32,10 @@
 			value="/WEB-INF/dev/views/order/cancel.jsp" />
 	</definition>
 	
-	<definition name="order/geoList" extends="default">
-		<put-attribute name="title" value="Orders list" />
-		<put-attribute name="body"
-			value="/WEB-INF/dev/views/order/geoList.jsp" />
-	</definition>
-	
-	<definition name="order/getGeoData" extends="default">
-		<put-attribute name="title" value="Get geo data" />
-		<put-attribute name="body"
-			value="/WEB-INF/dev/views/order/getGeoData.jsp" />
-	</definition>
-	
 	<definition name="order/getStatus" extends="default">
 		<put-attribute name="title" value="Get status" />
 		<put-attribute name="body"
 			value="/WEB-INF/dev/views/order/getStatus.jsp" />
-	</definition>
-	
-	<definition name="order/give" extends="default">
-		<put-attribute name="title" value="Give order to broker" />
-		<put-attribute name="body"
-			value="/WEB-INF/dev/views/order/give.jsp" />
-	</definition>
-	
-	<definition name="order/setGeoData" extends="default">
-		<put-attribute name="title" value="Send order geo data" />
-		<put-attribute name="body"
-			value="/WEB-INF/dev/views/order/setGeoData.jsp" />
 	</definition>
 	
 	<definition name="order/setStatus" extends="default">
@@ -72,12 +48,6 @@
 		<put-attribute name="title" value="Status list" />
 		<put-attribute name="body"
 			value="/WEB-INF/dev/views/order/statusList.jsp" />
-	</definition>
-	
-	<definition name="order/view" extends="default">
-		<put-attribute name="title" value="Order view" />
-		<put-attribute name="body"
-			value="/WEB-INF/dev/views/order/view.jsp" />
 	</definition>
 	
 	

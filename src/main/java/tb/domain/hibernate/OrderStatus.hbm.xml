@@ -11,7 +11,7 @@
 		<many-to-one name="order" class="tb.domain.order.Order">
 			<column name="orderId" />
 		</many-to-one>
-		<property name="status">
+		<property name="status" not-null="true">
 			<type name="org.hibernate.type.EnumType">
 				<param name="enumClass">tb.domain.order.OrderStatusType</param>
 			</type>

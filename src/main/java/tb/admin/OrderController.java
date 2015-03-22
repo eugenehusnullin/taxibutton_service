@@ -105,39 +105,43 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/setStatus", method = RequestMethod.GET)
-	public String sendStatus(@RequestParam("id") Long orderId, Model model) {
+	public String setStatus(@RequestParam("id") Long orderId, Model model) {
 		model.addAttribute("orderId", orderId);
 		return "order/setStatus";
 	}
 
 	@RequestMapping(value = "/setStatus", method = RequestMethod.POST)
-	public String sendStatus(HttpServletRequest request, @RequestParam("orderId") Long orderId,
-			@RequestParam("apiId") String apiId,
-			@RequestParam("apiKey") String apiKey, @RequestParam("status") String status) throws IOException,
+	public String setStatus(HttpServletRequest request) throws IOException,
 			URISyntaxException {
 
-		OrderModel orderModel = orderService.getOrder(orderId);
+		String clid = request.getParameter("clid");
+		String apikey = request.getParameter("apikey");
+		Long orderId = Long.parseLong(request.getParameter("id"));
+		String status = request.getParameter("status");
+		String extra = request.getParameter("extra");
+		String newcar = request.getParameter("newcar");
 
-		String url = HttpUtils.getApplicationUrl(request).concat("/1.x/setStatus");
+		OrderModel orderModel = orderService.getOrder(orderId);
+		String params = "orderid=" + orderModel.getUuid() + "&clid=" + clid + "&apikey=" + apikey;
+		if (newcar != null && !newcar.isEmpty()) {
+			params += "&newcar=" + newcar;
+		} else {
+			params += "&status=" + status + "&extra=" + extra;
+		}
+
+		String url = HttpUtils.getApplicationUrl(request).concat("/1.x/requestconfirm");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-		String params = "orderid=" + orderModel.getUuid() + "&clid=" + apiId + "&apikey=" + apiKey + "&status="
-				+ status;
-
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 		connection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
-
 		connection.setDoOutput(true);
-
 		DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-
 		outputStream.writeBytes(params);
 		outputStream.flush();
 		outputStream.close();
-
+		
 		@SuppressWarnings("unused")
 		int responseCode = connection.getResponseCode();
 

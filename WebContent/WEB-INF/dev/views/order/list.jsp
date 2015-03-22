@@ -40,7 +40,8 @@
 				</tr>
 				<tr>
 					<td>taxi actions:</td>
-					<td><a href="alacrity?id=${order.getId()}">Alacrity</a></td>
+					<td><a href="alacrity?id=${order.getId()}">alacrity</a> | <a href="setStatus?id=${order.getId()}">set status</a>
+					</td>
 				</tr>
 			</c:forEach>
 		</tbody>
