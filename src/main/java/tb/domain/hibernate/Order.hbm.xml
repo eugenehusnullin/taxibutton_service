@@ -38,12 +38,6 @@
 			</key>
 			<one-to-many class="tb.domain.order.OrderCancel" />
 		</set>
-		<set name="geoData" cascade="all">
-			<key>
-				<column name="orderId" />
-			</key>
-			<one-to-many class="tb.domain.order.GeoData" />
-		</set>
 		<set name="offerBrokerList" cascade="delete" table="offerbroker">
 			<key>
 				<column name="orderId" />

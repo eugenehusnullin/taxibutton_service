@@ -12,7 +12,6 @@
 		<mapping resource="tb/domain/hibernate/Order.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/OrderAcceptAlacrity.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/OrderStatus.hbm.xml" />
-		<mapping resource="tb/domain/hibernate/GeoData.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/OrderCancel.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/Device.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/OfferedOrderBroker.hbm.xml" />

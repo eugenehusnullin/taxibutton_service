@@ -3,6 +3,7 @@ package tb.service;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -25,5 +26,11 @@ public class Starter {
 		Date d = new Date(new Date().getTime() + (2 * 60 * 1000));
 		taskScheduler.schedule(carSynch::synch, d);
 		taskScheduler.schedule(tariffSynch::synch, d);
+	}
+	
+	@PreDestroy
+	public void stop() {
+		taskScheduler.shutdown();
+		taskScheduler.destroy();
 	}
 }
