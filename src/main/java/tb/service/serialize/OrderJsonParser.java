@@ -78,21 +78,15 @@ public class OrderJsonParser {
 				for (int i = 0; i < requirementsJson.length(); i++) {
 					JSONObject requirementJson = requirementsJson.getJSONObject(i);
 					Requirement currentRequirement = new Requirement();
-					String name = null;
-					String value = null;
 
 					try {
-						name = requirementJson.getString("name");
-						value = requirementJson.getString("value");
+						String name = YandexOrderSerializer.defineRequireName(requirementJson.getString("name"));
+						currentRequirement.setType(name);
+						currentRequirement.setOptions(requirementJson.getString("value"));
 					} catch (JSONException ex) {
 						throw new ParseOrderException("requirement bad. " + ex.toString());
 					}
 
-					if (!value.equals("yes")) {
-						currentRequirement.setOptions(value);
-					}
-
-					currentRequirement.setType(name);
 					currentRequirement.setOrder(order);
 					requirements.add(currentRequirement);
 				}

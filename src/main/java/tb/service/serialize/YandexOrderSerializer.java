@@ -240,7 +240,7 @@ public class YandexOrderSerializer {
 		return carsElement;
 	}
 
-	private static String defineRequireName(String old) {
+	public static String defineRequireName(String old) {
 		String requireName = null;
 
 		switch (old) {

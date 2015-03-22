@@ -76,13 +76,18 @@ public class OfferingOrder {
 		}
 
 		// define is notlater order
-		List<CarState> carStates = carDao.getNearCarStates(order.getSource().getLat(), order.getSource().getLon(),
-				COORDINATES_COEF * (order.getNotlater() ? cntAttempt : 4), limitBrokerIds);
+		List<CarState> carStates = carDao.getNearCarStates(
+				order.getSource().getLat(),
+				order.getSource().getLon(),
+				COORDINATES_COEF * (order.getNotlater() ? cntAttempt : 10),
+				limitBrokerIds);
+
 		Map<Long, Document> messages4Send = null;
 		if (order.getNotlater()) {
-			messages4Send = notlaterOffer(order, carStates);
+			carStates = carDao.getCarStatesByRequirements(carStates, order.getRequirements());
+			messages4Send = createNotlaterOffer(order, carStates);
 		} else {
-			messages4Send = exactOffer(order, carStates);
+			messages4Send = createExactOffer(order, carStates);
 		}
 
 		return makeOffer(messages4Send, order);
@@ -113,7 +118,7 @@ public class OfferingOrder {
 		return result;
 	}
 
-	private Map<Long, Document> exactOffer(Order order, List<CarState> carStates) {
+	private Map<Long, Document> createExactOffer(Order order, List<CarState> carStates) {
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
 		List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct().collect(Collectors.toList());
 		for (Long brokerId : brokerIdsList) {
@@ -127,7 +132,7 @@ public class OfferingOrder {
 		return messagesMap;
 	}
 
-	private Map<Long, Document> notlaterOffer(Order order, List<CarState> carStates) {
+	private Map<Long, Document> createNotlaterOffer(Order order, List<CarState> carStates) {
 		double lat = order.getSource().getLat();
 		double lon = order.getSource().getLon();
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();

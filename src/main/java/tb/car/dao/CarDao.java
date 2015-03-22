@@ -1,7 +1,9 @@
 package tb.car.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -16,6 +18,7 @@ import tb.car.domain.Car;
 import tb.car.domain.CarState;
 import tb.car.domain.CarStateEnum;
 import tb.domain.Broker;
+import tb.domain.order.Requirement;
 
 @Service
 public class CarDao {
@@ -121,6 +124,29 @@ public class CarDao {
 		}
 
 		return list;
+	}
+	
+	@Transactional(value = "inmemDbTm")
+	public List<CarState> getCarStatesByRequirements(List<CarState> carStates, Set<Requirement> reqs) {		
+		if (reqs == null || reqs.size() == 0) {
+			return carStates;
+		}
+		
+		List<String> reqsKeys = reqs.stream().map(p -> p.getType()).collect(Collectors.toList());
+		Session session = sessionFactory.getCurrentSession();
+		List<CarState> filteredCarStates = new ArrayList<CarState>(); 
+		for(CarState carState : carStates) {
+			Car car = (Car) session.createCriteria(Car.class)
+					.add(Restrictions.eq("brokerId", carState.getBrokerId()))
+					.add(Restrictions.eq("uuid", carState.getUuid()))
+					.uniqueResult();
+			
+			boolean b = reqsKeys.stream().allMatch(p -> car.getCarRequires().containsKey(p));
+			if (b) {
+				filteredCarStates.add(carState);
+			}
+		}
+		return filteredCarStates;
 	}
 
 	@Transactional(value = "inmemDbTm")
