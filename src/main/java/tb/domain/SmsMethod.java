@@ -1,5 +1,5 @@
 package tb.domain;
 
 public enum SmsMethod {
-	sms48, self
+	sms48, self, crm
 }

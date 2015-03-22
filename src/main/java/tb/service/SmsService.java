@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import tb.domain.SmsMethod;
 import tb.utils.Sms48;
+import tb.utils.SmsCrm;
 import tb.utils.SmsSelf;
 
 @Service
@@ -14,6 +15,8 @@ public class SmsService {
 	private Sms48 sms48;
 	@Autowired
 	private SmsSelf smsSelf;
+	@Autowired
+	private SmsCrm smsCrm;
 
 	@Value("#{mainSettings['device.registration.smsmethod']}")
 	private String smsMethodSetting;
@@ -28,6 +31,10 @@ public class SmsService {
 
 		case sms48:
 			sms48.send(phoneNumber, message);
+			break;
+			
+		case crm:
+			smsCrm.send(phoneNumber, message);
 			break;
 
 		default:

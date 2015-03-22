@@ -65,3 +65,4 @@ sms48.login=login
 sms48.pass=pass
 sms48.sender=knopka
 
+smscrm.request=http://crm.podglonass.ru/engine/ajax/crm/index.php?mod=smsgateway
