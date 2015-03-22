@@ -1,4 +1,0 @@
-sms48.request=http://sms48.ru/send_sms.php?api_login=[login]&to=[reciever]&from=[sender]&msg=[msg]&check3=[md5]
-sms48.login=login
-sms48.pass=pass
-sms48.sender=knopka

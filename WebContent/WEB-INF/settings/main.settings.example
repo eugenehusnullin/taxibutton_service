@@ -12,3 +12,56 @@ createorder.limit=180000
 
 device.registration.smsmethod=self
 ;device.registration.smsmethod=sms48
+
+;run synch cars and tariffs after application start in seconds
+starter.runsynch.seconds=60
+
+
+
+;;;;JDBC
+; file with examples
+; hibernate update structure
+hibernate.hbm2ddl.auto=update
+
+; hibernate recreate structure
+hibernate.hbm2ddl.auto=create-drop
+
+
+; HSQLDB in memory
+jdbc.driverClassName=org.hsqldb.jdbcDriver
+jdbc.url=jdbc:hsqldb:mem:tb
+jdbc.username=sa
+jdbc.password=
+hibernate.dialect=org.hibernate.dialect.HSQLDialect
+hibernate.show_sql=true
+hibernate.hbm2ddl.auto=create-drop
+
+; HSQLDB on disk
+jdbc.driverClassName=org.hsqldb.jdbcDriver
+jdbc.url=jdbc:hsqldb:file:D:/db_data/hsqldb/tb/tb
+jdbc.username=sa
+jdbc.password=
+hibernate.dialect=org.hibernate.dialect.HSQLDialect
+hibernate.show_sql=true
+hibernate.hbm2ddl.auto=create-drop
+
+
+; POSTGRES
+jdbc.driverClassName=org.postgresql.Driver
+jdbc.url=jdbc:postgresql://localhost:5432/tb
+jdbc.username=tb
+jdbc.password=tb
+hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect
+hibernate.show_sql=true
+hibernate.hbm2ddl.auto=create-drop
+
+
+
+
+
+;;;;;;;;;;;SMS
+sms48.request=http://sms48.ru/send_sms.php?api_login=[login]&to=[reciever]&from=[sender]&msg=[msg]&check3=[md5]
+sms48.login=login
+sms48.pass=pass
+sms48.sender=knopka
+

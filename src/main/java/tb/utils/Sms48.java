@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class Sms48 {
 
-	@Value("#{sms48Settings['sms48.request']}")
+	@Value("#{mainSettings['sms48.request']}")
 	private String request;
-	@Value("#{sms48Settings['sms48.login']}")
+	@Value("#{mainSettings['sms48.login']}")
 	private String login;
-	@Value("#{sms48Settings['sms48.pass']}")
+	@Value("#{mainSettings['sms48.pass']}")
 	private String pass;
-	@Value("#{sms48Settings['sms48.sender']}")
+	@Value("#{mainSettings['sms48.sender']}")
 	private String sender;
 
 	public void send(String reciever, String msg) {

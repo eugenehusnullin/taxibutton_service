@@ -9,9 +9,9 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd 
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-	<context:property-placeholder location="WEB-INF\settings\jdbc.settings" />
 	<util:properties id="mainSettings" location="WEB-INF\settings\main.settings"></util:properties>
-	<util:properties id="sms48Settings" location="WEB-INF\settings\sms48.settings"></util:properties>
+	<context:property-placeholder location="WEB-INF\settings\main.settings" />
+
 
 	<bean id="tbDS" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="${jdbc.driverClassName}" />
