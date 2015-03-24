@@ -10,5 +10,7 @@ public interface ITariffDao {
 
 	void saveOrUpdate(Tariff tariff);
 
-	public List<Tariff> getAll();
+	List<Tariff> getAll();
+	
+	void deleteAll();
 }

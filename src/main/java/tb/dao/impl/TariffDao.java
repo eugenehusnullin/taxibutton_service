@@ -37,4 +37,10 @@ public class TariffDao implements ITariffDao {
 	public void saveOrUpdate(Tariff tariff) {
 		sessionFactory.getCurrentSession().saveOrUpdate(tariff);
 	}
+
+	@Override
+	public void deleteAll() {
+		String hqlDelete = "delete Tariff";
+		sessionFactory.getCurrentSession().createQuery(hqlDelete).executeUpdate();		
+	}
 }

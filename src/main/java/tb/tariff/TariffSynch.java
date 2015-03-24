@@ -1,6 +1,7 @@
 package tb.tariff;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -19,14 +20,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import tb.dao.IBrokerDao;
 import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Tariff;
-import tb.utils.XmlUtils;
+import tb.domain.TariffType;
 
 @Service
 @EnableScheduling
@@ -44,14 +44,22 @@ public class TariffSynch {
 	public void synch() {
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
-			Document doc = fetchTariffs(broker);
-			if (doc != null) {
+			if (broker.getTariffUrl() == null || broker.getTariffUrl().isEmpty()) {
+				continue;
+			}
+			InputStream inputStream = fetchTariffs(broker.getTariffUrl());
+			if (inputStream != null) {
 				Date loadDate = new Date();
 				List<Tariff> tariffs;
 				try {
-					tariffs = tariffBuilder.createTariffs(doc, broker, loadDate);
+					if (broker.getTariffType() == TariffType.XML) {
+						tariffs = tariffBuilder.createTariffsFromXml(inputStream, broker, loadDate);
+					} else {
+						tariffs = tariffBuilder.createTariffsFromJson(inputStream, broker, loadDate);
+					}
 					updateTariffs(tariffs, broker, loadDate);
-				} catch (TransformerFactoryConfigurationError | TransformerException e) {
+				} catch (TransformerFactoryConfigurationError | TransformerException | ParserConfigurationException
+						| SAXException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -60,26 +68,23 @@ public class TariffSynch {
 	}
 
 	private void updateTariffs(List<Tariff> tariffs, Broker broker, Date loadDate) {
+		tariffDao.deleteAll();
 		for (Tariff tariff : tariffs) {
 			tariffDao.saveOrUpdate(tariff);
 		}
 	}
 
-	private Document fetchTariffs(Broker broker) {
+	private InputStream fetchTariffs(String tariffUrl) {
 		try {
-			if (broker.getTariffUrl() == null || broker.getTariffUrl().isEmpty()) {
-				return null;
-			}
-			URL url = new URL(broker.getTariffUrl());
+			URL url = new URL(tariffUrl);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/xml");
 
 			if (conn.getResponseCode() == 200) {
-				Document doc = XmlUtils.buildDomDocument(conn.getInputStream());
-				return doc;
+				return conn.getInputStream();
 			} else {
-				log.warn(String.format("Disp - %s don't response to tariff request. Error code: %d", broker.getName(),
+				log.warn(String.format("Disp - %s don't response to tariff request. Error code: %d", tariffUrl,
 						conn.getResponseCode()));
 			}
 		} catch (MalformedURLException e) {
@@ -88,10 +93,6 @@ public class TariffSynch {
 			log.error("url creation error.", e);
 		} catch (IOException e) {
 			log.error("open connection error.", e);
-		} catch (ParserConfigurationException e) {
-			log.error("create xml builder error.", e);
-		} catch (SAXException e) {
-			log.error("parse xml error.", e);
 		}
 		return null;
 	}
