@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import tb.domain.Broker;
 import tb.domain.SmsMethod;
+import tb.domain.TariffType;
 import tb.service.BrokerService;
 import tb.service.TariffService;
 
@@ -38,10 +39,12 @@ public class BrokerController {
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String create(@RequestParam("name") String name, @RequestParam("apiurl") String apiurl,
 			@RequestParam("apiId") String apiId, @RequestParam("apiKey") String apiKey,
-			@RequestParam("smsMethod") String smsMethod, @RequestParam("tariffurl") String tariffUrl,
+			@RequestParam("smsMethod") String smsMethod, @RequestParam("tarifftype") String tariffTypeParam,
+			@RequestParam("tariffurl") String tariffUrl,
 			@RequestParam("driverurl") String driverUrl, Model model) {
 
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
+		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
 
 		Broker broker = new Broker();
 		broker.setName(name);
@@ -51,6 +54,7 @@ public class BrokerController {
 		broker.setSmsMethod(smsM);
 		broker.setTariffUrl(tariffUrl);
 		broker.setDriverUrl(driverUrl);
+		broker.setTariffType(tariffType);
 		brokerService.add(broker);
 
 		return "redirect:list";
@@ -80,6 +84,7 @@ public class BrokerController {
 		model.addAttribute("name", broker.getName());
 		model.addAttribute("apiUrl", broker.getApiurl());
 		model.addAttribute("smsMethod", broker.getSmsMethod() == null ? -1 : broker.getSmsMethod().ordinal());
+		model.addAttribute("tarifftype", broker.getTariffType() == null ? -1 : broker.getTariffType().ordinal());
 
 		return "broker/edit";
 	}
@@ -87,10 +92,12 @@ public class BrokerController {
 	@RequestMapping(value = "/edit", method = RequestMethod.POST)
 	public String edit(@RequestParam("brokerId") Long brokerId, @RequestParam("apiId") String apiId,
 			@RequestParam("apiKey") String apiKey, @RequestParam("name") String name,
-			@RequestParam("apiUrl") String apiUrl, @RequestParam("smsMethod") String smsMethod) {
+			@RequestParam("apiUrl") String apiUrl, @RequestParam("smsMethod") String smsMethod,
+			@RequestParam("tarifftype") String tariffTypeParam) {
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
+		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
 
-		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM);
+		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM, tariffType);
 		return "redirect:list";
 	}
 }

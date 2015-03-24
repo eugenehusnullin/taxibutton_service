@@ -16,6 +16,7 @@ public class Broker {
 	private String driverUrl;
 	private Set<MapArea> mapAreas;
 	private SmsMethod smsMethod;
+	private TariffType tariffType;
 
 	public Long getId() {
 		return id;
@@ -95,5 +96,13 @@ public class Broker {
 
 	public void setDriverUrl(String driverUrl) {
 		this.driverUrl = driverUrl;
+	}
+
+	public TariffType getTariffType() {
+		return tariffType;
+	}
+
+	public void setTariffType(TariffType tariffType) {
+		this.tariffType = tariffType;
 	}
 }

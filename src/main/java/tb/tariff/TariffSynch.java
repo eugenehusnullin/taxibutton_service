@@ -67,6 +67,9 @@ public class TariffSynch {
 
 	private Document fetchTariffs(Broker broker) {
 		try {
+			if (broker.getTariffUrl() == null || broker.getTariffUrl().isEmpty()) {
+				return null;
+			}
 			URL url = new URL(broker.getTariffUrl());
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");

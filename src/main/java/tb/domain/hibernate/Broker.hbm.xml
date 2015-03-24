@@ -26,5 +26,11 @@
 				<param name="enumClass">tb.domain.SmsMethod</param>
 			</type>
 		</property>
+		
+		<property name="tariffType">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">tb.domain.TariffType</param>
+			</type>
+		</property>
 	</class>
 </hibernate-mapping>
