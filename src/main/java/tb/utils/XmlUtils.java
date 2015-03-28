@@ -46,10 +46,11 @@ public class XmlUtils {
 	public static String getElementContent(Element element, String elementName) {
 		NodeList nodeList = element.getElementsByTagName(elementName);
 		if (nodeList != null && nodeList.getLength() > 0) {
-			return nodeList.item(0).getFirstChild().getNodeValue();
-		} else {
-			return null;
+			if (nodeList.item(0).getFirstChild() != null) {
+				return nodeList.item(0).getFirstChild().getNodeValue();
+			}
 		}
+		return null;
 	}
 
 	public static Element getOneElement(Element element, String elementName) {
