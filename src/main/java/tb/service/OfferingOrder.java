@@ -55,7 +55,7 @@ public class OfferingOrder {
 	@Autowired
 	private IOfferedOrderBrokerDao offeredOrderBrokerDao;
 
-	private final static int NOTLATER_MINUTES = 25;
+	private final static int NOTLATER_MINUTES = 1;
 	private final static double COORDINATES_COEF = 0.03;
 	private final static int SPEED = 40;
 	private final static int MINUTE_IN_HOUR = 60;
@@ -82,12 +82,16 @@ public class OfferingOrder {
 				COORDINATES_COEF * (order.getNotlater() ? cntAttempt : 10),
 				limitBrokerIds);
 
+		// DEMO
+		//List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct().collect(Collectors.toList());
+		List<Long> brokerIdsList = brokerDao.getActive().stream().map(p -> p.getId()).collect(Collectors.toList());
+
 		Map<Long, Document> messages4Send = null;
 		if (order.getNotlater()) {
 			carStates = carDao.getCarStatesByRequirements(carStates, order.getRequirements());
-			messages4Send = createNotlaterOffer(order, carStates);
+			messages4Send = createNotlaterOffer(order, brokerIdsList, carStates);
 		} else {
-			messages4Send = createExactOffer(order, carStates);
+			messages4Send = createExactOffer(order, brokerIdsList);
 		}
 
 		return makeOffer(messages4Send, order);
@@ -118,9 +122,8 @@ public class OfferingOrder {
 		return result;
 	}
 
-	private Map<Long, Document> createExactOffer(Order order, List<CarState> carStates) {
+	private Map<Long, Document> createExactOffer(Order order, List<Long> brokerIdsList) {
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
-		List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct().collect(Collectors.toList());
 		for (Long brokerId : brokerIdsList) {
 			Broker broker = brokerDao.get(brokerId);
 			List<Tariff> tariffs = tariffDao.get(broker);
@@ -132,11 +135,10 @@ public class OfferingOrder {
 		return messagesMap;
 	}
 
-	private Map<Long, Document> createNotlaterOffer(Order order, List<CarState> carStates) {
+	private Map<Long, Document> createNotlaterOffer(Order order, List<Long> brokerIdsList, List<CarState> carStates) {
 		double lat = order.getSource().getLat();
 		double lon = order.getSource().getLon();
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
-		List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct().collect(Collectors.toList());
 		for (Long brokerId : brokerIdsList) {
 			List<CarState> filteredCarStates = carStates.stream()
 					.filter(p -> p.getBrokerId() == brokerId)
@@ -148,7 +150,7 @@ public class OfferingOrder {
 				car4Request.setUuid(carState.getUuid());
 				int dist = (int) calcDistance(lat, lon, carState.getLatitude(), carState.getLongitude());
 				car4Request.setDist(dist);
-				car4Request.setTime((dist * MINUTE_IN_HOUR) / SPEED );
+				car4Request.setTime((dist * MINUTE_IN_HOUR) / SPEED);
 				car4Request.setTariff(carDao.getFirstTariff(carState.getBrokerId(), carState.getUuid()));
 
 				car4RequestList.add(car4Request);
