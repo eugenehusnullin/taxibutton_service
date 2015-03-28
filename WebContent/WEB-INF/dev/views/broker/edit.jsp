@@ -15,7 +15,7 @@
 		<br/> tariff
 		<input type="radio" name="tarifftype" value="0" <c:if test="${tarifftype == 0}">checked</c:if> /> xml
 		<input type="radio" name="tarifftype" value="1" <c:if test="${tarifftype == 1}">checked</c:if> /> json
-		<br/>tariff url <input type="text" name="tariffurl" value="http://"/>
-		<br/>driver url <input type="text" name="driverurl" value="http://"/>
+		<br/>tariff url <input type="text" name="tariffUrl" value="${tariffUrl}"/>
+		<br/>driver url <input type="text" name="driverUrl" value="${driverUrl}"/>
 		<br /><input type="submit" value="Save" />
 	</form>

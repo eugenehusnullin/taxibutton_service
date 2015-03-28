@@ -51,7 +51,7 @@ public class BrokerService {
 
 	@Transactional
 	public void update(Long brokerId, String apiId, String apiKey, String name, String apiUrl, SmsMethod smsMethod,
-			TariffType tariffType) {
+			TariffType tariffType, String tariffUrl, String driverUrl) {
 		Broker broker = brokerDao.get(brokerId);
 
 		broker.setApiId(apiId);
@@ -60,6 +60,8 @@ public class BrokerService {
 		broker.setName(name);
 		broker.setSmsMethod(smsMethod);
 		broker.setTariffType(tariffType);
+		broker.setTariffUrl(tariffUrl);
+		broker.setDriverUrl(driverUrl);
 
 		brokerDao.saveOrUpdate(broker);
 	}

@@ -85,6 +85,8 @@ public class BrokerController {
 		model.addAttribute("apiUrl", broker.getApiurl());
 		model.addAttribute("smsMethod", broker.getSmsMethod() == null ? -1 : broker.getSmsMethod().ordinal());
 		model.addAttribute("tarifftype", broker.getTariffType() == null ? -1 : broker.getTariffType().ordinal());
+		model.addAttribute("driverUrl", broker.getDriverUrl());
+		model.addAttribute("tariffUrl", broker.getTariffUrl());
 
 		return "broker/edit";
 	}
@@ -93,11 +95,13 @@ public class BrokerController {
 	public String edit(@RequestParam("brokerId") Long brokerId, @RequestParam("apiId") String apiId,
 			@RequestParam("apiKey") String apiKey, @RequestParam("name") String name,
 			@RequestParam("apiUrl") String apiUrl, @RequestParam("smsMethod") String smsMethod,
-			@RequestParam("tarifftype") String tariffTypeParam) {
+			@RequestParam("tarifftype") String tariffTypeParam,
+			@RequestParam("tariffUrl") String tariffUrl,
+			@RequestParam("driverUrl") String driverUrl) {
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
 
-		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM, tariffType);
+		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM, tariffType, tariffUrl, driverUrl);
 		return "redirect:list";
 	}
 }
