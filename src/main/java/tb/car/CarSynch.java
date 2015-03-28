@@ -39,7 +39,7 @@ public class CarSynch {
 	private CarDao carDao;
 
 	@Transactional
-	@Scheduled(cron = "0 01 * * * *")
+	@Scheduled(cron = "0 0/2 * * * *")
 	public void synch() {
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {

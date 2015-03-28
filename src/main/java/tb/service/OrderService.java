@@ -2,6 +2,7 @@ package tb.service;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,6 +28,7 @@ import tb.admin.model.OrderStatusModel;
 import tb.car.dao.CarDao;
 import tb.car.domain.Car;
 import tb.car.domain.Car4Request;
+import tb.car.domain.GeoData;
 import tb.dao.IBrokerDao;
 import tb.dao.IDeviceDao;
 import tb.dao.IOfferedOrderBrokerDao;
@@ -276,12 +278,47 @@ public class OrderService {
 	@Transactional
 	public JSONObject getGeodata(JSONObject getGeodataJsonObject) throws DeviceNotFoundException,
 			OrderNotFoundException, ParseException {
+		String apiId = getGeodataJsonObject.optString("apiId");
+		Device device = deviceDao.get(apiId);
+		if (device == null) {
+			throw new DeviceNotFoundException(apiId);
+		}
+
 		String orderUuid = getGeodataJsonObject.optString("orderId");
+		Order order = orderDao.get(orderUuid);
+		if (order == null) {
+			throw new OrderNotFoundException(orderUuid);
+		}
+
+		if (!order.getDevice().getApiId().equals(apiId)) {
+			throw new OrderNotFoundException(orderUuid);
+		}
+
+		String lastDateString = getGeodataJsonObject.optString("lastDate");
+		Date date = null;
+		if (!lastDateString.isEmpty()) {
+			date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(lastDateString);
+		}
+		List<GeoData> geoDataList = carDao.getGeoData(order.getBroker().getId(), order.getCarUuid(),
+				date == null ? DatetimeUtils.utcToLocal(order.getBookingDate()).getTime() : date);
+
 		JSONObject geoDataJson = new JSONObject();
-		geoDataJson.put("orderId", orderUuid);
+		geoDataJson.put("orderId", order.getUuid());
 
 		JSONArray geoPointsArrayJson = new JSONArray();
+		for (GeoData currentPoint : geoDataList) {
+
+			JSONObject currentPointJson = new JSONObject();
+			currentPointJson.put("lat", currentPoint.getLat());
+			currentPointJson.put("lon", currentPoint.getLon());
+			currentPointJson.put("direction", 1);
+			currentPointJson.put("speed", 45);
+			currentPointJson.put("category", "n");
+			currentPointJson.put("date", currentPoint.getDate());
+			geoPointsArrayJson.put(currentPointJson);
+		}
 		geoDataJson.put("points", geoPointsArrayJson);
+
 		return geoDataJson;
 	}
 

@@ -7,5 +7,6 @@
 	<session-factory>
  		<mapping resource="tb/car/domain/Car.hbm.xml" />
  		<mapping resource="tb/car/domain/CarState.hbm.xml" />
+ 		<mapping resource="tb/car/domain/GeoData.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

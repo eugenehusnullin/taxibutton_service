@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tb.car.domain.Car;
 import tb.car.domain.CarState;
 import tb.car.domain.CarStateEnum;
+import tb.car.domain.GeoData;
 import tb.domain.Broker;
 import tb.domain.order.Requirement;
 
@@ -69,7 +71,21 @@ public class CarDao {
 				savedCarState.setDate(carState.getDate());
 				session.update(savedCarState);
 			}
+			
+			GeoData geoData = createGeoData(broker, carState);
+			session.save(geoData);
 		}
+	}
+	
+	private GeoData createGeoData(Broker broker, CarState carState) {
+		GeoData geoData = new GeoData();
+		geoData.setBrokerId(broker.getId());
+		geoData.setUuid(carState.getUuid());
+		geoData.setDate(carState.getDate());
+		geoData.setLat(carState.getLatitude());
+		geoData.setLon(carState.getLongitude());
+		
+		return geoData;
 	}
 
 	@Transactional(value = "inmemDbTm")
@@ -173,5 +189,17 @@ public class CarDao {
 				.add(Restrictions.eq("brokerId", brokerId))
 				.add(Restrictions.eq("uuid", uuid))
 				.uniqueResult();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Transactional(value = "inmemDbTm")
+	public List<GeoData> getGeoData(Long brokerId, String carUuid, Date date) {
+		return sessionFactory.getCurrentSession()
+				.createCriteria(GeoData.class)
+				.add(Restrictions.eq("brokerId", brokerId))
+				.add(Restrictions.eq("uuid", carUuid))
+				.add(Restrictions.ge("date", date))
+				.addOrder(Order.asc("date"))
+				.list();
 	}
 }

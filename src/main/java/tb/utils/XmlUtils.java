@@ -1,5 +1,6 @@
 package tb.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -18,6 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class XmlUtils {
@@ -39,7 +41,7 @@ public class XmlUtils {
 	public static Document buildDomDocument(String data) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document doc = builder.parse(data);
+		Document doc = builder.parse(new InputSource(new ByteArrayInputStream(data.getBytes("utf-8"))));
 		return doc;
 	}
 
