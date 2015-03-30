@@ -50,6 +50,7 @@ public class OrderController {
 			start = 0;
 		} else {
 			start = Integer.parseInt(request.getParameter("start"));
+			start = start - 1;
 		}
 
 		List<OrderModel> orderList = orderService.listByPage("id", "desc", start, 10);
