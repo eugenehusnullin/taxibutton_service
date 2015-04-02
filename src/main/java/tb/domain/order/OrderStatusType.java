@@ -11,11 +11,6 @@ public enum OrderStatusType {
 		this.value = value;
 	}
 
-	public static boolean IsValidForUserCancel(OrderStatusType statusType) {
-		return statusType == OrderStatusType.Created || statusType == OrderStatusType.Taked
-				|| statusType == OrderStatusType.Prepared || statusType == OrderStatusType.Driving;
-	}
-
 	public static boolean EndProcessingStatus(OrderStatusType statusType) {
 		return statusType == OrderStatusType.Completed || statusType == OrderStatusType.Cancelled
 				|| statusType == OrderStatusType.Failed;
@@ -27,5 +22,10 @@ public enum OrderStatusType {
 	
 	public static boolean IsValidForTake(OrderStatusType status) {
 		return status == OrderStatusType.Created;
+	}
+	
+	public static boolean IsValidForUserGeodata(OrderStatusType statusType) {
+		return statusType == OrderStatusType.Driving || statusType == OrderStatusType.Waiting
+				|| statusType == OrderStatusType.Transporting;
 	}
 }

@@ -26,7 +26,7 @@ public class YandexOrderSerializer {
 
 	private static final Logger log = LoggerFactory.getLogger(Run.class);
 
-	public static Document orderToSetcarXml(Order order, Car4Request car, String clientPhone) {
+	public static Document orderToSetcarXml(Order order, Date bookingdate, Car4Request car, String clientPhone) {
 		try {
 			Document doc = createDoc();
 			Element requestElement = doc.createElement("Request");
@@ -36,7 +36,7 @@ public class YandexOrderSerializer {
 			requestElement.appendChild(createContactInfo(doc, clientPhone));
 			requestElement.appendChild(createSource(doc, order.getSource()));
 			requestElement.appendChild(createDestinations(doc, order.getDestinations()));
-			requestElement.appendChild(createBooking(doc, order.getNotlater(), order.getBookingDate()));
+			requestElement.appendChild(createBooking(doc, order.getNotlater(), bookingdate));
 			if (order.getRequirements() != null && order.getRequirements().size() > 0) {
 				requestElement.appendChild(createRequirements(doc, order.getRequirements()));
 			}
@@ -48,7 +48,7 @@ public class YandexOrderSerializer {
 		}
 	}
 
-	public static Document orderToRequestXml(Order order, List<String> tariffs, List<Car4Request> cars) {
+	public static Document orderToRequestXml(Order order, Date bookingdate, List<String> tariffs, List<Car4Request> cars) {
 		try {
 			Document doc = createDoc();
 			Element requestElement = doc.createElement("Request");
@@ -63,7 +63,7 @@ public class YandexOrderSerializer {
 			requestElement.appendChild(createRecipient(doc));
 			requestElement.appendChild(createSource(doc, order.getSource()));
 			requestElement.appendChild(createDestinations(doc, order.getDestinations()));
-			requestElement.appendChild(createBooking(doc, order.getNotlater(), order.getBookingDate()));
+			requestElement.appendChild(createBooking(doc, order.getNotlater(), bookingdate));
 			if (order.getRequirements() != null && order.getRequirements().size() > 0) {
 				requestElement.appendChild(createRequirements(doc, order.getRequirements()));
 			}

@@ -17,6 +17,7 @@ public class Broker {
 	private Set<MapArea> mapAreas;
 	private SmsMethod smsMethod;
 	private TariffType tariffType;
+	private Integer timezoneOffset;
 
 	public Long getId() {
 		return id;
@@ -104,5 +105,13 @@ public class Broker {
 
 	public void setTariffType(TariffType tariffType) {
 		this.tariffType = tariffType;
+	}
+
+	public Integer getTimezoneOffset() {
+		return timezoneOffset;
+	}
+
+	public void setTimezoneOffset(Integer timezoneOffset) {
+		this.timezoneOffset = timezoneOffset;
 	}
 }

@@ -126,9 +126,13 @@ public class OfferingOrder {
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
 		for (Long brokerId : brokerIdsList) {
 			Broker broker = brokerDao.get(brokerId);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(order.getBookingDate());
+			calendar.add(Calendar.HOUR_OF_DAY, broker.getTimezoneOffset());
+
 			List<Tariff> tariffs = tariffDao.get(broker);
 			List<String> tariffIds = tariffs.stream().map(p -> p.getTariffId()).collect(Collectors.toList());
-			Document doc = YandexOrderSerializer.orderToRequestXml(order, tariffIds, null);
+			Document doc = YandexOrderSerializer.orderToRequestXml(order, calendar.getTime(), tariffIds, null);
 
 			messagesMap.put(brokerId, doc);
 		}
@@ -140,6 +144,11 @@ public class OfferingOrder {
 		double lon = order.getSource().getLon();
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
 		for (Long brokerId : brokerIdsList) {
+			Broker broker = brokerDao.get(brokerId);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(order.getBookingDate());
+			calendar.add(Calendar.HOUR_OF_DAY, broker.getTimezoneOffset());
+
 			List<CarState> filteredCarStates = carStates.stream()
 					.filter(p -> p.getBrokerId() == brokerId)
 					.collect(Collectors.toList());
@@ -161,7 +170,8 @@ public class OfferingOrder {
 					.distinct()
 					.collect(Collectors.toList());
 
-			Document doc = YandexOrderSerializer.orderToRequestXml(order, tariffsList, car4RequestList);
+			Document doc = YandexOrderSerializer.orderToRequestXml(order, calendar.getTime(), tariffsList,
+					car4RequestList);
 			messagesMap.put(brokerId, doc);
 		}
 

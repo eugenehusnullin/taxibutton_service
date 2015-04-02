@@ -214,11 +214,6 @@ public class OrderService {
 	}
 
 	private void cancelAction(Order order, String reason, Device device) throws NotValidOrderStatusException {
-		OrderStatus status = orderStatusDao.getLast(order);
-
-		if (!OrderStatusType.IsValidForUserCancel(status.getStatus())) {
-			throw new NotValidOrderStatusException(status);
-		}
 
 		OrderCancel orderCancel = new OrderCancel();
 		orderCancel.setOrder(order);
@@ -294,13 +289,20 @@ public class OrderService {
 			throw new OrderNotFoundException(orderUuid);
 		}
 
-		String lastDateString = getGeodataJsonObject.optString("lastDate");
-		Date date = null;
-		if (!lastDateString.isEmpty()) {
-			date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(lastDateString);
+		List<GeoData> geoDataList = new ArrayList<GeoData>();
+		if (OrderStatusType.IsValidForUserGeodata(order.getLastStatus().getStatus())) {
+			String lastDateString = getGeodataJsonObject.optString("lastDate");
+			Date date = null;
+			if (!lastDateString.isEmpty()) {
+				date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(lastDateString);
+			}
+			OrderStatus firstUserGeodataStatus = order.getStatuses().stream()
+					.filter(p -> OrderStatusType.IsValidForUserGeodata(p.getStatus()))
+					.sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate()))
+					.findFirst().get();
+			geoDataList = carDao.getGeoData(order.getBroker().getId(), order.getCarUuid(),
+					date == null ? DatetimeUtils.utcToLocal(firstUserGeodataStatus.getDate()).getTime() : date);
 		}
-		List<GeoData> geoDataList = carDao.getGeoData(order.getBroker().getId(), order.getCarUuid(),
-				date == null ? DatetimeUtils.utcToLocal(order.getBookingDate()).getTime() : date);
 
 		JSONObject geoDataJson = new JSONObject();
 		geoDataJson.put("orderId", order.getUuid());
@@ -529,8 +531,12 @@ public class OrderService {
 		Car4Request car4Request = new Car4Request();
 		car4Request.setUuid(car.getUuid());
 		car4Request.setTariff(carDao.getFirstTariff(winnerAlacrity.getBroker().getId(), winnerAlacrity.getUuid()));
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(order.getBookingDate());
+		calendar.add(Calendar.HOUR_OF_DAY, winnerAlacrity.getBroker().getTimezoneOffset());
 
-		Document doc = YandexOrderSerializer.orderToSetcarXml(order, car4Request, order.getPhone());
+		Document doc = YandexOrderSerializer.orderToSetcarXml(order, calendar.getTime(), car4Request, order.getPhone());
 		String url = winnerAlacrity.getBroker().getApiurl() + "/1.x/setcar";
 
 		try {

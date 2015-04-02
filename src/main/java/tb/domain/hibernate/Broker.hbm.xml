@@ -32,5 +32,7 @@
 				<param name="enumClass">tb.domain.TariffType</param>
 			</type>
 		</property>
+		
+		<property name="timezoneOffset"></property>
 	</class>
 </hibernate-mapping>
