@@ -28,7 +28,7 @@
 				</tr>
 				<tr>
 					<td>client actions:</td>
-					<td><a href="getStatus?id=${order.getId()}">Get status</a></td>
+					<td><a href="getStatus?id=${order.getId()}">Get status</a> | <a href="getGeodata?id=${order.getId()}">geodata</a></td>
 				</tr>
 				<tr>
 					<td>admin actions:</td>

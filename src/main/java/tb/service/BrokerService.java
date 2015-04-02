@@ -51,7 +51,7 @@ public class BrokerService {
 
 	@Transactional
 	public void update(Long brokerId, String apiId, String apiKey, String name, String apiUrl, SmsMethod smsMethod,
-			TariffType tariffType, String tariffUrl, String driverUrl) {
+			TariffType tariffType, String tariffUrl, String driverUrl, Integer timezoneOffset) {
 		Broker broker = brokerDao.get(brokerId);
 
 		broker.setApiId(apiId);
@@ -62,6 +62,7 @@ public class BrokerService {
 		broker.setTariffType(tariffType);
 		broker.setTariffUrl(tariffUrl);
 		broker.setDriverUrl(driverUrl);
+		broker.setTimezoneOffset(timezoneOffset);
 
 		brokerDao.saveOrUpdate(broker);
 	}

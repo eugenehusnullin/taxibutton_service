@@ -148,6 +148,55 @@ public class OrderController {
 
 		return "redirect:list";
 	}
+	
+	@RequestMapping(value = "/getGeodata", method = RequestMethod.GET)
+	public String getGeodata(@RequestParam("id") Long orderId, Model model) {
+
+		model.addAttribute("orderId", orderId);
+		return "order/getGeodata";
+	}
+	
+	@RequestMapping(value = "/getGeodata", method = RequestMethod.POST)
+	public String getGeodata(HttpServletRequest request,
+			@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
+
+		OrderModel orderModel = orderService.getOrder(orderId);
+		JSONObject getGeodataJson = new JSONObject();
+
+		getGeodataJson.put("apiId", apiId);
+		getGeodataJson.put("orderId", orderModel.getUuid());
+
+		try {
+			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/geodata");
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			connection.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+
+			wr.writeBytes(getGeodataJson.toString());
+			wr.flush();
+			wr.close();
+
+			int responceCode = connection.getResponseCode();
+
+			if (responceCode != 200) {
+				model.addAttribute("result",
+						"Error sending order to server: " + IOUtils.toString(connection.getInputStream()));
+			} else {
+				model.addAttribute("result", IOUtils.toString(connection.getInputStream()));
+			}
+
+		} catch (Exception ex) {
+			model.addAttribute("result", "Error getting order status: " + ex.toString());
+		}
+
+		return "result";
+	}
 
 	@RequestMapping(value = "/getStatus", method = RequestMethod.GET)
 	public String getStatus(@RequestParam("id") Long orderId, Model model) {

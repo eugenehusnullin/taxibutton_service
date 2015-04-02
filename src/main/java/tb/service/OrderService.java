@@ -301,7 +301,7 @@ public class OrderService {
 					.sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate()))
 					.findFirst().get();
 			geoDataList = carDao.getGeoData(order.getBroker().getId(), order.getCarUuid(),
-					date == null ? DatetimeUtils.utcToLocal(firstUserGeodataStatus.getDate()).getTime() : date);
+					date == null ? firstUserGeodataStatus.getDate() : date);
 		}
 
 		JSONObject geoDataJson = new JSONObject();

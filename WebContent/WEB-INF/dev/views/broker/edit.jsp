@@ -17,5 +17,6 @@
 		<input type="radio" name="tarifftype" value="1" <c:if test="${tarifftype == 1}">checked</c:if> /> json
 		<br/>tariff url <input type="text" name="tariffUrl" value="${tariffUrl}"/>
 		<br/>driver url <input type="text" name="driverUrl" value="${driverUrl}"/>
+		<br/>time zone offset <input type="text" name="timezoneOffset" value="${timezoneOffset}"/>
 		<br /><input type="submit" value="Save" />
 	</form>
