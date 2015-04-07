@@ -51,5 +51,6 @@
 				<param name="enumClass">tb.domain.order.VehicleClass</param>
 			</type>
 		</property>
+		<property name="comments" length="128"/>
 	</class>
 </hibernate-mapping>

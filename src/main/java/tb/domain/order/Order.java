@@ -24,6 +24,7 @@ public class Order {
 	private VehicleClass orderVehicleClass;
 	private Broker brokerCreator;
 	private Boolean notlater;
+	private String comments;
 
 	public Long getId() {
 		return id;
@@ -156,5 +157,13 @@ public class Order {
 
 	public void setCarUuid(String carUuid) {
 		this.carUuid = carUuid;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 }

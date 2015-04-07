@@ -111,6 +111,8 @@ public class OrderJsonParser {
 				offerBrokerList.add(broker);
 			}
 		}
+		
+		order.setComments(jsonObject.optString("comments", null));
 
 		order.setNotlater(OfferingOrder.defineNotlater(bookingDate));
 		order.setPhone(recipientPhone);

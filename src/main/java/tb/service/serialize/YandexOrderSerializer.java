@@ -40,6 +40,9 @@ public class YandexOrderSerializer {
 			if (order.getRequirements() != null && order.getRequirements().size() > 0) {
 				requestElement.appendChild(createRequirements(doc, order.getRequirements()));
 			}
+			if (order.getComments() != null && !order.getComments().isEmpty()) {
+				requestElement.appendChild(createComments(doc, order.getComments()));
+			}
 
 			return doc;
 		} catch (Exception ex) {
@@ -69,6 +72,9 @@ public class YandexOrderSerializer {
 			}
 			if (order.getDestinations() != null && order.getDestinations().size() > 0) {
 				requestElement.appendChild(createRouteInfo(doc));
+			}
+			if (order.getComments() != null && !order.getComments().isEmpty()) {
+				requestElement.appendChild(createComments(doc, order.getComments()));
 			}
 
 			return doc;
@@ -181,6 +187,12 @@ public class YandexOrderSerializer {
 		Element orderIdElement = doc.createElement("Orderid");
 		orderIdElement.appendChild(doc.createTextNode(orderId));
 		return orderIdElement;
+	}
+
+	private static Element createComments(Document doc, String comments) {
+		Element element = doc.createElement("Comments");
+		element.appendChild(doc.createTextNode(comments));
+		return element;
 	}
 
 	private static Document createDoc() throws ParserConfigurationException {
