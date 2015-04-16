@@ -131,26 +131,6 @@ public class OrderService {
 	}
 
 	@Transactional
-	public String createFromBroker(JSONObject createOrderObject) throws BrokerNotFoundException, ParseOrderException {
-		String apiId = createOrderObject.optString("apiId");
-		String apiKey = createOrderObject.optString("apiKey");
-		if (apiId == null || apiKey == null) {
-			throw new BrokerNotFoundException(apiId);
-		}
-
-		Broker broker = brokerDao.getByApiId(apiId, apiKey);
-		if (broker == null) {
-			throw new BrokerNotFoundException(apiId);
-		}
-
-		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), null, brokerDao);
-		order.setBrokerCreator(broker);
-		create(order);
-
-		return order.getUuid();
-	}
-
-	@Transactional
 	public String createFromDevice(JSONObject createOrderObject) throws DeviceNotFoundException, ParseOrderException {
 		String deviceApiid = createOrderObject.optString("apiId");
 		Device device = deviceDao.get(deviceApiid);

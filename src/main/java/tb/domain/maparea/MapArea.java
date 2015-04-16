@@ -6,8 +6,6 @@ public abstract class MapArea {
 	private String name;
 	private String about;
 
-	public abstract boolean contains(double x, double y);
-
 	public Long getId() {
 		return id;
 	}

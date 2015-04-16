@@ -21,14 +21,19 @@ function initialize(serverUrl) {
 		drawingControl : true,
 		drawingControlOptions : {
 			position : google.maps.ControlPosition.TOP_CENTER,
-			drawingModes : [ google.maps.drawing.OverlayType.POLYGON ]
+			drawingModes : [ google.maps.drawing.OverlayType.MARKER,
+					google.maps.drawing.OverlayType.CIRCLE,
+					google.maps.drawing.OverlayType.POLYGON,
+					google.maps.drawing.OverlayType.POLYLINE,
+					google.maps.drawing.OverlayType.RECTANGLE ]
 		},
-		drawingMode : google.maps.drawing.OverlayType.MARKER,
+		drawingMode : google.maps.drawing.OverlayType.POLYGON,
 		polygonOptions : polygonOptions
 	});
 	drawingManager.setMap(map);
 
-	google.maps.event.addListener(drawingManager, 'polygoncomplete', function(obj) {
+	google.maps.event.addListener(drawingManager, 'polygoncomplete', function(
+			obj) {
 		mapArea = obj;
 		showModal(serverUrl);
 	});
@@ -44,7 +49,7 @@ function showModal(serverUrl) {
 
 	$('#newMapzone .btn-save').click(function(event) {
 		event.preventDefault();
-		
+
 		var vertices = mapArea.getPath();
 		var newMapzone = {
 			'name' : $('#newMapzoneName').val(),
@@ -72,6 +77,7 @@ function addMapZone(serverUrl, mapZone) {
 		dataType : "html",
 		type : "POST",
 		data : mapZone,
-		success : function(r) {}
+		success : function(r) {
+		}
 	});
 }

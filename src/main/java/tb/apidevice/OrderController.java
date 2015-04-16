@@ -1,8 +1,6 @@
 package tb.apidevice;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.List;
@@ -47,10 +45,10 @@ public class OrderController {
 	public void create(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			log.trace(stringBuffer.toString());
+			String str = getHttpServletRequestBuffer(request);
+			log.trace(str);
 
-			JSONObject createOrderObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			JSONObject createOrderObject = (JSONObject) new JSONTokener(str).nextValue();
 
 			try {
 				String orderUuid = orderService.createFromDevice(createOrderObject);
@@ -80,8 +78,8 @@ public class OrderController {
 	public void cancel(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			JSONObject cancelOrderJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			String str = getHttpServletRequestBuffer(request);
+			JSONObject cancelOrderJson = (JSONObject) new JSONTokener(str).nextValue();
 			try {
 				orderService.cancel(cancelOrderJson);
 
@@ -111,8 +109,8 @@ public class OrderController {
 	public void status(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			JSONObject getStatusObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			String str = getHttpServletRequestBuffer(request);
+			JSONObject getStatusObject = (JSONObject) new JSONTokener(str).nextValue();
 
 			try {
 				JSONObject statusJson = orderService.getStatus(getStatusObject);
@@ -137,8 +135,8 @@ public class OrderController {
 	public void geodata(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			JSONObject jsonObject = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			String str = getHttpServletRequestBuffer(request);
+			JSONObject jsonObject = (JSONObject) new JSONTokener(str).nextValue();
 
 			try {
 				JSONObject geoDataJson = orderService.getGeodata(jsonObject);
@@ -162,10 +160,10 @@ public class OrderController {
 	@RequestMapping(value = "/feedback", method = RequestMethod.POST)
 	public void feedback(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			StringBuffer stringBuffer = getHttpServletRequestBuffer(request);
-			log.trace(stringBuffer.toString());
+			String str = getHttpServletRequestBuffer(request);
+			log.trace(str);
 
-			JSONObject feedbackJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			JSONObject feedbackJson = (JSONObject) new JSONTokener(str).nextValue();
 			orderService.saveFeedback(feedbackJson);
 			response.setStatus(200);
 		} catch (UnsupportedEncodingException e) {
@@ -187,7 +185,16 @@ public class OrderController {
 	@Transactional
 	public void getBrokers(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			List<Broker> brokers = brokerService.getAll();
+
+			String lat = request.getParameter("lat");
+			String lon = request.getParameter("lon");
+			List<Broker> brokers = null;
+			if (lat != null && lon != null) {
+				brokers = brokerService.getBrokersByMapAreas(Double.parseDouble(lat), Double.parseDouble(lon)); 
+			} else {
+				brokers = brokerService.getAll();
+			}
+
 			JSONArray jsonArray = new JSONArray();
 			for (Broker broker : brokers) {
 				JSONObject jsonBroker = new JSONObject();
@@ -201,17 +208,7 @@ public class OrderController {
 		}
 	}
 
-	private StringBuffer getHttpServletRequestBuffer(HttpServletRequest request) throws UnsupportedEncodingException,
-			IOException {
-		StringBuffer stringBuffer = new StringBuffer();
-		String line = null;
-
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
-
-		while ((line = bufferedReader.readLine()) != null) {
-			stringBuffer.append(line);
-		}
-
-		return stringBuffer;
+	private String getHttpServletRequestBuffer(HttpServletRequest request) throws IOException {
+		return IOUtils.toString(request.getInputStream(), "UTF-8");
 	}
 }

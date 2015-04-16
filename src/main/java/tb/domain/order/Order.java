@@ -22,7 +22,6 @@ public class Order {
 	private Set<OrderCancel> orderCancel;
 	private Set<Broker> offerBrokerList;
 	private VehicleClass orderVehicleClass;
-	private Broker brokerCreator;
 	private Boolean notlater;
 	private String comments;
 
@@ -133,14 +132,6 @@ public class Order {
 
 	public void setBookingDate(Date bookingDate) {
 		this.bookingDate = bookingDate;
-	}
-
-	public Broker getBrokerCreator() {
-		return brokerCreator;
-	}
-
-	public void setBrokerCreator(Broker brokerCreator) {
-		this.brokerCreator = brokerCreator;
 	}
 
 	public Boolean getNotlater() {

@@ -10,8 +10,7 @@
 		</id>
 		<many-to-one name="device" column="deviceId" />
 		<many-to-one name="broker" column="brokerid" />
-		<property name="carUuid" length="40"></property>
-		<many-to-one name="brokerCreator" column="brokerCreatorId" />
+		<property name="carUuid" length="40"></property>		
 		<property name="uuid" unique-key="order_uk2" />
 		<property name="notlater" />
 		<property name="phone" length="20" />

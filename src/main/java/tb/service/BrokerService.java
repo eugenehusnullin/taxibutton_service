@@ -1,5 +1,6 @@
 package tb.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +22,8 @@ public class BrokerService {
 	private IBrokerDao brokerDao;
 	@Autowired
 	private IMapAreaDao mapAreaDao;
+	@Autowired
+	private MapAreaAssist mapAreaAssist;
 
 	@Transactional
 	public void addMapArea(MapArea mapArea) {
@@ -30,6 +33,21 @@ public class BrokerService {
 	@Transactional
 	public List<Broker> getAll() {
 		return brokerDao.getAll();
+	}
+
+	@Transactional
+	public List<Broker> getBrokersByMapAreas(double lat, double lon) {
+		List<Broker> allBrokers = brokerDao.getAll();
+		List<Broker> result = new ArrayList<Broker>();
+		for (Broker broker : allBrokers) {
+			for (MapArea mapArea : broker.getMapAreas()) {
+				if (mapAreaAssist.contains(mapArea, lat, lon)) {
+					result.add(broker);
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 	@Transactional
