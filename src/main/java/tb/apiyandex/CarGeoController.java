@@ -38,8 +38,6 @@ public class CarGeoController {
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public void index(HttpServletRequest request, HttpServletResponse response) {
-
-		log.error(request.getParameter("data"));
 		try {
 			try {
 				Document document = XmlUtils.buildDomDocument(request.getParameter("data"));

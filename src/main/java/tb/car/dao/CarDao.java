@@ -116,7 +116,7 @@ public class CarDao {
 	}
 
 	@Transactional(value = "inmemDbTm")
-	public List<CarState> getNearCarStates(double lat, double lon, double diff, List<Long> limitBrokerIds) {
+	public List<CarState> getNearCarStates(double lat, double lon, double diff) {
 		Session session = sessionFactory.getCurrentSession();
 		Date date = new Date((new Date()).getTime() - 300000);
 		String q = " from CarState cs "
@@ -132,12 +132,6 @@ public class CarDao {
 				.setDouble("lon", lon)
 				.setDouble("diff", diff)
 				.list();
-
-		if (limitBrokerIds != null && limitBrokerIds.size() > 0) {
-			list = list.stream()
-					.filter(p -> limitBrokerIds.contains(p.getBrokerId()))
-					.collect(Collectors.toList());
-		}
 
 		return list;
 	}

@@ -3,7 +3,6 @@ package tb.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -54,8 +53,10 @@ public class OfferingOrder {
 	private ITariffDao tariffDao;
 	@Autowired
 	private IOfferedOrderBrokerDao offeredOrderBrokerDao;
+	@Autowired
+	private BrokerService brokerService;
 
-	private final static int NOTLATER_MINUTES = 1;
+	private final static int NOTLATER_MINUTES = 25;
 	private final static double COORDINATES_COEF = 0.03;
 	private final static int SPEED = 40;
 	private final static int MINUTE_IN_HOUR = 60;
@@ -69,29 +70,33 @@ public class OfferingOrder {
 			return null;
 		}
 
-		Collection<Broker> limitBrokers = order.getOfferBrokerList();
-		List<Long> limitBrokerIds = null;
-		if (limitBrokers != null && limitBrokers.size() > 0) {
-			limitBrokerIds = limitBrokers.stream().map(p -> p.getId()).collect(Collectors.toList());
-		}
-
-		// define is notlater order
-		List<CarState> carStates = carDao.getNearCarStates(
-				order.getSource().getLat(),
-				order.getSource().getLon(),
-				COORDINATES_COEF * (order.getNotlater() ? cntAttempt : 10),
-				limitBrokerIds);
-
-		// DEMO
-		//List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct().collect(Collectors.toList());
-		List<Long> brokerIdsList = brokerDao.getActive().stream().map(p -> p.getId()).collect(Collectors.toList());
-
 		Map<Long, Document> messages4Send = null;
 		if (order.getNotlater()) {
+			List<CarState> carStates = carDao.getNearCarStates(order.getSource().getLat(), order.getSource().getLon(),
+					COORDINATES_COEF * (order.getNotlater() ? cntAttempt : 10));
+			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
+				final List<Long> limitBrokerIds = order.getOfferBrokerList().stream().map(m -> m.getId())
+						.collect(Collectors.toList());
+				carStates = carStates.stream()
+						.filter(p -> limitBrokerIds.contains(p.getBrokerId()))
+						.collect(Collectors.toList());
+			}
+			List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct()
+					.collect(Collectors.toList());
+
 			carStates = carDao.getCarStatesByRequirements(carStates, order.getRequirements());
 			messages4Send = createNotlaterOffer(order, brokerIdsList, carStates);
 		} else {
-			messages4Send = createExactOffer(order, brokerIdsList);
+			List<Broker> brokers = brokerService.getBrokersByMapAreas(order.getSource().getLat(),
+					order.getSource().getLon());
+			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
+				final List<Long> limitBrokerIds = order.getOfferBrokerList().stream().map(m -> m.getId())
+						.collect(Collectors.toList());
+				brokers = brokers.stream()
+						.filter(p -> limitBrokerIds.contains(p.getId()))
+						.collect(Collectors.toList());
+			}
+			messages4Send = createExactOffer(order, brokers.stream().map(p -> p.getId()).collect(Collectors.toList()));
 		}
 
 		return makeOffer(messages4Send, order);
