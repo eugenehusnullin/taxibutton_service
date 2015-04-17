@@ -68,7 +68,7 @@ public class TariffSynch {
 	}
 
 	private void updateTariffs(List<Tariff> tariffs, Broker broker, Date loadDate) {
-		tariffDao.deleteAll();
+		tariffDao.delete(broker);
 		for (Tariff tariff : tariffs) {
 			tariffDao.saveOrUpdate(tariff);
 		}

@@ -12,5 +12,5 @@ public interface ITariffDao {
 
 	List<Tariff> getAll();
 	
-	void deleteAll();
+	void delete(Broker broker);
 }
