@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import tb.dao.IMapAreaDao;
+import tb.domain.Broker;
 import tb.domain.maparea.MapArea;
 
 @Repository("MapAreaDao")
@@ -18,6 +19,14 @@ public class MapAreaDao implements IMapAreaDao {
 	@Override
 	public void add(MapArea mapArea) {
 		sessionFactory.getCurrentSession().save(mapArea);
+	}
+
+	@Override
+	public void delete(Broker broker) {
+		String hqlDelete = "delete MapArea where :broker in elements(brokers)";
+		sessionFactory.getCurrentSession().createQuery(hqlDelete)
+			.setEntity("broker", broker)
+			.executeUpdate();		
 	}
 
 }

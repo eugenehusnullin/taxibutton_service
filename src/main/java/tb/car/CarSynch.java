@@ -2,10 +2,6 @@ package tb.car;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +21,7 @@ import tb.car.dao.CarDao;
 import tb.car.domain.Car;
 import tb.dao.IBrokerDao;
 import tb.domain.Broker;
+import tb.utils.HttpUtils;
 import tb.utils.XmlUtils;
 
 @Service
@@ -43,46 +40,27 @@ public class CarSynch {
 	public void synch() {
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
-			InputStream carsInputStream = fetchCarsInputStream(broker);
-			Document doc = null;
 			try {
-				doc = XmlUtils.buildDomDocument(carsInputStream);
-			} catch (ParserConfigurationException | SAXException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (doc != null) {
-				Date loadDate = new Date();
-				List<Car> cars = carBuilder.createCars(doc, broker, loadDate);
-				updateCars(cars, broker, loadDate);
+				InputStream carsInputStream = HttpUtils.makeGetRequest(broker.getDriverUrl(), "application/xml");
+				Document doc = null;
+				try {
+					doc = XmlUtils.buildDomDocument(carsInputStream);
+				} catch (ParserConfigurationException | SAXException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (doc != null) {
+					Date loadDate = new Date();
+					List<Car> cars = carBuilder.createCars(doc, broker, loadDate);
+					updateCars(cars, broker, loadDate);
+				}
+			} catch (IOException e) {
+				log.error("Car synch error: ", e);
 			}
 		}
 	}
 
 	private void updateCars(List<Car> cars, Broker broker, Date loadDate) {
 		carDao.updateCars(cars, broker, loadDate);
-	}
-
-	public InputStream fetchCarsInputStream(Broker broker) {
-		try {
-			URL url = new URL(broker.getDriverUrl());
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept", "application/xml");
-
-			if (conn.getResponseCode() == 200) {
-				return conn.getInputStream();
-			} else {
-				log.warn(String.format("Disp - %s return error to CARS request. Error code: %d", broker.getName(),
-						conn.getResponseCode()));
-			}
-		} catch (MalformedURLException e) {
-			log.error("url creation error.", e);
-		} catch (ProtocolException e) {
-			log.error("url creation error.", e);
-		} catch (IOException e) {
-			log.error("open connection error.", e);
-		}
-		return null;
 	}
 }

@@ -14,6 +14,11 @@
 		<property name="name" length="128"></property>
 		<property name="about" length="1024"></property>
 		
+		<set name="brokers" table="brokermapareas">
+			<key column="mapareaid"></key>
+			<many-to-many column="brokerid" class="tb.domain.Broker"></many-to-many>
+		</set>
+		
 		<subclass name="Polygon" discriminator-value="polygon">
 			<property name="points" type="PointArray" length="10240"></property>
 		</subclass>

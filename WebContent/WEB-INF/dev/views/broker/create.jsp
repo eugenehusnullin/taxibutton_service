@@ -18,6 +18,7 @@
 		<input type="radio" name="tarifftype" value="1" />json
 		<br/>tariff url <input type="text" name="tariffurl" value="http://"/>
 		<br/>driver url <input type="text" name="driverurl" value="http://"/>
+		<br/>maparea url <input type="text" name="mapareaurl" value="http://"/>
 		<br/>time zone offset <input type="text" name="timezoneOffset" value="0"/>
 		<br /> <input type="submit" value="save" />
 	</form>

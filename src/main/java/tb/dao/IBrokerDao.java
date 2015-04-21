@@ -23,4 +23,6 @@ public interface IBrokerDao {
 	void saveOrUpdate(Broker broker);
 	
 	void delete(Broker broker);
+
+	List<Broker> getBrokersNeedMapareaSynch();
 }

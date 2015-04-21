@@ -14,6 +14,7 @@ public class Broker {
 	private String apiurl;
 	private String tariffUrl;
 	private String driverUrl;
+	private String mapareaUrl;
 	private Set<MapArea> mapAreas;
 	private SmsMethod smsMethod;
 	private TariffType tariffType;
@@ -113,5 +114,13 @@ public class Broker {
 
 	public void setTimezoneOffset(Integer timezoneOffset) {
 		this.timezoneOffset = timezoneOffset;
+	}
+
+	public String getMapareaUrl() {
+		return mapareaUrl;
+	}
+
+	public void setMapareaUrl(String mapareaUrl) {
+		this.mapareaUrl = mapareaUrl;
 	}
 }

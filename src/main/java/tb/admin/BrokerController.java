@@ -42,6 +42,7 @@ public class BrokerController {
 			@RequestParam("smsMethod") String smsMethod, @RequestParam("tarifftype") String tariffTypeParam,
 			@RequestParam("tariffurl") String tariffUrl,
 			@RequestParam("driverurl") String driverUrl,
+			@RequestParam("mapareaurl") String mapareaUrl,
 			@RequestParam("timezoneOffset") Integer timezoneOffset,
 			Model model) {
 
@@ -56,6 +57,7 @@ public class BrokerController {
 		broker.setSmsMethod(smsM);
 		broker.setTariffUrl(tariffUrl);
 		broker.setDriverUrl(driverUrl);
+		broker.setMapareaUrl(mapareaUrl);
 		broker.setTariffType(tariffType);
 		broker.setTimezoneOffset(timezoneOffset);
 		brokerService.add(broker);
@@ -90,6 +92,7 @@ public class BrokerController {
 		model.addAttribute("tarifftype", broker.getTariffType() == null ? -1 : broker.getTariffType().ordinal());
 		model.addAttribute("driverUrl", broker.getDriverUrl());
 		model.addAttribute("tariffUrl", broker.getTariffUrl());
+		model.addAttribute("mapareaUrl", broker.getMapareaUrl());
 		model.addAttribute("timezoneOffset", broker.getTimezoneOffset());
 
 		return "broker/edit";
@@ -102,11 +105,13 @@ public class BrokerController {
 			@RequestParam("tarifftype") String tariffTypeParam,
 			@RequestParam("tariffUrl") String tariffUrl,
 			@RequestParam("driverUrl") String driverUrl,
+			@RequestParam("mapareaUrl") String mapareaUrl,
 			@RequestParam("timezoneOffset") Integer timezoneOffset) {
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
 
-		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM, tariffType, tariffUrl, driverUrl, timezoneOffset);
+		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM, tariffType, tariffUrl, driverUrl,
+				timezoneOffset, mapareaUrl);
 		return "redirect:list";
 	}
 }

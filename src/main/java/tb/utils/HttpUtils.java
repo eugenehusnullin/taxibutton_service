@@ -1,6 +1,7 @@
 package tb.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -66,4 +67,15 @@ public class HttpUtils {
 		return responseCode;
 	}
 
+	public static InputStream makeGetRequest(String address, String contentType) throws IOException {
+		URL url = new URL(address);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Accept", contentType);
+
+		if (conn.getResponseCode() == 200) {
+			return conn.getInputStream();
+		}
+		return null;
+	}
 }
