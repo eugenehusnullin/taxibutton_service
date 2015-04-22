@@ -11,6 +11,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import tb.car.CarSynch;
+import tb.maparea.MapareaSynch;
 import tb.tariff.TariffSynch;
 
 @Service
@@ -19,6 +20,8 @@ public class Starter {
 	private CarSynch carSynch;
 	@Autowired
 	private TariffSynch tariffSynch;
+	@Autowired
+	private MapareaSynch mapareaSynch;
 	private ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
 	@Value("#{mainSettings['starter.runsynch.seconds']}")
 	private Integer runsynchSeconds;
@@ -29,6 +32,9 @@ public class Starter {
 		Date d = new Date(new Date().getTime() + (runsynchSeconds * 1000));
 		taskScheduler.schedule(carSynch::synch, d);
 		taskScheduler.schedule(tariffSynch::synch, d);
+		
+		d = new Date(new Date().getTime() + ((runsynchSeconds + 60) * 1000));
+		taskScheduler.schedule(mapareaSynch::synch, d);
 	}
 	
 	@PreDestroy
