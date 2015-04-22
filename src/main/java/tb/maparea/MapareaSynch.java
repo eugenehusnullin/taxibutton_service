@@ -30,7 +30,7 @@ public class MapareaSynch {
 	@Autowired
 	private IMapAreaDao mapAreaDao;
 
-	@Scheduled(cron = "0 01 * * * *")
+	@Scheduled(cron = "0 10 * * * *")
 	@Transactional
 	public void synch() {
 		List<Broker> brokers = brokerDao.getBrokersNeedMapareaSynch();
