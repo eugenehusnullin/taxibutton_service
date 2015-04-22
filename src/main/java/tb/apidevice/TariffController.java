@@ -36,7 +36,7 @@ public class TariffController {
 			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
 			try {
-				JSONArray responseJson = tariffService.getAll(requestJson);
+				JSONArray responseJson = tariffService.getByBroker(requestJson);
 				DataOutputStream outputStream = new DataOutputStream(response.getOutputStream());
 				byte[] bytes = responseJson.toString().getBytes("UTF-8");
 				outputStream.write(bytes);

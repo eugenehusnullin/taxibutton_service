@@ -28,6 +28,7 @@ import tb.service.exceptions.NotValidOrderStatusException;
 import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
 import tb.service.exceptions.WrongData;
+import tb.utils.NetStreamUtils;
 
 @RequestMapping("/order")
 @Controller("apiDeviceOrderController")
@@ -181,13 +182,16 @@ public class OrderController {
 		}
 	}
 
-	@RequestMapping(value = "/getbrokers", method = RequestMethod.GET)
+	@RequestMapping(value = "/getbrokers", method = RequestMethod.POST)
 	@Transactional
 	public void getBrokers(HttpServletRequest request, HttpServletResponse response) {
 		try {
+			
+			StringBuffer stringBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
+			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
-			String lat = request.getParameter("lat");
-			String lon = request.getParameter("lon");
+			String lat = requestJson.optString("lat");
+			String lon = requestJson.optString("lon");
 			List<Broker> brokers = null;
 			if (lat != null && lon != null) {
 				brokers = brokerService.getBrokersByMapAreas(Double.parseDouble(lat), Double.parseDouble(lon)); 

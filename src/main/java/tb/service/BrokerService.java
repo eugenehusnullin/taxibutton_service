@@ -86,4 +86,9 @@ public class BrokerService {
 		brokerDao.saveOrUpdate(broker);
 	}
 
+	@Transactional
+	public Broker getByUuid(String uuid) {
+		return brokerDao.get(uuid);
+	}
+
 }

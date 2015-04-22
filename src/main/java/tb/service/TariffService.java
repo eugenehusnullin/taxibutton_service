@@ -30,7 +30,7 @@ public class TariffService {
 	private IBrokerDao brokerDao;
 
 	@Transactional
-	public JSONArray getAll(JSONObject requestJson) throws DeviceNotFoundException {
+	public JSONArray getByBroker(JSONObject requestJson) throws DeviceNotFoundException {
 
 		String apiId = requestJson.optString("apiId");
 		Device device = deviceDao.get(apiId);
@@ -38,12 +38,15 @@ public class TariffService {
 			throw new DeviceNotFoundException(apiId);
 		}
 
-		List<Tariff> tariffs = tariffDao.getAll();
+		String uuid = requestJson.optString("uuid");
+		Broker broker = brokerDao.get(uuid);
+
+		List<Tariff> tariffs = tariffDao.get(broker);
 		JSONArray tariffsJsonArray = new JSONArray();
-		for (Tariff simoleTariff : tariffs) {
+		for (Tariff tariff : tariffs) {
 			JSONObject tariffJson = new JSONObject();
-			tariffJson.put("brokerId", simoleTariff.getBroker().getUuid());
-			tariffJson.put("tariff", simoleTariff.getTariff());
+			tariffJson.put("brokerId", tariff.getBroker().getUuid());
+			tariffJson.put("tariff", tariff.getTariff());
 			tariffsJsonArray.put(tariffJson);
 		}
 		return tariffsJsonArray;
