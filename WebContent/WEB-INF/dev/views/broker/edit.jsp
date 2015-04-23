@@ -18,6 +18,7 @@
 		<br/>tariff url <input type="text" name="tariffUrl" value="${tariffUrl}"/>
 		<br/>driver url <input type="text" name="driverUrl" value="${driverUrl}"/>
 		<br/>maparea url <input type="text" name="mapareaUrl" value="${mapareaUrl}"/>
+		<br/>cost url <input type="text" name="costUrl" value="${costUrl}"/>
 		<br/>time zone offset <input type="text" name="timezoneOffset" value="${timezoneOffset}"/>
 		<br /><input type="submit" value="Save" />
 	</form>

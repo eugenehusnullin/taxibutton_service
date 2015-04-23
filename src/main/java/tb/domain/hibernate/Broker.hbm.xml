@@ -16,6 +16,7 @@
 		<property name="tariffUrl" length="100" />
 		<property name="driverUrl" length="100" />
 		<property name="mapareaUrl" length="100" />
+		<property name="costUrl" length="100" />
 		
 		<set name="mapAreas" table="brokermapareas">
 			<key column="brokerid"></key>

@@ -131,7 +131,7 @@ public class OrderService {
 	}
 
 	@Transactional
-	public String createFromDevice(JSONObject createOrderObject) throws DeviceNotFoundException, ParseOrderException {
+	public Order initOrder(JSONObject createOrderObject) throws DeviceNotFoundException, ParseOrderException {
 		String deviceApiid = createOrderObject.optString("apiId");
 		Device device = deviceDao.get(deviceApiid);
 		if (device == null) {
@@ -141,12 +141,10 @@ public class OrderService {
 		Order order = OrderJsonParser
 				.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
 		order.setDevice(device);
-		create(order);
-
-		return order.getUuid();
+		return order;
 	}
 
-	private void create(Order order) throws ParseOrderException {
+	public void create(Order order) throws ParseOrderException {
 		// check booking date
 		if (DatetimeUtils.checkTimeout(order.getBookingDate(), createOrderLimit, new Date())) {
 			throw new ParseOrderException("bookingdate is out");
@@ -520,7 +518,7 @@ public class OrderService {
 		String url = winnerAlacrity.getBroker().getApiurl() + "/1.x/setcar";
 
 		try {
-			boolean posted = HttpUtils.postDocumentOverHttp(doc, url);
+			boolean posted = HttpUtils.postDocumentOverHttp(doc, url).getResponseCode() == 200;
 			if (!posted) {
 				log.info("Error giving order to broker: " + winnerAlacrity.getBroker().getId().toString());
 				return false;

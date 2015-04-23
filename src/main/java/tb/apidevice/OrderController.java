@@ -2,11 +2,15 @@ package tb.apidevice;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -19,15 +23,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.w3c.dom.Document;
 
 import tb.domain.Broker;
+import tb.domain.order.Order;
 import tb.service.BrokerService;
+import tb.service.OfferingOrder;
 import tb.service.OrderService;
 import tb.service.exceptions.DeviceNotFoundException;
 import tb.service.exceptions.NotValidOrderStatusException;
 import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
 import tb.service.exceptions.WrongData;
+import tb.utils.HttpUtils;
 import tb.utils.NetStreamUtils;
 
 @RequestMapping("/order")
@@ -40,6 +48,8 @@ public class OrderController {
 	private OrderService orderService;
 	@Autowired
 	private BrokerService brokerService;
+	@Autowired
+	private OfferingOrder offeringOrder;
 
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -52,8 +62,9 @@ public class OrderController {
 			JSONObject createOrderObject = (JSONObject) new JSONTokener(str).nextValue();
 
 			try {
-				String orderUuid = orderService.createFromDevice(createOrderObject);
-
+				Order order = orderService.initOrder(createOrderObject);
+				orderService.create(order);
+				String orderUuid = order.getUuid();
 				JSONObject responseJson = new JSONObject();
 				responseJson.put("status", "ok");
 				responseJson.put("orderId", orderUuid);
@@ -186,7 +197,7 @@ public class OrderController {
 	@Transactional
 	public void getBrokers(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			
+
 			StringBuffer stringBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
 			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
 
@@ -194,7 +205,7 @@ public class OrderController {
 			String lon = requestJson.optString("lon");
 			List<Broker> brokers = null;
 			if (lat != null && lon != null) {
-				brokers = brokerService.getBrokersByMapAreas(Double.parseDouble(lat), Double.parseDouble(lon)); 
+				brokers = brokerService.getBrokersByMapAreas(Double.parseDouble(lat), Double.parseDouble(lon));
 			} else {
 				brokers = brokerService.getAll();
 			}
@@ -210,6 +221,41 @@ public class OrderController {
 		} catch (Exception e) {
 
 		}
+	}
+
+	@RequestMapping(value = "/cost", method = RequestMethod.POST)
+	public void cost(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			String str = getHttpServletRequestBuffer(request);
+			JSONObject costOrderObject = (JSONObject) new JSONTokener(str).nextValue();
+			
+			Order order = orderService.initOrder(costOrderObject);
+			String uuid = costOrderObject.optString("uuid");
+			Broker broker = brokerService.getByUuid(uuid);
+			Document doc = offeringOrder.createExactOffer(order, broker);
+			HttpURLConnection connection = HttpUtils.postDocumentOverHttp(doc, broker.getCostUrl());
+			IOUtils.copy(connection.getInputStream(), response.getOutputStream());
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeviceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseOrderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerFactoryConfigurationError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	private String getHttpServletRequestBuffer(HttpServletRequest request) throws IOException {

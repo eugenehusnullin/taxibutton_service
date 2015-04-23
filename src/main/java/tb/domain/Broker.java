@@ -15,6 +15,7 @@ public class Broker {
 	private String tariffUrl;
 	private String driverUrl;
 	private String mapareaUrl;
+	private String costUrl;
 	private Set<MapArea> mapAreas;
 	private SmsMethod smsMethod;
 	private TariffType tariffType;
@@ -122,5 +123,13 @@ public class Broker {
 
 	public void setMapareaUrl(String mapareaUrl) {
 		this.mapareaUrl = mapareaUrl;
+	}
+
+	public String getCostUrl() {
+		return costUrl;
+	}
+
+	public void setCostUrl(String costUrl) {
+		this.costUrl = costUrl;
 	}
 }

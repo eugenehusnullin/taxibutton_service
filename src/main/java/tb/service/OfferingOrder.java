@@ -96,7 +96,7 @@ public class OfferingOrder {
 						.filter(p -> limitBrokerIds.contains(p.getId()))
 						.collect(Collectors.toList());
 			}
-			messages4Send = createExactOffer(order, brokers.stream().map(p -> p.getId()).collect(Collectors.toList()));
+			messages4Send = createExactOffers(order, brokers.stream().map(p -> p.getId()).collect(Collectors.toList()));
 		}
 
 		return makeOffer(messages4Send, order);
@@ -111,7 +111,7 @@ public class OfferingOrder {
 			Broker broker = brokerDao.get(brokerId);
 			String url = broker.getApiurl() + "/1.x/requestcar";
 			try {
-				boolean posted = HttpUtils.postDocumentOverHttp(doc, url);
+				boolean posted = HttpUtils.postDocumentOverHttp(doc, url).getResponseCode() == 200;
 				result |= posted;
 				if (posted) {
 					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
@@ -127,21 +127,27 @@ public class OfferingOrder {
 		return result;
 	}
 
-	private Map<Long, Document> createExactOffer(Order order, List<Long> brokerIdsList) {
+	private Map<Long, Document> createExactOffers(Order order, List<Long> brokerIdsList) {
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
 		for (Long brokerId : brokerIdsList) {
 			Broker broker = brokerDao.get(brokerId);
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(order.getBookingDate());
-			calendar.add(Calendar.HOUR_OF_DAY, broker.getTimezoneOffset());
-
-			List<Tariff> tariffs = tariffDao.get(broker);
-			List<String> tariffIds = tariffs.stream().map(p -> p.getTariffId()).collect(Collectors.toList());
-			Document doc = YandexOrderSerializer.orderToRequestXml(order, calendar.getTime(), tariffIds, null);
-
+			Document doc = createExactOffer(order, broker);
 			messagesMap.put(brokerId, doc);
 		}
 		return messagesMap;
+	}
+	
+	@Transactional
+	public Document createExactOffer(Order order, Broker broker) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(order.getBookingDate());
+		calendar.add(Calendar.HOUR_OF_DAY, broker.getTimezoneOffset());
+
+		List<Tariff> tariffs = tariffDao.get(broker);
+		List<String> tariffIds = tariffs.stream().map(p -> p.getTariffId()).collect(Collectors.toList());
+		Document doc = YandexOrderSerializer.orderToRequestXml(order, calendar.getTime(), tariffIds, null);
+
+		return doc;
 	}
 
 	private Map<Long, Document> createNotlaterOffer(Order order, List<Long> brokerIdsList, List<CarState> carStates) {

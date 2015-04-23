@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
 
 public class HttpUtils {
 
-	public static boolean postDocumentOverHttp(Document document, String url) throws IOException,
+	public static HttpURLConnection postDocumentOverHttp(Document document, String url) throws IOException,
 			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
@@ -31,7 +31,7 @@ public class HttpUtils {
 		IOUtils.write(s, connection.getOutputStream(), "UTF-8");
 		connection.getOutputStream().flush();
 		connection.getOutputStream().close();
-		return connection.getResponseCode() == 200;
+		return connection;
 	}
 
 	public static String getApplicationUrl(HttpServletRequest request) throws URISyntaxException {
