@@ -20,7 +20,7 @@
 		</set>
 		
 		<subclass name="Polygon" discriminator-value="polygon">
-			<property name="points" type="PointArray" length="10240"></property>
+			<property name="points" type="PointArray" length="20240"></property>
 		</subclass>
 	</class>
 </hibernate-mapping>

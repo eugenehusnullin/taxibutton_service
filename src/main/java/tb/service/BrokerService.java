@@ -92,5 +92,4 @@ public class BrokerService {
 	public Broker getByUuid(String uuid) {
 		return brokerDao.get(uuid);
 	}
-
 }

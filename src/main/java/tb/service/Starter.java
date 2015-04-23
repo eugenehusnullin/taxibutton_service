@@ -33,7 +33,7 @@ public class Starter {
 		taskScheduler.schedule(carSynch::synch, d);
 		taskScheduler.schedule(tariffSynch::synch, d);
 		
-		d = new Date(new Date().getTime() + ((runsynchSeconds + 60) * 1000));
+		d = new Date(new Date().getTime() + (runsynchSeconds * 1000));
 		taskScheduler.schedule(mapareaSynch::synch, d);
 	}
 	

@@ -1,7 +1,5 @@
 package tb.dao.impl;
 
-import java.util.List;
-
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,19 +23,9 @@ public class MapAreaDao implements IMapAreaDao {
 
 	@Override
 	public void delete(Broker broker) {
-		String hqlDelete = "delete MapArea where :broker in elements(brokers)";
-		sessionFactory.getCurrentSession().createQuery(hqlDelete)
-				.setEntity("broker", broker)
-				.executeUpdate();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<MapArea> get(Broker broker) {
-		String hqlDelete = "from MapArea where :broker in elements(brokers)";
-		return sessionFactory.getCurrentSession().createQuery(hqlDelete)
-				.setEntity("broker", broker)
-				.list();
+		for (MapArea mapArea : broker.getMapAreas()) {
+			sessionFactory.getCurrentSession().delete(mapArea);
+		}
 	}
 
 }

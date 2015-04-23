@@ -1,6 +1,6 @@
 package tb.apidevice;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,12 +37,12 @@ public class MapareaController {
 		try {
 			StringBuffer stringBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
 			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
-			
+
 			String uuid = requestJson.optString("uuid");
 			if (uuid != null) {
 				Broker broker = brokerService.getByUuid(uuid);
 				if (broker != null) {
-					List<MapArea> mapAreas = mapareaDao.get(broker);
+					Set<MapArea> mapAreas = broker.getMapAreas();
 					JSONObject result = mapareaSerializer.serialize(mapAreas);
 					IOUtils.write(result.toString(), response.getOutputStream(), "UTF-8");
 				}

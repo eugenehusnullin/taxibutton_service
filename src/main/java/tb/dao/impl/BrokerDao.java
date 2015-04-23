@@ -27,8 +27,10 @@ public class BrokerDao implements IBrokerDao {
 
 	@Override
 	public Broker get(String uuid) {
-		return (Broker) sessionFactory.getCurrentSession().createCriteria(Broker.class)
-				.add(Restrictions.eq("uuid", uuid)).uniqueResult();
+		return (Broker) sessionFactory.getCurrentSession()
+				.createCriteria(Broker.class)
+				.add(Restrictions.eq("uuid", uuid))
+				.uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -76,8 +78,7 @@ public class BrokerDao implements IBrokerDao {
 	@Override
 	public List<Broker> getBrokersNeedMapareaSynch() {
 		return sessionFactory.getCurrentSession().createCriteria(Broker.class)
-				.add(Restrictions.isNotNull("mapareaUrl"))
-				.add(Restrictions.isNotEmpty("mapareaUrl"))
+				.add(Restrictions.neOrIsNotNull("mapareaUrl", ""))
 				.add(Restrictions.eq("tariffType", TariffType.JSON))
 				.list();
 	}

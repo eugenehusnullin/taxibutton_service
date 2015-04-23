@@ -18,7 +18,7 @@
 		<property name="mapareaUrl" length="100" />
 		<property name="costUrl" length="100" />
 		
-		<set name="mapAreas" table="brokermapareas">
+		<set name="mapAreas" table="brokermapareas" lazy="false">
 			<key column="brokerid"></key>
 			<many-to-many column="mapareaid" class="tb.domain.maparea.MapArea"></many-to-many>
 		</set>
