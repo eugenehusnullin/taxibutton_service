@@ -46,7 +46,7 @@ public class TariffSynch {
 			}
 
 			try {
-				InputStream inputStream = HttpUtils.makeGetRequest(broker.getTariffUrl(), 
+				InputStream inputStream = HttpUtils.makeGetRequest(broker.getTariffUrl(),
 						broker.getTariffType() == TariffType.XML ? "application/xml" : "application/json");
 				if (inputStream != null) {
 					Date loadDate = new Date();

@@ -144,6 +144,7 @@ public class OrderService {
 		return order;
 	}
 
+	@Transactional
 	public void create(Order order) throws ParseOrderException {
 		// check booking date
 		if (DatetimeUtils.checkTimeout(order.getBookingDate(), createOrderLimit, new Date())) {
