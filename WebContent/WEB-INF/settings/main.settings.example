@@ -5,6 +5,10 @@ choosewinner.cancelorder.timeout=600000
 offerorder.threads.count=30
 offerorder.repeat.pause=30000
 
+offerorder.coordcoef=0.1
+offerorder.notlaterminutes=25
+offerorder.speed=40
+
 cancelorder.threads.count=10
 
 createorder.limit=180000
