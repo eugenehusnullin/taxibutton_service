@@ -15,6 +15,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
@@ -34,7 +35,6 @@ import tb.domain.order.Order;
 import tb.domain.order.OrderStatus;
 import tb.domain.order.OrderStatusType;
 import tb.service.serialize.YandexOrderSerializer;
-import tb.utils.DatetimeUtils;
 import tb.utils.HttpUtils;
 
 @Service
@@ -56,9 +56,10 @@ public class OfferingOrder {
 	@Autowired
 	private BrokerService brokerService;
 
-	private final static int NOTLATER_MINUTES = 25;
-	private final static double COORDINATES_COEF = 0.03;
-	private final static int SPEED = 40;
+	@Value("#{mainSettings['offerorder.coordcoef']}")
+	private double COORDINATES_COEF;
+	@Value("#{mainSettings['offerorder.speed']}")
+	private int SPEED;
 	private final static int MINUTE_IN_HOUR = 60;
 
 	@Transactional
@@ -73,7 +74,7 @@ public class OfferingOrder {
 		Map<Long, Document> messages4Send = null;
 		if (order.getNotlater()) {
 			List<CarState> carStates = carDao.getNearCarStates(order.getSource().getLat(), order.getSource().getLon(),
-					COORDINATES_COEF * (order.getNotlater() ? cntAttempt : 10));
+					COORDINATES_COEF * cntAttempt);
 			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
 				final List<Long> limitBrokerIds = order.getOfferBrokerList().stream().map(m -> m.getId())
 						.collect(Collectors.toList());
@@ -136,7 +137,7 @@ public class OfferingOrder {
 		}
 		return messagesMap;
 	}
-	
+
 	@Transactional
 	public Document createExactOffer(Order order, Broker broker) {
 		Calendar calendar = Calendar.getInstance();
@@ -201,13 +202,5 @@ public class OfferingOrder {
 	private boolean checkOrderValid4Offer(Order order) {
 		OrderStatus orderStatus = orderStatusDao.getLast(order);
 		return OrderStatusType.IsValidForOffer(orderStatus.getStatus());
-	}
-
-	public static boolean defineNotlater(Date bookingDateUtc) {
-		Calendar bookingCalendar = DatetimeUtils.utcToLocal(bookingDateUtc);
-		Calendar localCalendar = Calendar.getInstance();
-		localCalendar.add(Calendar.MINUTE, NOTLATER_MINUTES);
-
-		return localCalendar.getTime().after(bookingCalendar.getTime());
 	}
 }

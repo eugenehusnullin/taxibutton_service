@@ -95,6 +95,9 @@ public class OrderService {
 
 	@Value("#{mainSettings['createorder.limit']}")
 	private Integer createOrderLimit = 60000;
+	
+	@Value("#{mainSettings['offerorder.notlaterminutes']}")
+	private int notlaterMinutes;
 
 	@Transactional
 	public void saveFeedback(JSONObject feedbackJson) throws OrderNotFoundException, WrongData {
@@ -139,7 +142,7 @@ public class OrderService {
 		}
 
 		Order order = OrderJsonParser
-				.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao);
+				.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao, notlaterMinutes);
 		order.setDevice(device);
 		return order;
 	}

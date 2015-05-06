@@ -2,6 +2,7 @@ package tb.service.serialize;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,12 +19,20 @@ import tb.domain.order.AddressPoint;
 import tb.domain.order.Order;
 import tb.domain.order.Requirement;
 import tb.domain.order.VehicleClass;
-import tb.service.OfferingOrder;
 import tb.service.exceptions.ParseOrderException;
+import tb.utils.DatetimeUtils;
 
 public class OrderJsonParser {
 
-	public static Order Json2Order(JSONObject jsonObject, String phone, IBrokerDao brokerDao)
+	private static boolean defineNotlater(Date bookingDateUtc, int notlaterMinutes) {
+		Calendar bookingCalendar = DatetimeUtils.utcToLocal(bookingDateUtc);
+		Calendar localCalendar = Calendar.getInstance();
+		localCalendar.add(Calendar.MINUTE, notlaterMinutes);
+
+		return localCalendar.getTime().after(bookingCalendar.getTime());
+	}
+
+	public static Order Json2Order(JSONObject jsonObject, String phone, IBrokerDao brokerDao, int notlaterMinutes)
 			throws ParseOrderException {
 
 		Order order = new Order();
@@ -111,10 +120,10 @@ public class OrderJsonParser {
 				offerBrokerList.add(broker);
 			}
 		}
-		
+
 		order.setComments(jsonObject.optString("comments", null));
 
-		order.setNotlater(OfferingOrder.defineNotlater(bookingDate));
+		order.setNotlater(defineNotlater(bookingDate, notlaterMinutes));
 		order.setPhone(recipientPhone);
 		order.setBookingDate(bookingDate);
 		order.setDestinations(addressPoints);
