@@ -22,20 +22,24 @@ public class OfferedOrderBrokerDao implements IOfferedOrderBrokerDao {
 
 	@Override
 	public void save(OfferedOrderBroker offeredOrderBroker) {
-		sessionFactory.getCurrentSession().saveOrUpdate(offeredOrderBroker);
+		sessionFactory.getCurrentSession()
+				.saveOrUpdate(offeredOrderBroker);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<OfferedOrderBroker> get(Order order) {
 		return sessionFactory.getCurrentSession().createCriteria(OfferedOrderBroker.class)
-				.add(Restrictions.eq("order", order)).list();
+				.add(Restrictions.eq("order", order))
+				.list();
 	}
 
 	@Override
 	public Long count(Order order) {
 		return (Long) sessionFactory.getCurrentSession().createCriteria(OfferedOrderBroker.class)
-				.add(Restrictions.eq("order", order)).setProjection(Projections.rowCount()).uniqueResult();
+				.add(Restrictions.eq("order", order))
+				.setProjection(Projections.rowCount())
+				.uniqueResult();
 	}
 
 }

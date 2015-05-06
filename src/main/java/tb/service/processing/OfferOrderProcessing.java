@@ -71,18 +71,7 @@ public class OfferOrderProcessing {
 		@Override
 		public void run() {
 			try {
-				// do pause before offer, maybe client canceled order
-				Date currentDatetime = new Date();
-				if (orderExecHolder.getStartOffer().after(currentDatetime)) {
-					long diff = orderExecHolder.getStartOffer().getTime() - currentDatetime.getTime();
-					try {
-						Thread.sleep(diff);
-					} catch (InterruptedException e) {
-						return;
-					}
-				}
-
-				Boolean offered = offeringOrder.offer(orderExecHolder.getOrder().getId(), orderExecHolder.getAttemptCount());
+				Boolean offered = offeringOrder.offer(orderExecHolder.getOrder().getId());
 
 				if (offered != null) {
 					if (offered) {

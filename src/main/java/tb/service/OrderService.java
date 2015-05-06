@@ -90,9 +90,6 @@ public class OrderService {
 	@Autowired
 	private CarDao carDao;
 
-	@Value("#{mainSettings['offerorder.wait.pause']}")
-	private Integer waitPause;
-
 	@Value("#{mainSettings['createorder.limit']}")
 	private Integer createOrderLimit = 60000;
 	
@@ -164,9 +161,7 @@ public class OrderService {
 		orderStatus.setStatus(OrderStatusType.Created);
 		orderStatusDao.save(orderStatus);
 
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MILLISECOND, waitPause);
-		OrderExecHolder orderExecHolder = new OrderExecHolder(order, cal.getTime());
+		OrderExecHolder orderExecHolder = new OrderExecHolder(order);
 		offerOrderProcessing.addOrder(orderExecHolder);
 	}
 

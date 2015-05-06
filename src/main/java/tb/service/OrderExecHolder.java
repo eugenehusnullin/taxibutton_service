@@ -7,17 +7,15 @@ import tb.domain.order.Order;
 public class OrderExecHolder {
 	private Order order;
 	private int attemptCount;
-	private Date startOffer;
 	private Date startChooseWinner;
 
-	public OrderExecHolder(Order order, Date startOffer) {
-		this(order, 1, startOffer);
+	public OrderExecHolder(Order order) {
+		this(order, 1);
 	}
 
-	public OrderExecHolder(Order order, int attemptCount, Date startOffer) {
+	public OrderExecHolder(Order order, int attemptCount) {
 		this.order = order;
 		this.attemptCount = attemptCount;
-		this.startOffer = startOffer;
 	}
 	
 	public int incrementAttempt() {
@@ -31,10 +29,6 @@ public class OrderExecHolder {
 
 	public int getAttemptCount() {
 		return attemptCount;
-	}
-
-	public Date getStartOffer() {
-		return startOffer;
 	}
 
 	public Date getStartChooseWinner() {

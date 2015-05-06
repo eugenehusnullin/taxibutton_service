@@ -63,7 +63,7 @@ public class OfferingOrder {
 	private final static int MINUTE_IN_HOUR = 60;
 
 	@Transactional
-	public Boolean offer(Long orderId, int cntAttempt) {
+	public Boolean offer(Long orderId) {
 		Order order = orderDao.get(orderId);
 
 		// common check (order state and e.t.c.)
@@ -74,7 +74,7 @@ public class OfferingOrder {
 		Map<Long, Document> messages4Send = null;
 		if (order.getNotlater()) {
 			List<CarState> carStates = carDao.getNearCarStates(order.getSource().getLat(), order.getSource().getLon(),
-					COORDINATES_COEF * cntAttempt);
+					COORDINATES_COEF);
 			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
 				final List<Long> limitBrokerIds = order.getOfferBrokerList().stream().map(m -> m.getId())
 						.collect(Collectors.toList());
@@ -105,9 +105,19 @@ public class OfferingOrder {
 
 	private boolean makeOffer(Map<Long, Document> messages4Send, Order order) {
 		boolean result = false;
+		List<OfferedOrderBroker> offeredOrderBrokerList = offeredOrderBrokerDao.get(order);
+		List<Long> excludeBrokers = offeredOrderBrokerList
+				.stream()
+				.map(m -> m.getBroker().getId())
+				.collect(Collectors.toList());
+
 		for (Map.Entry<Long, Document> entry : messages4Send.entrySet()) {
 			Long brokerId = entry.getKey();
 			Document doc = entry.getValue();
+			
+			if (excludeBrokers.contains(brokerId)) {
+				continue;
+			}
 
 			Broker broker = brokerDao.get(brokerId);
 			String url = broker.getApiurl() + "/1.x/requestcar";
