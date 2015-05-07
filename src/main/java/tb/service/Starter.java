@@ -42,4 +42,8 @@ public class Starter {
 		taskScheduler.shutdown();
 		taskScheduler.destroy();
 	}
+	
+	public void schedule(Runnable task, Date startTime) {
+		taskScheduler.schedule(task, startTime);
+	}
 }

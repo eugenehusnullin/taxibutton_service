@@ -45,3 +45,8 @@
 	<a href="create">Create</a>
 	<br />
 	<a href="tariffs">Get tariffs</a>
+	<br />
+	<a href="carsynch">Car synch</a>
+	<br />
+	<br />
+	<br />

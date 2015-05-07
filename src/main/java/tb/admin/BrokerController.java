@@ -1,5 +1,6 @@
 package tb.admin;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import tb.car.CarSynch;
 import tb.domain.Broker;
 import tb.domain.SmsMethod;
 import tb.domain.TariffType;
 import tb.service.BrokerService;
+import tb.service.Starter;
 import tb.service.TariffService;
 
 @RequestMapping("/broker")
@@ -23,6 +26,19 @@ public class BrokerController {
 	private BrokerService brokerService;
 	@Autowired
 	private TariffService tariffService;
+	@Autowired
+	private Starter starter;
+	@Autowired
+	private CarSynch carSynch;
+	
+	@RequestMapping(value = "/carsynch", method = RequestMethod.GET)
+	public String carSynch(Model model) {
+		Date d = new Date(new Date().getTime() + 3000);
+		starter.schedule(carSynch::synch, d);
+		
+		model.addAttribute("result", "Car synch started, wait some seconds.");
+		return "result";
+	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) {
