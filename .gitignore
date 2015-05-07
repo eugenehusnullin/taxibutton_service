@@ -10,3 +10,5 @@ WebContent/WEB-INF/settings/jdbc.settings
 WebContent/WEB-INF/settings/main.settings
 WebContent/WEB-INF/settings/sms48.settings
 .DS_Store
+
+src/main/resources/log4j2.xml
