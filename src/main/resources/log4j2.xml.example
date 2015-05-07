@@ -4,8 +4,15 @@
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>
-		<RollingFile name="RollingFile" fileName="logs/app.log"
-			filePattern="logs/app-%d{yyyy-MM-dd}-%i.log.gz">
+		<RollingFile name="RollingFile" fileName="logs/tb.log"
+			filePattern="logs/tb-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+		</RollingFile>
+		<RollingFile name="RollingFileErrors" fileName="logs/tb-errors.log"
+			filePattern="logs/tb-errors-%d{yyyy-MM-dd}-%i.log.gz">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 			<Policies>
 				<TimeBasedTriggeringPolicy />
