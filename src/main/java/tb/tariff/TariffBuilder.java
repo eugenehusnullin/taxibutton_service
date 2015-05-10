@@ -59,10 +59,9 @@ public class TariffBuilder {
 			list.add(tariff);
 			tariff.setBroker(broker);
 
-			JSONObject jsonTariff = tariffsArray.getJSONObject(i);
-			JSONObject jsonTariffClass = jsonTariff.getJSONObject("TariffClass");
-			tariff.setTariffId(jsonTariffClass.getString("Id"));
-			tariff.setName(jsonTariffClass.getString("DisplayName"));
+			JSONObject jsonTariff = tariffsArray.getJSONObject(i);			
+			tariff.setTariffId(jsonTariff.getString("Id"));			
+			tariff.setName(jsonTariff.getJSONArray("Names").getJSONObject(0).getString("Value"));
 			tariff.setTariff(jsonTariff.toString());
 		}
 		return list;
