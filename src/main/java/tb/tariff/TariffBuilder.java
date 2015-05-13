@@ -61,7 +61,7 @@ public class TariffBuilder {
 
 			JSONObject jsonTariff = tariffsArray.getJSONObject(i);			
 			tariff.setTariffId(jsonTariff.getString("Id"));			
-			tariff.setName(jsonTariff.getJSONArray("Names").getJSONObject(0).getString("Value"));
+			tariff.setName(jsonTariff.getString("Name"));
 			tariff.setTariff(jsonTariff.toString());
 		}
 		return list;
