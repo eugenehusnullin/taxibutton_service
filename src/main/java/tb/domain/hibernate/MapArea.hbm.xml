@@ -19,6 +19,11 @@
 			<many-to-many column="brokerid" class="tb.domain.Broker"></many-to-many>
 		</set>
 		
+		<set name="tariffDefinitions" table="tariffdefinitionmapareas">
+			<key column="mapareaid"></key>
+			<many-to-many column="tariffdefinitionid" class="tb.domain.TariffDefinition"></many-to-many>
+		</set>
+		
 		<subclass name="Polygon" discriminator-value="polygon">
 			<property name="points" type="PointArray" length="20240"></property>
 		</subclass>

@@ -12,7 +12,7 @@ import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Tariff;
 
-@Repository("SimpleTariffDao")
+@Repository("TariffDao")
 public class TariffDao implements ITariffDao {
 
 	@Autowired

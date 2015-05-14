@@ -57,6 +57,7 @@ import tb.service.processing.CancelOrderProcessing;
 import tb.service.processing.OfferOrderProcessing;
 import tb.service.serialize.OrderJsonParser;
 import tb.service.serialize.YandexOrderSerializer;
+import tb.tariffdefinition.TariffDefinitionHelper;
 import tb.utils.DatetimeUtils;
 import tb.utils.HttpUtils;
 
@@ -498,16 +499,22 @@ public class OrderService {
 
 		return models;
 	}
+	
+	@Autowired
+	private TariffDefinitionHelper tariffDefinitionHelper;
 
 	// assign order executer
 	@Transactional
 	public boolean giveOrder(Long orderId, OrderAcceptAlacrity winnerAlacrity) {
 		Order order = orderDao.get(orderId);
+		
+		String tariffIdName = tariffDefinitionHelper.getTariffIdName(order.getSource().getLat(),
+				order.getSource().getLon(), order.getOrderVehicleClass());
 
 		Car car = carDao.getCar(winnerAlacrity.getBroker().getId(), winnerAlacrity.getUuid());
 		Car4Request car4Request = new Car4Request();
 		car4Request.setUuid(car.getUuid());
-		car4Request.setTariff(carDao.getFirstTariff(winnerAlacrity.getBroker().getId(), winnerAlacrity.getUuid()));
+		car4Request.setTariff(tariffIdName);
 		
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(order.getBookingDate());

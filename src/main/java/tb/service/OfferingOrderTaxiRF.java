@@ -29,17 +29,17 @@ import tb.dao.IOrderDao;
 import tb.dao.IOrderStatusDao;
 import tb.dao.ITariffDao;
 import tb.domain.Broker;
-import tb.domain.Tariff;
 import tb.domain.order.OfferedOrderBroker;
 import tb.domain.order.Order;
 import tb.domain.order.OrderStatus;
 import tb.domain.order.OrderStatusType;
 import tb.service.serialize.YandexOrderSerializer;
+import tb.tariffdefinition.TariffDefinitionHelper;
 import tb.utils.HttpUtils;
 
 @Service
-public class OfferingOrder {
-	private static final Logger log = LoggerFactory.getLogger(OfferingOrder.class);
+public class OfferingOrderTaxiRF {
+	private static final Logger log = LoggerFactory.getLogger(OfferingOrderTaxiRF.class);
 
 	@Autowired
 	private IOrderDao orderDao;
@@ -55,6 +55,8 @@ public class OfferingOrder {
 	private IOfferedOrderBrokerDao offeredOrderBrokerDao;
 	@Autowired
 	private BrokerService brokerService;
+	@Autowired
+	private TariffDefinitionHelper tariffDefinitionHelper;
 
 	@Value("#{mainSettings['offerorder.coordcoef']}")
 	private double COORDINATES_COEF;
@@ -68,6 +70,13 @@ public class OfferingOrder {
 
 		// common check (order state and e.t.c.)
 		if (!checkOrderValid4Offer(order)) {
+			return null;
+		}
+
+		String tariffIdName = tariffDefinitionHelper.getTariffIdName(order.getSource().getLat(),
+				order.getSource().getLon(), order.getOrderVehicleClass());
+		if (tariffIdName == null) {
+			log.info("Tariff definition not found for order id=" + order.getId());
 			return null;
 		}
 
@@ -86,7 +95,7 @@ public class OfferingOrder {
 					.collect(Collectors.toList());
 
 			carStates = carDao.getCarStatesByRequirements(carStates, order.getRequirements());
-			messages4Send = createNotlaterOffer(order, brokerIdsList, carStates);
+			messages4Send = createNotlaterOffer(order, brokerIdsList, carStates, tariffIdName);
 		} else {
 			List<Broker> brokers = brokerService.getBrokersByMapAreas(order.getSource().getLat(),
 					order.getSource().getLon());
@@ -97,7 +106,8 @@ public class OfferingOrder {
 						.filter(p -> limitBrokerIds.contains(p.getId()))
 						.collect(Collectors.toList());
 			}
-			messages4Send = createExactOffers(order, brokers.stream().map(p -> p.getId()).collect(Collectors.toList()));
+			messages4Send = createExactOffers(order, brokers.stream().map(p -> p.getId()).collect(Collectors.toList()),
+					tariffIdName);
 		}
 
 		return makeOffer(messages4Send, order);
@@ -114,7 +124,7 @@ public class OfferingOrder {
 		for (Map.Entry<Long, Document> entry : messages4Send.entrySet()) {
 			Long brokerId = entry.getKey();
 			Document doc = entry.getValue();
-			
+
 			if (excludeBrokers.contains(brokerId)) {
 				continue;
 			}
@@ -138,30 +148,31 @@ public class OfferingOrder {
 		return result;
 	}
 
-	private Map<Long, Document> createExactOffers(Order order, List<Long> brokerIdsList) {
+	private Map<Long, Document> createExactOffers(Order order, List<Long> brokerIdsList, String tariffIdName) {
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
 		for (Long brokerId : brokerIdsList) {
 			Broker broker = brokerDao.get(brokerId);
-			Document doc = createExactOffer(order, broker);
+			Document doc = createExactOffer(order, broker, tariffIdName);
 			messagesMap.put(brokerId, doc);
 		}
 		return messagesMap;
 	}
 
 	@Transactional
-	public Document createExactOffer(Order order, Broker broker) {
+	public Document createExactOffer(Order order, Broker broker, String tariffIdName) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(order.getBookingDate());
 		calendar.add(Calendar.HOUR_OF_DAY, broker.getTimezoneOffset());
 
-		List<Tariff> tariffs = tariffDao.get(broker);
-		List<String> tariffIds = tariffs.stream().map(p -> p.getTariffId()).collect(Collectors.toList());
+		List<String> tariffIds = new ArrayList<String>();
+		tariffIds.add(tariffIdName);
 		Document doc = YandexOrderSerializer.orderToRequestXml(order, calendar.getTime(), tariffIds, null);
 
 		return doc;
 	}
 
-	private Map<Long, Document> createNotlaterOffer(Order order, List<Long> brokerIdsList, List<CarState> carStates) {
+	private Map<Long, Document> createNotlaterOffer(Order order, List<Long> brokerIdsList, List<CarState> carStates,
+			String tariffIdName) {
 		double lat = order.getSource().getLat();
 		double lon = order.getSource().getLon();
 		Map<Long, Document> messagesMap = new HashMap<Long, Document>();
@@ -182,7 +193,7 @@ public class OfferingOrder {
 				int dist = (int) calcDistance(lat, lon, carState.getLatitude(), carState.getLongitude());
 				car4Request.setDist(dist);
 				car4Request.setTime((dist * MINUTE_IN_HOUR) / SPEED);
-				car4Request.setTariff(carDao.getFirstTariff(carState.getBrokerId(), carState.getUuid()));
+				car4Request.setTariff(tariffIdName);
 
 				car4RequestList.add(car4Request);
 			}

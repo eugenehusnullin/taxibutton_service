@@ -28,7 +28,7 @@ import org.w3c.dom.Document;
 import tb.domain.Broker;
 import tb.domain.order.Order;
 import tb.service.BrokerService;
-import tb.service.OfferingOrder;
+import tb.service.OfferingOrderYandexTaxi;
 import tb.service.OrderService;
 import tb.service.exceptions.DeviceNotFoundException;
 import tb.service.exceptions.NotValidOrderStatusException;
@@ -49,7 +49,7 @@ public class OrderController {
 	@Autowired
 	private BrokerService brokerService;
 	@Autowired
-	private OfferingOrder offeringOrder;
+	private OfferingOrderYandexTaxi offeringOrder;
 
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)

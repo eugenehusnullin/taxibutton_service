@@ -17,5 +17,6 @@
 		<mapping resource="tb/domain/hibernate/OfferedOrderBroker.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/Feedback.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/MapArea.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/TariffDefinition.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

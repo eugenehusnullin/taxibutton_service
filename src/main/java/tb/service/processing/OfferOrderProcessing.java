@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import tb.service.OfferingOrder;
+import tb.service.OfferingOrderTaxiRF;
 import tb.service.OrderExecHolder;
 import tb.service.OrderService;
 import tb.utils.ThreadFactorySecuenceNaming;
@@ -112,7 +112,7 @@ public class OfferOrderProcessing {
 	@Autowired
 	private CancelOrderProcessing cancelOrderProcessing;
 	@Autowired
-	private OfferingOrder offeringOrder;
+	private OfferingOrderTaxiRF offeringOrder;
 
 	public OfferOrderProcessing() {
 		queue = new ArrayDeque<OrderExecHolder>();
