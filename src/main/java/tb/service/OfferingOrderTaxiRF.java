@@ -70,41 +70,72 @@ public class OfferingOrderTaxiRF {
 
 		// common check (order state and e.t.c.)
 		if (!checkOrderValid4Offer(order)) {
+			log.info("Order - " + order.getUuid() + ", has bad state for offering.");
 			return null;
 		}
 
 		String tariffIdName = tariffDefinitionHelper.getTariffIdName(order.getSource().getLat(),
 				order.getSource().getLon(), order.getOrderVehicleClass());
 		if (tariffIdName == null) {
-			log.info("Tariff definition not found for order id=" + order.getId());
+			log.info("Order - " + order.getUuid() + ", tariff definition not found for order.");
 			return null;
 		}
 
 		Map<Long, Document> messages4Send = null;
 		if (order.getNotlater()) {
+			log.info("Order - " + order.getUuid() + ", try offer NOT LATER order.");
+
 			List<CarState> carStates = carDao.getNearCarStates(order.getSource().getLat(), order.getSource().getLon(),
 					COORDINATES_COEF);
+
+			if (carStates.size() == 0) {
+				log.info("Order - " + order.getUuid()
+						+ ", NOT OFFER - not found car normal state or(and) nornmal distance.");
+			}
+
 			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
 				final List<Long> limitBrokerIds = order.getOfferBrokerList().stream().map(m -> m.getId())
 						.collect(Collectors.toList());
 				carStates = carStates.stream()
 						.filter(p -> limitBrokerIds.contains(p.getBrokerId()))
 						.collect(Collectors.toList());
+
+				if (carStates.size() == 0) {
+					log.info("Order - " + order.getUuid()
+							+ ", NOT OFFER - not found car normal state or(and) nornmal distance of choosed broker.");
+				}
 			}
 			List<Long> brokerIdsList = carStates.stream().map(p -> p.getBrokerId()).distinct()
 					.collect(Collectors.toList());
 
 			carStates = carDao.getCarStatesByRequirements(carStates, order.getRequirements());
+			if (carStates.size() == 0) {
+				log.info("Order - " + order.getUuid()
+						+ ", NOT OFFER - not found car with selected additional services.");
+			}
 			messages4Send = createNotlaterOffer(order, brokerIdsList, carStates, tariffIdName);
 		} else {
+			log.info("Order - " + order.getUuid() + ", try offer EXACT order.");
+			
 			List<Broker> brokers = brokerService.getBrokersByMapAreas(order.getSource().getLat(),
 					order.getSource().getLon());
+			
+			if (brokers.size() == 0) {
+				log.info("Order - " + order.getUuid()
+						+ ", NOT OFFER - not found brokers with needed mapareas.");
+			}
+			
 			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
 				final List<Long> limitBrokerIds = order.getOfferBrokerList().stream().map(m -> m.getId())
 						.collect(Collectors.toList());
 				brokers = brokers.stream()
 						.filter(p -> limitBrokerIds.contains(p.getId()))
 						.collect(Collectors.toList());
+				
+				if (brokers.size() == 0) {
+					log.info("Order - " + order.getUuid()
+							+ ", NOT OFFER - not found choosed broker in mapareas.");
+				}
 			}
 			messages4Send = createExactOffers(order, brokers.stream().map(p -> p.getId()).collect(Collectors.toList()),
 					tariffIdName);
