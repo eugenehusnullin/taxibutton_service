@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,8 @@ import tb.utils.XmlUtils;
 @RequestMapping("/carstatus")
 public class CarStatusController {
 
+	private static final Logger logger = LoggerFactory.getLogger(CarStatusController.class);
+
 	@Autowired
 	private IBrokerDao brokerDao;
 	@Autowired
@@ -38,6 +42,8 @@ public class CarStatusController {
 	public void index(HttpServletRequest request, HttpServletResponse response, @RequestParam("clid") String clid,
 			@RequestParam("apikey") String apikey, @RequestParam("uuid") String uuid,
 			@RequestParam("status") String status) {
+
+		logger.info("Single status update: broker=" + clid + " car=" + uuid + " status=" + status);
 
 		Broker broker = brokerDao.getByApiId(clid);
 		if (broker == null || !broker.getApiKey().equals(apikey)) {
@@ -65,6 +71,14 @@ public class CarStatusController {
 		} else {
 			try {
 				Document document = XmlUtils.buildDomDocument(request.getInputStream());
+				if (logger.isInfoEnabled()) {
+					try {
+						String forLog = XmlUtils.nodeToString(document.getFirstChild());
+						logger.info("Multi status update: " + forLog);
+					} catch (Exception e) {
+						logger.error("Cannot log.");
+					}
+				}
 				List<CarState> carStates = carStateBuilder.createCarStateStatuses(document);
 				carDao.updateCarStateStatuses(broker, carStates);
 				response.setStatus(200);
