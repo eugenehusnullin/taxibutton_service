@@ -44,14 +44,6 @@
 
 	<context:component-scan base-package="tb" />
 	<context:annotation-config />
-
-
-	<bean id="tariffService" class="tb.service.TariffService" />
-	<task:scheduled-tasks scheduler="tariffsProcessingScheduler">
-		<task:scheduled ref="tariffService" method="pullBrokersTariffs"
-			fixed-delay="3600000" />
-	</task:scheduled-tasks>
-	<task:scheduler id="tariffsProcessingScheduler" pool-size="10" />
 	
 	
 	<bean id="inmemDbDs" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
