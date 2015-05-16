@@ -17,6 +17,7 @@ import tb.domain.TariffType;
 import tb.service.BrokerService;
 import tb.service.Starter;
 import tb.service.TariffService;
+import tb.tariff.TariffSynch;
 
 @RequestMapping("/broker")
 @Controller
@@ -30,13 +31,24 @@ public class BrokerController {
 	private Starter starter;
 	@Autowired
 	private CarSynch carSynch;
+	@Autowired
+	private TariffSynch tariffSynch;
 	
 	@RequestMapping(value = "/carsynch", method = RequestMethod.GET)
 	public String carSynch(Model model) {
 		Date d = new Date(new Date().getTime() + 3000);
 		starter.schedule(carSynch::synch, d);
 		
-		model.addAttribute("result", "Car synch started, wait some seconds.");
+		model.addAttribute("result", "Car synch started, wait some seconds. And you can see result in log files.");
+		return "result";
+	}
+	
+	@RequestMapping(value = "/tariffsynch", method = RequestMethod.GET)
+	public String tariffSynch(Model model) {
+		Date d = new Date(new Date().getTime() + 3000);
+		starter.schedule(tariffSynch::synch, d);
+		
+		model.addAttribute("result", "Tariff synch started, wait some seconds. And you can see result in log files.");
 		return "result";
 	}
 
@@ -80,13 +92,6 @@ public class BrokerController {
 		broker.setTimezoneOffset(timezoneOffset);
 		brokerService.add(broker);
 
-		return "redirect:list";
-	}
-
-	@RequestMapping(value = "/tariffs", method = RequestMethod.GET)
-	public String tariffs() {
-
-		tariffService.pullBrokersTariffs();
 		return "redirect:list";
 	}
 

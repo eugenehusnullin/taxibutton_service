@@ -1,16 +1,12 @@
 package tb.service;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.SAXException;
 
 import tb.dao.IBrokerDao;
 import tb.dao.IDeviceDao;
@@ -57,14 +53,5 @@ public class TariffService {
 		Broker broker = brokerDao.get(brokerId);
 		Tariff simpleTariff = tariffDao.get(broker).get(0);
 		return simpleTariff.getTariff();
-	}
-
-	@Transactional
-	public void create(String tariff, Long brokerId) throws ParserConfigurationException, SAXException, IOException {
-	}
-
-	@Transactional
-	public void pullBrokersTariffs() {
-
 	}
 }

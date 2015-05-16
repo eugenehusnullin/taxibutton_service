@@ -38,23 +38,19 @@ public class CarSynch {
 	@Transactional
 	@Scheduled(cron = "0 0/2 * * * *")
 	public void synch() {
+		log.info("Start car synch.");
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
+			log.info("Broker - " + broker.getName() + "(" + broker.getApiId() + ")");
 			try {
 				InputStream carsInputStream = HttpUtils.makeGetRequest(broker.getDriverUrl(), "application/xml");
-				Document doc = null;
-				try {
-					doc = XmlUtils.buildDomDocument(carsInputStream);
-				} catch (ParserConfigurationException | SAXException | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if (doc != null) {
-					Date loadDate = new Date();
-					List<Car> cars = carBuilder.createCars(doc, broker, loadDate);
-					updateCars(cars, broker, loadDate);
-				}
-			} catch (IOException e) {
+				Document doc = XmlUtils.buildDomDocument(carsInputStream);
+				Date loadDate = new Date();
+				List<Car> cars = carBuilder.createCars(doc, broker, loadDate);
+				log.info(cars.size() + " cars - pulled from broker.");
+				updateCars(cars, broker, loadDate);
+				log.info("Cars saved to db.");
+			} catch (ParserConfigurationException | SAXException | IOException e) {
 				log.error("Car synch error: ", e);
 			}
 		}

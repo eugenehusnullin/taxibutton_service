@@ -39,9 +39,12 @@ public class TariffSynch {
 	@Scheduled(cron = "0 01 * * * *")
 	@Transactional
 	public void synch() {
+		log.info("Start tariff synch.");
 		List<Broker> brokers = brokerDao.getActive();
 		for (Broker broker : brokers) {
+			log.info("Broker - " + broker.getName() + "(" + broker.getApiId() + ")");
 			if (broker.getTariffUrl() == null || broker.getTariffUrl().isEmpty()) {
+				log.warn("tariff url is empty.");
 				continue;
 			}
 
@@ -51,20 +54,18 @@ public class TariffSynch {
 				if (inputStream != null) {
 					Date loadDate = new Date();
 					List<Tariff> tariffs;
-					try {
-						if (broker.getTariffType() == TariffType.XML) {
-							tariffs = tariffBuilder.createTariffsFromXml(inputStream, broker, loadDate);
-						} else {
-							tariffs = tariffBuilder.createTariffsFromJson(inputStream, broker, loadDate);
-						}
-						updateTariffs(tariffs, broker, loadDate);
-					} catch (TransformerFactoryConfigurationError | TransformerException | ParserConfigurationException
-							| SAXException | IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+
+					if (broker.getTariffType() == TariffType.XML) {
+						tariffs = tariffBuilder.createTariffsFromXml(inputStream, broker, loadDate);
+					} else {
+						tariffs = tariffBuilder.createTariffsFromJson(inputStream, broker, loadDate);
 					}
+					log.info(tariffs.size() + " tariffs - pulled from broker.");
+					updateTariffs(tariffs, broker, loadDate);
+					log.info("Tariffs saved to db.");
 				}
-			} catch (IOException e) {
+			} catch (TransformerFactoryConfigurationError | TransformerException | ParserConfigurationException
+					| SAXException | IOException e) {
 				log.error("Tariff synch error: ", e);
 			}
 		}

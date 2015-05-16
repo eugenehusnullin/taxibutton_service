@@ -11,7 +11,7 @@
 <script type="text/javascript"
 	src="<c:url value="/resources/js/dev.js"/>"></script>
 <body>
-	<table class="mainTable">
+	<table border="1">
 		<thead>
 			<tr>
 				<th>#</th>
@@ -42,11 +42,11 @@
 		</tbody>
 	</table>
 	<br />
-	<a href="create">Create</a>
+	<a href="create">Create</a>	
 	<br />
-	<a href="tariffs">Get tariffs</a>
+	<a href="carsynch">Car synch (pull cars from dispatchers)</a>
 	<br />
-	<a href="carsynch">Car synch</a>
+	<a href="tariffsynch">Tariff synch (pull tariffs from dispatchers)</a>
 	<br />
 	<br />
 	<br />

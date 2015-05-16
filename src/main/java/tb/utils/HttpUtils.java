@@ -14,14 +14,12 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 public class HttpUtils {
-	
-	private static final Logger log = LoggerFactory.getLogger(HttpUtils.class);
 
-	public static HttpURLConnection postDocumentOverHttp(Document document, String url) throws IOException,
+	public static HttpURLConnection postDocumentOverHttp(Document document, String url, Logger logger)
+			throws IOException,
 			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
@@ -32,9 +30,9 @@ public class HttpUtils {
 		connection.setDoOutput(true);
 
 		String s = XmlUtils.nodeToString(document.getFirstChild());
-		
-		log.trace(s);
-		
+
+		logger.info(s);
+
 		IOUtils.write(s, connection.getOutputStream(), "UTF-8");
 		connection.getOutputStream().flush();
 		connection.getOutputStream().close();

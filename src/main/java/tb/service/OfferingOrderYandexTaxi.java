@@ -39,7 +39,7 @@ import tb.utils.HttpUtils;
 
 @Service
 public class OfferingOrderYandexTaxi {
-	private static final Logger log = LoggerFactory.getLogger(OfferingOrderYandexTaxi.class);
+	private static final Logger logger = LoggerFactory.getLogger(OfferingOrderYandexTaxi.class);
 
 	@Autowired
 	private IOrderDao orderDao;
@@ -122,7 +122,7 @@ public class OfferingOrderYandexTaxi {
 			Broker broker = brokerDao.get(brokerId);
 			String url = broker.getApiurl() + "/1.x/requestcar";
 			try {
-				boolean posted = HttpUtils.postDocumentOverHttp(doc, url).getResponseCode() == 200;
+				boolean posted = HttpUtils.postDocumentOverHttp(doc, url, logger).getResponseCode() == 200;
 				result |= posted;
 				if (posted) {
 					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
@@ -132,7 +132,7 @@ public class OfferingOrderYandexTaxi {
 					offeredOrderBrokerDao.save(offeredOrderBroker);
 				}
 			} catch (IOException | TransformerException | TransformerFactoryConfigurationError e) {
-				log.error("MAKE OFFER.", e);
+				logger.error("MAKE OFFER.", e);
 			}
 		}
 		return result;

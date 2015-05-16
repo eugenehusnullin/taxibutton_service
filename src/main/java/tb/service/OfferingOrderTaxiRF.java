@@ -39,7 +39,7 @@ import tb.utils.HttpUtils;
 
 @Service
 public class OfferingOrderTaxiRF {
-	private static final Logger log = LoggerFactory.getLogger(OfferingOrderTaxiRF.class);
+	private static final Logger logger = LoggerFactory.getLogger(OfferingOrderTaxiRF.class);
 
 	@Autowired
 	private IOrderDao orderDao;
@@ -70,27 +70,28 @@ public class OfferingOrderTaxiRF {
 
 		// common check (order state and e.t.c.)
 		if (!checkOrderValid4Offer(order)) {
-			log.info("Order - " + order.getUuid() + ", has bad state for offering.");
+			logger.info("Order - " + order.getUuid() + ", has bad state for offering.");
 			return null;
 		}
 
 		String tariffIdName = tariffDefinitionHelper.getTariffIdName(order.getSource().getLat(),
 				order.getSource().getLon(), order.getOrderVehicleClass());
 		if (tariffIdName == null) {
-			log.info("Order - " + order.getUuid() + ", tariff definition not found for order.");
+			logger.info("Order - " + order.getUuid() + ", tariff definition not found for order.");
 			return null;
 		}
 
 		Map<Long, Document> messages4Send = null;
 		if (order.getNotlater()) {
-			log.info("Order - " + order.getUuid() + ", try offer NOT LATER order.");
+			logger.info("Order - " + order.getUuid() + ", try offer NOT LATER order.");
 
 			List<CarState> carStates = carDao.getNearCarStates(order.getSource().getLat(), order.getSource().getLon(),
 					COORDINATES_COEF);
 
 			if (carStates.size() == 0) {
-				log.info("Order - " + order.getUuid()
+				logger.info("Order - " + order.getUuid()
 						+ ", NOT OFFER - not found car normal state or(and) nornmal distance.");
+				return false;
 			}
 
 			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
@@ -101,7 +102,7 @@ public class OfferingOrderTaxiRF {
 						.collect(Collectors.toList());
 
 				if (carStates.size() == 0) {
-					log.info("Order - " + order.getUuid()
+					logger.info("Order - " + order.getUuid()
 							+ ", NOT OFFER - not found car normal state or(and) nornmal distance of choosed broker.");
 				}
 			}
@@ -110,18 +111,18 @@ public class OfferingOrderTaxiRF {
 
 			carStates = carDao.getCarStatesByRequirements(carStates, order.getRequirements());
 			if (carStates.size() == 0) {
-				log.info("Order - " + order.getUuid()
+				logger.info("Order - " + order.getUuid()
 						+ ", NOT OFFER - not found car with selected additional services.");
 			}
 			messages4Send = createNotlaterOffer(order, brokerIdsList, carStates, tariffIdName);
 		} else {
-			log.info("Order - " + order.getUuid() + ", try offer EXACT order.");
+			logger.info("Order - " + order.getUuid() + ", try offer EXACT order.");
 			
 			List<Broker> brokers = brokerService.getBrokersByMapAreas(order.getSource().getLat(),
 					order.getSource().getLon());
 			
 			if (brokers.size() == 0) {
-				log.info("Order - " + order.getUuid()
+				logger.info("Order - " + order.getUuid()
 						+ ", NOT OFFER - not found brokers with needed mapareas.");
 			}
 			
@@ -133,7 +134,7 @@ public class OfferingOrderTaxiRF {
 						.collect(Collectors.toList());
 				
 				if (brokers.size() == 0) {
-					log.info("Order - " + order.getUuid()
+					logger.info("Order - " + order.getUuid()
 							+ ", NOT OFFER - not found choosed broker in mapareas.");
 				}
 			}
@@ -163,7 +164,7 @@ public class OfferingOrderTaxiRF {
 			Broker broker = brokerDao.get(brokerId);
 			String url = broker.getApiurl() + "/1.x/requestcar";
 			try {
-				boolean posted = HttpUtils.postDocumentOverHttp(doc, url).getResponseCode() == 200;
+				boolean posted = HttpUtils.postDocumentOverHttp(doc, url, logger).getResponseCode() == 200;
 				result |= posted;
 				if (posted) {
 					OfferedOrderBroker offeredOrderBroker = new OfferedOrderBroker();
@@ -173,7 +174,7 @@ public class OfferingOrderTaxiRF {
 					offeredOrderBrokerDao.save(offeredOrderBroker);
 				}
 			} catch (IOException | TransformerException | TransformerFactoryConfigurationError e) {
-				log.error("MAKE OFFER.", e);
+				logger.error("MAKE OFFER.", e);
 			}
 		}
 		return result;

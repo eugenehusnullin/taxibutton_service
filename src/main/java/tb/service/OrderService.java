@@ -64,7 +64,7 @@ import tb.utils.HttpUtils;
 @Service
 public class OrderService {
 
-	private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+	private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
 	@Autowired
 	private IOrderDao orderDao;
@@ -524,9 +524,9 @@ public class OrderService {
 		String url = winnerAlacrity.getBroker().getApiurl() + "/1.x/setcar";
 
 		try {
-			boolean posted = HttpUtils.postDocumentOverHttp(doc, url).getResponseCode() == 200;
+			boolean posted = HttpUtils.postDocumentOverHttp(doc, url, logger).getResponseCode() == 200;
 			if (!posted) {
-				log.info("Error giving order to broker: " + winnerAlacrity.getBroker().getId().toString());
+				logger.info("Error giving order to broker: " + winnerAlacrity.getBroker().getId().toString());
 				return false;
 			} else {
 				order.setBroker(winnerAlacrity.getBroker());
@@ -542,7 +542,7 @@ public class OrderService {
 				return true;
 			}
 		} catch (IOException | TransformerException | TransformerFactoryConfigurationError e) {
-			log.error(e.toString());
+			logger.error(e.toString());
 			return false;
 		}
 	}

@@ -42,7 +42,7 @@ import tb.utils.NetStreamUtils;
 @Controller("apiDeviceOrderController")
 public class OrderController {
 
-	private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+	private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
 	@Autowired
 	private OrderService orderService;
@@ -57,7 +57,7 @@ public class OrderController {
 
 		try {
 			String str = getHttpServletRequestBuffer(request);
-			log.trace(str);
+			logger.trace(str);
 
 			JSONObject createOrderObject = (JSONObject) new JSONTokener(str).nextValue();
 
@@ -72,16 +72,16 @@ public class OrderController {
 				IOUtils.write(responseJson.toString(), response.getOutputStream(), "UTF-8");
 			} catch (DeviceNotFoundException dnfe) {
 				response.setStatus(403);
-				log.error(dnfe.toString());
+				logger.error(dnfe.toString());
 			} catch (ParseOrderException e) {
 				response.sendError(404, e.toString());
-				log.error(e.toString());
+				logger.error(e.toString());
 			}
 		} catch (UnsupportedEncodingException e) {
-			log.error("apiDeviceOrderController.create", e);
+			logger.error("apiDeviceOrderController.create", e);
 			response.setStatus(500);
 		} catch (IOException e) {
-			log.error("apiDeviceOrderController.create", e);
+			logger.error("apiDeviceOrderController.create", e);
 			response.setStatus(500);
 		}
 	}
@@ -108,10 +108,10 @@ public class OrderController {
 				response.setStatus(404);
 			}
 		} catch (UnsupportedEncodingException e) {
-			log.error("apiDeviceOrderController.cancel", e);
+			logger.error("apiDeviceOrderController.cancel", e);
 			response.setStatus(500);
 		} catch (IOException e) {
-			log.error("apiDeviceOrderController.cancel", e);
+			logger.error("apiDeviceOrderController.cancel", e);
 			response.setStatus(500);
 		}
 	}
@@ -134,10 +134,10 @@ public class OrderController {
 				response.setStatus(403);
 			}
 		} catch (UnsupportedEncodingException e) {
-			log.error("apiDeviceOrderController.cancel", e);
+			logger.error("apiDeviceOrderController.cancel", e);
 			response.setStatus(500);
 		} catch (IOException e) {
-			log.error("apiDeviceOrderController.cancel", e);
+			logger.error("apiDeviceOrderController.cancel", e);
 			response.setStatus(500);
 		}
 	}
@@ -161,10 +161,10 @@ public class OrderController {
 				response.setStatus(403);
 			}
 		} catch (UnsupportedEncodingException e) {
-			log.error("apiDeviceOrderController.cancel", e);
+			logger.error("apiDeviceOrderController.cancel", e);
 			response.setStatus(500);
 		} catch (IOException e) {
-			log.error("apiDeviceOrderController.cancel", e);
+			logger.error("apiDeviceOrderController.cancel", e);
 			response.setStatus(500);
 		}
 	}
@@ -173,22 +173,22 @@ public class OrderController {
 	public void feedback(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			String str = getHttpServletRequestBuffer(request);
-			log.trace(str);
+			logger.trace(str);
 
 			JSONObject feedbackJson = (JSONObject) new JSONTokener(str).nextValue();
 			orderService.saveFeedback(feedbackJson);
 			response.setStatus(200);
 		} catch (UnsupportedEncodingException e) {
-			log.error("apiDeviceOrderController.feedback", e);
+			logger.error("apiDeviceOrderController.feedback", e);
 			response.setStatus(500);
 		} catch (IOException e) {
-			log.error("apiDeviceOrderController.feedback", e);
+			logger.error("apiDeviceOrderController.feedback", e);
 			response.setStatus(500);
 		} catch (OrderNotFoundException e) {
-			log.error("apiDeviceOrderController.feedback", e);
+			logger.error("apiDeviceOrderController.feedback", e);
 			response.setStatus(403);
 		} catch (WrongData e) {
-			log.error("apiDeviceOrderController.feedback", e);
+			logger.error("apiDeviceOrderController.feedback", e);
 			response.setStatus(404);
 		}
 	}
@@ -233,7 +233,7 @@ public class OrderController {
 			String uuid = costOrderObject.optString("uuid");
 			Broker broker = brokerService.getByUuid(uuid);
 			Document doc = offeringOrder.createExactOffer(order, broker);
-			HttpURLConnection connection = HttpUtils.postDocumentOverHttp(doc, broker.getCostUrl());
+			HttpURLConnection connection = HttpUtils.postDocumentOverHttp(doc, broker.getCostUrl(), logger);
 			IOUtils.copy(connection.getInputStream(), response.getOutputStream());
 			
 		} catch (IOException e) {
