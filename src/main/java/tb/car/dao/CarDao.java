@@ -66,17 +66,23 @@ public class CarDao {
 					.uniqueResult();
 
 			if (savedCarState != null) {
-				savedCarState.setLatitude(carState.getLatitude());
-				savedCarState.setLongitude(carState.getLongitude());
-				savedCarState.setDate(carState.getDate());
-				session.update(savedCarState);
+				String update = "update CarState c set c.latitude = :latitude, c.longitude = :longitude"
+						+ ", c.date = :date "
+						+ "where c.brokerId = :brokerId and c.uuid = :uuid";
+				session.createQuery(update)
+						.setDouble("latitude", carState.getLatitude())
+						.setDouble("longitude", carState.getLongitude())
+						.setTimestamp("date", carState.getDate())
+						.setLong("brokerId", carState.getBrokerId())
+						.setString("uuid", carState.getUuid())
+						.executeUpdate();
 			}
-			
+
 			GeoData geoData = createGeoData(broker, carState);
 			session.save(geoData);
 		}
 	}
-	
+
 	private GeoData createGeoData(Broker broker, CarState carState) {
 		GeoData geoData = new GeoData();
 		geoData.setBrokerId(broker.getId());
@@ -84,7 +90,7 @@ public class CarDao {
 		geoData.setDate(carState.getDate());
 		geoData.setLat(carState.getLatitude());
 		geoData.setLon(carState.getLongitude());
-		
+
 		return geoData;
 	}
 
@@ -100,8 +106,13 @@ public class CarDao {
 		if (carState == null) {
 			return false;
 		} else {
-			carState.setState(carStateEnum);
-			session.update(carState);
+			String update = "update CarState c set c.state = :state "
+					+ " where c.brokerId = :brokerId and c.uuid = :uuid";
+			session.createQuery(update)
+					.setParameter("state", carStateEnum)
+					.setLong("brokerId", carState.getBrokerId())
+					.setString("uuid", carState.getUuid())
+					.executeUpdate();
 
 			return true;
 		}
@@ -122,7 +133,7 @@ public class CarDao {
 		String q = " from CarState cs "
 				+ " where cs.state=0 "
 				+ " and cs.date>=:date "
-				+ " and (abs(:lat-cs.latitude) + abs(:lon-cs.longitude)) <= :diff "				
+				+ " and (abs(:lat-cs.latitude) + abs(:lon-cs.longitude)) <= :diff "
 				+ " order by abs(:lat-cs.latitude) + abs(:lon-cs.longitude) ";
 
 		@SuppressWarnings("unchecked")
@@ -135,22 +146,22 @@ public class CarDao {
 
 		return list;
 	}
-	
+
 	@Transactional(value = "inmemDbTm")
-	public List<CarState> getCarStatesByRequirements(List<CarState> carStates, Set<Requirement> reqs) {		
+	public List<CarState> getCarStatesByRequirements(List<CarState> carStates, Set<Requirement> reqs) {
 		if (reqs == null || reqs.size() == 0) {
 			return carStates;
 		}
-		
+
 		List<String> reqsKeys = reqs.stream().map(p -> p.getType()).collect(Collectors.toList());
 		Session session = sessionFactory.getCurrentSession();
-		List<CarState> filteredCarStates = new ArrayList<CarState>(); 
-		for(CarState carState : carStates) {
+		List<CarState> filteredCarStates = new ArrayList<CarState>();
+		for (CarState carState : carStates) {
 			Car car = (Car) session.createCriteria(Car.class)
 					.add(Restrictions.eq("brokerId", carState.getBrokerId()))
 					.add(Restrictions.eq("uuid", carState.getUuid()))
 					.uniqueResult();
-			
+
 			boolean b = reqsKeys.stream().allMatch(p -> car.getCarRequires().containsKey(p));
 			if (b) {
 				filteredCarStates.add(carState);
