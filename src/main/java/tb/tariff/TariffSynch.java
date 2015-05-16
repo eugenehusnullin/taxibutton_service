@@ -69,6 +69,7 @@ public class TariffSynch {
 				log.error("Tariff synch error: ", e);
 			}
 		}
+		log.info("End tariff synch.");
 	}
 
 	private void updateTariffs(List<Tariff> tariffs, Broker broker, Date loadDate) {

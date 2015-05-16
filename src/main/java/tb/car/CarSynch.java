@@ -36,7 +36,7 @@ public class CarSynch {
 	private CarDao carDao;
 
 	@Transactional
-	@Scheduled(cron = "0 0/2 * * * *")
+	@Scheduled(cron = "0 01 * * * *")
 	public void synch() {
 		log.info("Start car synch.");
 		List<Broker> brokers = brokerDao.getActive();
@@ -54,6 +54,7 @@ public class CarSynch {
 				log.error("Car synch error: ", e);
 			}
 		}
+		log.info("End car synch.");
 	}
 
 	private void updateCars(List<Car> cars, Broker broker, Date loadDate) {
