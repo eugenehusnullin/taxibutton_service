@@ -73,8 +73,8 @@ public class CarDao {
 						.setDouble("latitude", carState.getLatitude())
 						.setDouble("longitude", carState.getLongitude())
 						.setTimestamp("date", carState.getDate())
-						.setLong("brokerId", carState.getBrokerId())
-						.setString("uuid", carState.getUuid())
+						.setLong("brokerId", savedCarState.getBrokerId())
+						.setString("uuid", savedCarState.getUuid())
 						.executeUpdate();
 			}
 
