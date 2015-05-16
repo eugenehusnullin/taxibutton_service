@@ -117,22 +117,22 @@ public class OfferingOrderTaxiRF {
 			messages4Send = createNotlaterOffer(order, brokerIdsList, carStates, tariffIdName);
 		} else {
 			logger.info("Order - " + order.getUuid() + ", try offer EXACT order.");
-			
+
 			List<Broker> brokers = brokerService.getBrokersByMapAreas(order.getSource().getLat(),
 					order.getSource().getLon());
-			
+
 			if (brokers.size() == 0) {
 				logger.info("Order - " + order.getUuid()
 						+ ", NOT OFFER - not found brokers with needed mapareas.");
 			}
-			
+
 			if (order.getOfferBrokerList() != null && order.getOfferBrokerList().size() > 0) {
 				final List<Long> limitBrokerIds = order.getOfferBrokerList().stream().map(m -> m.getId())
 						.collect(Collectors.toList());
 				brokers = brokers.stream()
 						.filter(p -> limitBrokerIds.contains(p.getId()))
 						.collect(Collectors.toList());
-				
+
 				if (brokers.size() == 0) {
 					logger.info("Order - " + order.getUuid()
 							+ ", NOT OFFER - not found choosed broker in mapareas.");
@@ -174,7 +174,7 @@ public class OfferingOrderTaxiRF {
 					offeredOrderBrokerDao.save(offeredOrderBroker);
 				}
 			} catch (IOException | TransformerException | TransformerFactoryConfigurationError e) {
-				logger.error("MAKE OFFER.", e);
+				logger.error("MAKE OFFER ORDER - " + order.getUuid() + ".", e);
 			}
 		}
 		return result;
