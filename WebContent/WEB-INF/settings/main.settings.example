@@ -19,6 +19,9 @@ device.registration.smsmethod=self
 ;run synch cars and tariffs after application start in seconds
 starter.runsynch.seconds=60
 
+; COST SERVICE
+costservice.url=http://localhost:2351/cost
+
 
 
 ;;;;JDBC

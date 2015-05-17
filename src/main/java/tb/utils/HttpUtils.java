@@ -21,6 +21,12 @@ public class HttpUtils {
 	public static HttpURLConnection postDocumentOverHttp(Document document, String url, Logger logger)
 			throws IOException,
 			TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+		String raw = XmlUtils.nodeToString(document.getFirstChild());
+		logger.info(raw);
+		return postRawData(raw, url, "UTF-8");
+	}
+
+	public static HttpURLConnection postRawData(String raw, String url, String encoding) throws IOException {
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -29,11 +35,7 @@ public class HttpUtils {
 		connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 		connection.setDoOutput(true);
 
-		String s = XmlUtils.nodeToString(document.getFirstChild());
-
-		logger.info(s);
-
-		IOUtils.write(s, connection.getOutputStream(), "UTF-8");
+		IOUtils.write(raw, connection.getOutputStream(), encoding);
 		connection.getOutputStream().flush();
 		connection.getOutputStream().close();
 		return connection;
