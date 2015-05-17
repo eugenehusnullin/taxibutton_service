@@ -51,7 +51,7 @@ public class TariffBuilder {
 	}
 
 	public List<Tariff> createTariffsFromJson(InputStream inputStream, Broker broker, Date loadDate) throws IOException {
-		String tariffsString = IOUtils.toString(inputStream, "utf8");
+		String tariffsString = IOUtils.toString(inputStream, "windows-1251");
 		JSONArray tariffsArray = (JSONArray) new JSONTokener(tariffsString).nextValue();
 		List<Tariff> list = new ArrayList<Tariff>();
 		for (int i = 0; i < tariffsArray.length(); i++) {
