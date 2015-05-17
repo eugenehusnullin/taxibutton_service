@@ -59,8 +59,8 @@ public class CostRequest {
 				JSONObject costJson = new JSONObject();
 				costJson.put("sum", responseJson.get("Price"));
 				JSONObject responseNestedJson = responseJson.getJSONObject("Calculated");
-				costJson.put("km", responseNestedJson.get("Km"));
-				costJson.put("min", responseNestedJson.get("Min"));
+				costJson.put("km", responseNestedJson.getDouble("Km"));
+				costJson.put("min", responseNestedJson.getDouble("Min"));
 
 				return costJson;
 			} else {

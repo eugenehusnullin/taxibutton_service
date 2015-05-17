@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import tb.dao.ITariffDefinitionDao;
 import tb.domain.TariffDefinition;
@@ -19,6 +20,7 @@ public class TariffDefinitionHelper {
 	@Autowired
 	private ITariffDefinitionDao tariffDefinitionDao;
 
+	@Transactional
 	public String getTariffIdName(double lat, double lon, VehicleClass vehicleClass) {
 		List<TariffDefinition> tariffDefinitions = tariffDefinitionDao.get(vehicleClass);
 		
