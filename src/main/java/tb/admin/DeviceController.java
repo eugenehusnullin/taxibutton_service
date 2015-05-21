@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb.service.DeviceService;
-import tb.utils.HttpUtils;
-import tb.utils.NetStreamUtils;
+import utils.HttpUtils;
+import utils.NetStreamUtils;
 
 @RequestMapping("/device")
 @Controller

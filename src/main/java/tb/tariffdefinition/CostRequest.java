@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import tb.domain.maparea.Point;
 import tb.domain.order.VehicleClass;
 import tb.service.serialize.YandexOrderSerializer;
-import tb.utils.HttpUtils;
+import utils.HttpUtils;
 
 @Service
 public class CostRequest {

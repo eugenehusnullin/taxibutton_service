@@ -17,7 +17,7 @@ import tb.dao.IBrokerDao;
 import tb.dao.IMapAreaDao;
 import tb.domain.Broker;
 import tb.domain.maparea.MapArea;
-import tb.utils.HttpUtils;
+import utils.HttpUtils;
 
 @Service
 @EnableScheduling

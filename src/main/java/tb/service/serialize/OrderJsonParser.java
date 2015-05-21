@@ -20,7 +20,7 @@ import tb.domain.order.Order;
 import tb.domain.order.Requirement;
 import tb.domain.order.VehicleClass;
 import tb.service.exceptions.ParseOrderException;
-import tb.utils.DatetimeUtils;
+import utils.DatetimeUtils;
 
 public class OrderJsonParser {
 

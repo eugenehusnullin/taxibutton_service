@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import tb.service.TariffService;
 import tb.service.exceptions.DeviceNotFoundException;
-import tb.utils.NetStreamUtils;
+import utils.NetStreamUtils;
 
 @RequestMapping("/tariff")
 @Controller("apiDeviceTariffController")

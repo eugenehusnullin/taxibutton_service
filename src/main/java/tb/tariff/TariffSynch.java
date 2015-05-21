@@ -23,7 +23,7 @@ import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Tariff;
 import tb.domain.TariffType;
-import tb.utils.HttpUtils;
+import utils.HttpUtils;
 
 @Service
 @EnableScheduling

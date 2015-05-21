@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb.service.DeviceService;
-import tb.utils.NetStreamUtils;
 import tb.utils.Sms48;
 import tb.utils.SmsSelf;
+import utils.NetStreamUtils;
 
 @RequestMapping("/device")
 @Controller("apiDeviceRegistrationController")

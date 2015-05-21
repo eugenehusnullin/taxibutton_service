@@ -22,7 +22,7 @@ import tb.car.dao.CarDao;
 import tb.car.domain.CarState;
 import tb.dao.IBrokerDao;
 import tb.domain.Broker;
-import tb.utils.XmlUtils;
+import utils.XmlUtils;
 
 @Controller("apiyandexCarGeoController")
 @RequestMapping("/cargeo")

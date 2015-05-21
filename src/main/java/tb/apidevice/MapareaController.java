@@ -19,7 +19,7 @@ import tb.domain.Broker;
 import tb.domain.maparea.MapArea;
 import tb.maparea.MapareaSerializer;
 import tb.service.BrokerService;
-import tb.utils.NetStreamUtils;
+import utils.NetStreamUtils;
 
 @RequestMapping("/maparea")
 @Controller("apiDeviceMapareaController")

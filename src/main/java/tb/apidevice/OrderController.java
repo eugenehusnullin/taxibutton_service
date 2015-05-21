@@ -36,7 +36,7 @@ import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
 import tb.service.exceptions.WrongData;
 import tb.tariffdefinition.CostRequest;
-import tb.utils.NetStreamUtils;
+import utils.NetStreamUtils;
 
 @RequestMapping("/order")
 @Controller("apiDeviceOrderController")
