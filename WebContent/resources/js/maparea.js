@@ -21,11 +21,13 @@ function initialize(serverUrl) {
 		drawingControl : true,
 		drawingControlOptions : {
 			position : google.maps.ControlPosition.TOP_CENTER,
-			drawingModes : [ google.maps.drawing.OverlayType.MARKER,
-					google.maps.drawing.OverlayType.CIRCLE,
-					google.maps.drawing.OverlayType.POLYGON,
-					google.maps.drawing.OverlayType.POLYLINE,
-					google.maps.drawing.OverlayType.RECTANGLE ]
+			drawingModes : [ 
+			        //google.maps.drawing.OverlayType.MARKER,
+					//google.maps.drawing.OverlayType.CIRCLE,
+					google.maps.drawing.OverlayType.POLYGON //,
+					//google.maps.drawing.OverlayType.POLYLINE,
+					//google.maps.drawing.OverlayType.RECTANGLE
+					]
 		},
 		drawingMode : google.maps.drawing.OverlayType.POLYGON,
 		polygonOptions : polygonOptions

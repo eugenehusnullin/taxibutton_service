@@ -6,10 +6,10 @@
 
 <form method="POST">
 	<input type="hidden" name="id" value="${orderId}" />
-	broker clid <input type="text" name="clid" /><br /> 
+	broker clid <input type="text" name="clid" /><br />
 	broker apikey <input type="text" name="apikey" /><br />
-	status <input type="text" name="status" /><br />
+	status <input type="text" name="status" /> <br />
 	extra (completed-sum | cancel,failed-reason | driving-uuid) <input type="text" name="extra" /><br />
-	newcar (uuid) <input type="text" name="newcar" /><br />
+	newcar (uuid) <input type="text" name="newcar" /><br /> 
 	<input type="submit" value="Send" /><br />
 </form>
