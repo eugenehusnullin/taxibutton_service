@@ -11,7 +11,7 @@
 				<param name="enumClass">tb.domain.order.VehicleClass</param>
 			</type>
 		</property>
-		<set name="mapAreas" table="tariffdefinitionmapareas" lazy="false">
+		<set name="mapAreas" table="tariffdefinition_brokermapareas" lazy="false">
 			<key column="idname"></key>
 			<many-to-many column="mapareaid" class="tb.domain.maparea.MapArea"></many-to-many>
 		</set>

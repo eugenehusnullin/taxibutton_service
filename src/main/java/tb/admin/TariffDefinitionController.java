@@ -99,7 +99,7 @@ public class TariffDefinitionController {
 	}
 	
 	@RequestMapping(value = "/del", method = RequestMethod.GET)
-	public String deleteTariffDefinition(@RequestParam("idname") String idname, Model model) {
+	public String deleteTariffDefinition(@RequestParam("idname") String idname) {
 		tariffDefinitionDao.delete(idname);
 				
 		return "redirect:list";

@@ -18,5 +18,6 @@
 		<mapping resource="tb/domain/hibernate/Feedback.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/MapArea.hbm.xml" />
 		<mapping resource="tb/domain/hibernate/TariffDefinition.hbm.xml" />
+		<mapping resource="tb/domain/hibernate/TariffDefinitionMapArea.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>
