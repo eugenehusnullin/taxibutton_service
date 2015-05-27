@@ -55,6 +55,7 @@ public class TariffDefinitionController {
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addTariffDefinition(HttpServletRequest request) {
 		String idname = request.getParameter("idname");
+		String routingServiceName = request.getParameter("routingservicename");
 		String body = request.getParameter("body");
 		VehicleClass vc = VehicleClass.valueOf(request.getParameter("vc"));
 		
@@ -68,6 +69,7 @@ public class TariffDefinitionController {
 		
 		TariffDefinition tariffDefinition = new TariffDefinition();
 		tariffDefinition.setIdName(idname);
+		tariffDefinition.setRoutingServiceName(routingServiceName);
 		tariffDefinition.setBody(body);
 		tariffDefinition.setVehicleClass(vc);
 		tariffDefinition.setMapAreas(mapAreasSet);
@@ -85,6 +87,7 @@ public class TariffDefinitionController {
 			TariffDefinitionModel tariffDefinitionModel = new TariffDefinitionModel();
 			tariffDefinitionModel.setIdName(tariffDefinition.getIdName());
 			tariffDefinitionModel.setVehicleClass(tariffDefinition.getVehicleClass().name());
+			tariffDefinitionModel.setRoutingServiceName(tariffDefinition.getRoutingServiceName());
 			
 			String mapAreasnames = tariffDefinition.getMapAreas()
 				.stream()

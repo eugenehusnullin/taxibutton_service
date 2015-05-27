@@ -5,6 +5,7 @@ public class TariffDefinitionModel {
 	private String idName;
 	private String vehicleClass;
 	private String mapAreasNames;
+	private String routingServiceName;
 
 	public String getIdName() {
 		return idName;
@@ -28,5 +29,13 @@ public class TariffDefinitionModel {
 
 	public void setMapAreasNames(String mapAreasNames) {
 		this.mapAreasNames = mapAreasNames;
+	}
+
+	public String getRoutingServiceName() {
+		return routingServiceName;
+	}
+
+	public void setRoutingServiceName(String routingServiceName) {
+		this.routingServiceName = routingServiceName;
 	}
 }

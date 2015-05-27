@@ -9,6 +9,11 @@
 		<input type="text" name="idname" />
 		
 		<br />
+		<br /> RoutingServiceName:
+		<br />
+		<input type="text" name="routingservicename" value="YandexMapsService"/>
+		
+		<br />
 		<br /> Vehicle class:
 		<br />
 		<c:forEach items="${vcl}" var="vc">

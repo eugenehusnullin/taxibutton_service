@@ -22,8 +22,19 @@ public class TariffDefinitionHelper {
 
 	@Transactional
 	public String getTariffIdName(double lat, double lon, VehicleClass vehicleClass) {
+		TariffDefinition thatTariffDefinition = getTariffDefinition(lat, lon, vehicleClass);
+
+		if (thatTariffDefinition != null) {
+			return thatTariffDefinition.getIdName();
+		} else {
+			return null;
+		}
+	}
+
+	@Transactional
+	public TariffDefinition getTariffDefinition(double lat, double lon, VehicleClass vehicleClass) {
 		List<TariffDefinition> tariffDefinitions = tariffDefinitionDao.get(vehicleClass);
-		
+
 		TariffDefinition thatTariffDefinition = null;
 		for (TariffDefinition tariffDefinition : tariffDefinitions) {
 			Set<MapArea> mapAreas = tariffDefinition.getMapAreas();
@@ -37,11 +48,7 @@ public class TariffDefinitionHelper {
 				break;
 			}
 		}
-		
-		if (thatTariffDefinition != null) {
-			return thatTariffDefinition.getIdName();
-		} else {
-			return null;
-		}
+
+		return thatTariffDefinition;
 	}
 }

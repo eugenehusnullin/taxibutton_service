@@ -8,6 +8,7 @@
 	<thead>
 		<tr>
 			<th>idname</th>
+			<th>Routing Service Name</th>
 			<th>vehicle class</th>
 			<th>map areas names</th>
 			<th>actions</th>
@@ -17,6 +18,7 @@
 		<c:forEach items="${tariffdefs}" var="tariffdef">
 			<tr>
 				<td>${tariffdef.getIdName()}</td>
+				<td>${tariffdef.getRoutingServiceName()}</td>
 				<td>${tariffdef.getVehicleClass()}</td>
 				<td>${tariffdef.getMapAreasNames()}</td>
 				<td><a href="del?idname=${tariffdef.getIdName()}">delete</a></td>

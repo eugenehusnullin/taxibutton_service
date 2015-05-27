@@ -10,6 +10,7 @@ public class TariffDefinition {
 	private VehicleClass vehicleClass;
 	private Set<MapArea> mapAreas;
 	private String body;
+	private String routingServiceName;
 
 	public VehicleClass getVehicleClass() {
 		return vehicleClass;
@@ -41,5 +42,13 @@ public class TariffDefinition {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public String getRoutingServiceName() {
+		return routingServiceName;
+	}
+
+	public void setRoutingServiceName(String routingServiceName) {
+		this.routingServiceName = routingServiceName;
 	}
 }

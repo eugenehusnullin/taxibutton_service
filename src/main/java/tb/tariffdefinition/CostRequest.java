@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import tb.domain.TariffDefinition;
 import tb.domain.maparea.Point;
 import tb.domain.order.VehicleClass;
 import tb.service.serialize.YandexOrderSerializer;
@@ -33,12 +34,15 @@ public class CostRequest {
 
 	public JSONObject getCost(Point source, List<Point> destinations, VehicleClass vehicleClass, Date bookDate,
 			List<String> adds) {
+		TariffDefinition tariffDefinition = getTariffDefinition(source, vehicleClass);
+
 		JSONObject requestJson = new JSONObject();
 
-		requestJson.put("RoutingServiceName", "YandexMapsService");
+		requestJson.put("RoutingServiceName", tariffDefinition.getRoutingServiceName() == null ? "YandexMapsService"
+				: tariffDefinition.getRoutingServiceName());
 		requestJson.put("TaxiServiceId", "taxirf");
 		requestJson.put("BookingTime", getBookDate(bookDate));
-		requestJson.put("TariffName", getTariffIdName(source, vehicleClass));
+		requestJson.put("TariffName", tariffDefinition.getIdName());
 		requestJson.put("Source", getJsonPoint(source));
 		if (destinations != null) {
 			requestJson.put("Destinations", getJsonPoints(destinations));
@@ -64,7 +68,7 @@ public class CostRequest {
 
 				return costJson;
 			} else {
-				logger.warn("COST FAILURE: ResponseCode=" + connection.getResponseCode());				
+				logger.warn("COST FAILURE: ResponseCode=" + connection.getResponseCode());
 			}
 		} catch (IOException e) {
 			logger.error("getCost", e);
@@ -102,8 +106,8 @@ public class CostRequest {
 		return dateFormat.format(bookDate);
 	}
 
-	private String getTariffIdName(Point source, VehicleClass vehicleClass) {
-		return tariffDefinitionHelper.getTariffIdName(source.getLatitude(),
+	private TariffDefinition getTariffDefinition(Point source, VehicleClass vehicleClass) {
+		return tariffDefinitionHelper.getTariffDefinition(source.getLatitude(),
 				source.getLongitude(), vehicleClass);
 	}
 }

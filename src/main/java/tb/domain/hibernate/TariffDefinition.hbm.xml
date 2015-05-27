@@ -16,6 +16,8 @@
 			<many-to-many column="mapareaid" class="tb.domain.maparea.MapArea"></many-to-many>
 		</set>
 		
+		
+		<property name="routingServiceName" length="50"/>
 		<property name="body" length="30000" not-null="true"/>
 	</class>
 </hibernate-mapping>
