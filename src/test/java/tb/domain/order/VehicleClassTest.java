@@ -11,7 +11,7 @@ public class VehicleClassTest {
 	@Test
 	public void testOrdinal() {
 		assertEquals(0, VehicleClass.Ecomon.ordinal());
-		assertEquals(1, VehicleClass.Standard.ordinal());
+		assertEquals(1, VehicleClass.Comfort.ordinal());
 		assertEquals(2, VehicleClass.Business.ordinal());
 
 		assertEquals(0, VehicleClass.values()[0].ordinal());
