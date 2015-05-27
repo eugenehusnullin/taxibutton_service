@@ -3,15 +3,24 @@ package tb.domain.maparea;
 import java.util.Set;
 
 import tb.domain.Broker;
-import tb.domain.TariffDefinition;
 
-public abstract class MapArea {
+public class MapArea {
 
 	private Long id;
 	private String name;
 	private String about;
 	private Set<Broker> brokers;
-	private Set<TariffDefinition> tariffDefinitions;
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof MapArea) {
+			MapArea mapArea = (MapArea) obj;
+			if (id != null && mapArea.id != null) {
+				return id.equals(mapArea.id);
+			}
+		}
+		return super.equals(obj);
+	}
 
 	public Long getId() {
 		return id;
@@ -43,13 +52,5 @@ public abstract class MapArea {
 
 	public void setBrokers(Set<Broker> brokers) {
 		this.brokers = brokers;
-	}
-
-	public Set<TariffDefinition> getTariffDefinitions() {
-		return tariffDefinitions;
-	}
-
-	public void setTariffDefinitions(Set<TariffDefinition> tariffDefinitions) {
-		this.tariffDefinitions = tariffDefinitions;
 	}
 }

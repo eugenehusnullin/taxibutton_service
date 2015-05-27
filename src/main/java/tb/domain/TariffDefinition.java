@@ -6,18 +6,10 @@ import tb.domain.maparea.MapArea;
 import tb.domain.order.VehicleClass;
 
 public class TariffDefinition {
-	private Long id;
 	private String idName;
 	private VehicleClass vehicleClass;
 	private Set<MapArea> mapAreas;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	private String body;
 
 	public VehicleClass getVehicleClass() {
 		return vehicleClass;
@@ -41,5 +33,13 @@ public class TariffDefinition {
 
 	public void setIdName(String idName) {
 		this.idName = idName;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
 	}
 }

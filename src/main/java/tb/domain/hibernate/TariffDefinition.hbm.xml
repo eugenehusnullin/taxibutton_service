@@ -5,18 +5,17 @@
 
 <hibernate-mapping package="tb.domain">
 	<class name="TariffDefinition" table="tariffdefinitions">
-		<id name="id">
-			<generator class="identity" />
-		</id>
-		<property name="idName" length="50"/>
-		<property name="vehicleClass">
+		<id name="idName" length="50"></id>
+		<property name="vehicleClass" not-null="true">
 			<type name="org.hibernate.type.EnumType">
 				<param name="enumClass">tb.domain.order.VehicleClass</param>
 			</type>
 		</property>
 		<set name="mapAreas" table="tariffdefinitionmapareas" lazy="false">
-			<key column="tariffdefinitionid"></key>
+			<key column="idname"></key>
 			<many-to-many column="mapareaid" class="tb.domain.maparea.MapArea"></many-to-many>
 		</set>
+		
+		<property name="body" length="30000" not-null="true"/>
 	</class>
 </hibernate-mapping>

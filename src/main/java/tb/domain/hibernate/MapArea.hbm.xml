@@ -11,21 +11,16 @@
 		</id>
 		<discriminator column="area_type" type="string"></discriminator>
 		
-		<property name="name" length="128"></property>
-		<property name="about" length="1024"></property>
+		<property name="name" length="128" update="false"></property>
+		<property name="about" length="1024" update="false"></property>
 		
 		<set name="brokers" table="brokermapareas">
 			<key column="mapareaid"></key>
 			<many-to-many column="brokerid" class="tb.domain.Broker"></many-to-many>
 		</set>
 		
-		<set name="tariffDefinitions" table="tariffdefinitionmapareas">
-			<key column="mapareaid"></key>
-			<many-to-many column="tariffdefinitionid" class="tb.domain.TariffDefinition"></many-to-many>
-		</set>
-		
 		<subclass name="Polygon" discriminator-value="polygon">
-			<property name="points" type="PointArray" length="20240"></property>
+			<property name="points" type="PointArray" length="20240" update="false"></property>
 		</subclass>
 	</class>
 </hibernate-mapping>

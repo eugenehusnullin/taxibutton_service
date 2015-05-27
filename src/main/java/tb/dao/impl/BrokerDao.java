@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tb.dao.IBrokerDao;
 import tb.domain.Broker;
-import tb.domain.TariffType;
 
 @Repository("BrokerDao")
 public class BrokerDao implements IBrokerDao {
@@ -79,7 +78,6 @@ public class BrokerDao implements IBrokerDao {
 	public List<Broker> getBrokersNeedMapareaSynch() {
 		return sessionFactory.getCurrentSession().createCriteria(Broker.class)
 				.add(Restrictions.neOrIsNotNull("mapareaUrl", ""))
-				.add(Restrictions.eq("tariffType", TariffType.JSON))
 				.list();
 	}
 }

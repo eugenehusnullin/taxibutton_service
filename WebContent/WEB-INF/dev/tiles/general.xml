@@ -97,4 +97,18 @@
 		<put-attribute name="body" value="/WEB-INF/dev/views/maparea/create.jsp" />
 	</definition>
 	
+	
+	
+	<definition name="tariffdef/add" extends="default">
+		<put-attribute name="title" value="Add tariff definition" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/tariffdef/add.jsp" />
+	</definition>
+	
+	<definition name="tariffdef/list" extends="default">
+		<put-attribute name="title" value="List of tariffs definitions" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/tariffdef/list.jsp" />
+	</definition>
+	
 </tiles-definitions>
