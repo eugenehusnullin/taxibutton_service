@@ -9,6 +9,8 @@
 
 <link type="text/css" rel="stylesheet"
 	href="<c:url value="/admin/resources/css/bootstrap.min.css"/>">
+<link type="text/css" rel="stylesheet"
+	href="<c:url value="/admin/resources/css/root.css"/>">
 <title><tiles:insertAttribute name="title" ignore="true" /></title>
 </head>
 <body>
