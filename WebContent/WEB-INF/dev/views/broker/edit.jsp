@@ -20,5 +20,17 @@
 		<br/>maparea url <input type="text" name="mapareaUrl" value="${mapareaUrl}"/>
 		<br/>cost url <input type="text" name="costUrl" value="${costUrl}"/>
 		<br/>time zone offset <input type="text" name="timezoneOffset" value="${timezoneOffset}"/>
+		
+		<br />
+		<br /> Map areas:
+		<br />
+		<c:forEach items="${mapareas}" var="maparea">
+			<input type="checkbox" name="mapareas" value="${maparea.getId()}" 
+				<c:if test="${mapareasids.contains(maparea.getId())}">
+					checked="checked"
+				</c:if>
+				/>${maparea.getName()}<br />
+		</c:forEach>
+
 		<br /><input type="submit" value="Save" />
 	</form>

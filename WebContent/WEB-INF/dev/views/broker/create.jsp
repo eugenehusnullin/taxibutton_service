@@ -21,5 +21,13 @@
 		<br/>maparea url <input type="text" name="mapareaurl" value="http://"/>
 		<br/>cost url <input type="text" name="costurl" value="http://"/>
 		<br/>time zone offset <input type="text" name="timezoneOffset" value="0"/>
+		
+		<br />
+		<br /> Map areas:
+		<br />
+		<c:forEach items="${mapareas}" var="maparea">
+			<input type="checkbox" name="mapareas" value="${maparea.getId()}" />${maparea.getName()}<br />
+		</c:forEach>
+		
 		<br /> <input type="submit" value="save" />
 	</form>

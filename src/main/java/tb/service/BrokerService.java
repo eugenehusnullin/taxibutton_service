@@ -2,6 +2,7 @@ package tb.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class BrokerService {
 	@Transactional
 	public void update(Long brokerId, String apiId, String apiKey, String name, String apiUrl, SmsMethod smsMethod,
 			TariffType tariffType, String tariffUrl, String driverUrl, Integer timezoneOffset, String mapareaUrl,
-			String costUrl) {
+			String costUrl, Set<MapArea> mapAreasSet) {
 		Broker broker = brokerDao.get(brokerId);
 
 		broker.setApiId(apiId);
@@ -84,7 +85,7 @@ public class BrokerService {
 		broker.setTimezoneOffset(timezoneOffset);
 		broker.setMapareaUrl(mapareaUrl);
 		broker.setCostUrl(costUrl);
-
+		broker.setMapAreas(mapAreasSet);
 		brokerDao.saveOrUpdate(broker);
 	}
 

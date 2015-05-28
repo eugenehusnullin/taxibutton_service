@@ -1,7 +1,10 @@
 package tb.admin;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import tb.admin.model.MapAreaModel;
 import tb.car.CarSynch;
+import tb.dao.IMapAreaDao;
 import tb.domain.Broker;
 import tb.domain.SmsMethod;
 import tb.domain.TariffType;
+import tb.domain.maparea.MapArea;
 import tb.service.BrokerService;
 import tb.service.Starter;
 import tb.service.TariffService;
@@ -33,6 +39,8 @@ public class BrokerController {
 	private CarSynch carSynch;
 	@Autowired
 	private TariffSynch tariffSynch;
+	@Autowired
+	private IMapAreaDao mapAreaDao;
 	
 	@RequestMapping(value = "/carsynch", method = RequestMethod.GET)
 	public String carSynch(Model model) {
@@ -60,7 +68,17 @@ public class BrokerController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
-	public String create() {
+	public String create(Model model) {
+		List<MapAreaModel> mapAreaModels = new ArrayList<MapAreaModel>();
+		List<MapArea> mapAreas = mapAreaDao.getAll();
+		for (MapArea mapArea : mapAreas) {
+			MapAreaModel mapAreaModel = new MapAreaModel();
+			mapAreaModel.setId(mapArea.getId());
+			mapAreaModel.setName(mapArea.getName());
+			mapAreaModels.add(mapAreaModel);
+		}
+		model.addAttribute("mapareas", mapAreaModels);
+		
 		return "broker/create";
 	}
 
@@ -73,10 +91,18 @@ public class BrokerController {
 			@RequestParam("mapareaurl") String mapareaUrl,
 			@RequestParam("costurl") String costUrl,
 			@RequestParam("timezoneOffset") Integer timezoneOffset,
+			@RequestParam("mapareas") String[] mapAreaIds,
 			Model model) {
 
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
+		
+		Set<MapArea> mapAreasSet = new HashSet<MapArea>();
+		for (String mapAreaId : mapAreaIds) {
+			MapArea mapArea = new MapArea();
+			mapArea.setId(Long.parseLong(mapAreaId));
+			mapAreasSet.add(mapArea);
+		}
 
 		Broker broker = new Broker();
 		broker.setName(name);
@@ -90,6 +116,7 @@ public class BrokerController {
 		broker.setCostUrl(costUrl);
 		broker.setTariffType(tariffType);
 		broker.setTimezoneOffset(timezoneOffset);
+		broker.setMapAreas(mapAreasSet);
 		brokerService.add(broker);
 
 		return "redirect:list";
@@ -118,6 +145,20 @@ public class BrokerController {
 		model.addAttribute("mapareaUrl", broker.getMapareaUrl());
 		model.addAttribute("costUrl", broker.getCostUrl());
 		model.addAttribute("timezoneOffset", broker.getTimezoneOffset());
+		
+		List<MapAreaModel> mapAreaModels = new ArrayList<MapAreaModel>();
+		List<MapArea> mapAreas = mapAreaDao.getAll();
+		for (MapArea mapArea : mapAreas) {
+			MapAreaModel mapAreaModel = new MapAreaModel();
+			mapAreaModel.setId(mapArea.getId());
+			mapAreaModel.setName(mapArea.getName());
+			mapAreaModels.add(mapAreaModel);
+		}
+		model.addAttribute("mapareas", mapAreaModels);
+		
+		List<Long> mapAreasIds = new ArrayList<Long>();
+		broker.getMapAreas().stream().forEach(a -> mapAreasIds.add(a.getId()));
+		model.addAttribute("mapareasids", mapAreasIds);
 
 		return "broker/edit";
 	}
@@ -131,12 +172,20 @@ public class BrokerController {
 			@RequestParam("driverUrl") String driverUrl,
 			@RequestParam("mapareaUrl") String mapareaUrl,
 			@RequestParam("costUrl") String costUrl,
-			@RequestParam("timezoneOffset") Integer timezoneOffset) {
+			@RequestParam("timezoneOffset") Integer timezoneOffset,
+			@RequestParam("mapareas") String[] mapAreaIds) {
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
+		
+		Set<MapArea> mapAreasSet = new HashSet<MapArea>();
+		for (String mapAreaId : mapAreaIds) {
+			MapArea mapArea = new MapArea();
+			mapArea.setId(Long.parseLong(mapAreaId));
+			mapAreasSet.add(mapArea);
+		}
 
 		brokerService.update(brokerId, apiId, apiKey, name, apiUrl, smsM, tariffType, tariffUrl, driverUrl,
-				timezoneOffset, mapareaUrl, costUrl);
+				timezoneOffset, mapareaUrl, costUrl, mapAreasSet);
 		return "redirect:list";
 	}
 }

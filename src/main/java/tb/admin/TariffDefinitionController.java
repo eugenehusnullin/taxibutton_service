@@ -32,7 +32,7 @@ public class TariffDefinitionController {
 	private ITariffDefinitionDao tariffDefinitionDao;
 
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
-	public String addTariffDefinition(Model model) {
+	public String add(Model model) {
 		List<String> vcl = new ArrayList<String>();
 		for (VehicleClass vc : VehicleClass.values()) {
 			vcl.add(vc.name());
@@ -53,7 +53,7 @@ public class TariffDefinitionController {
 	}
 	
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public String addTariffDefinition(HttpServletRequest request) {
+	public String add(HttpServletRequest request) {
 		String idname = request.getParameter("idname");
 		String routingServiceName = request.getParameter("routingservicename");
 		String body = request.getParameter("body");
@@ -80,7 +80,7 @@ public class TariffDefinitionController {
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String listTariffsDefinitions(Model model) {
+	public String list(Model model) {
 		List<TariffDefinitionModel> tariffDefinitionModelList = new ArrayList<TariffDefinitionModel>();
 		List<TariffDefinition> tariffDefinitionList = tariffDefinitionDao.getAll();
 		for (TariffDefinition tariffDefinition : tariffDefinitionList) {
@@ -102,7 +102,7 @@ public class TariffDefinitionController {
 	}
 	
 	@RequestMapping(value = "/del", method = RequestMethod.GET)
-	public String deleteTariffDefinition(@RequestParam("idname") String idname) {
+	public String delete(@RequestParam("idname") String idname) {
 		tariffDefinitionDao.delete(idname);
 				
 		return "redirect:list";
