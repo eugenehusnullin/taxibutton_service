@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import tb.domain.maparea.Point;
 import tb.domain.maparea.Polygon;
 import tb.service.BrokerService;
+import tb.service.MapAreaAssist;
 
 @RequestMapping("/maparea")
 @Controller("devMapArea")
@@ -21,6 +22,8 @@ public class MapAreaController {
 
 	@Autowired
 	private BrokerService brokerService;
+	@Autowired
+	private MapAreaAssist mapAreaAssist;
 
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public String create(Model model) {
@@ -54,6 +57,7 @@ public class MapAreaController {
 				polygon.setPoints(points);
 
 				brokerService.addMapArea(polygon);
+				mapAreaAssist.updateMapArea(polygon);
 			}
 
 		}

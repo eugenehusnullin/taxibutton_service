@@ -15,7 +15,7 @@
 		<c:forEach items="${tariffdefmapareas}" var="tariffdefmaparea">
 			<tr>
 				<td>${tariffdefmaparea.getName()}</td>
-				<td><a href="del?name=${tariffdefmaparea.getName()}">delete</a></td>
+				<td><a href="edit?name=${tariffdefmaparea.getName()}">edit</a> | <a href="del?name=${tariffdefmaparea.getName()}">delete</a></td>
 			</tr>
 		</c:forEach>
 	</tbody>

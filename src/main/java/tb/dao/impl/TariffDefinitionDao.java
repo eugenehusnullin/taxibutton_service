@@ -48,4 +48,20 @@ public class TariffDefinitionDao implements ITariffDefinitionDao {
 				.setString("idname", idname)
 				.executeUpdate();
 	}
+
+	@Transactional
+	@Override
+	public TariffDefinition get(String idname) {
+		return (TariffDefinition) sessionFactory.getCurrentSession()
+				.createCriteria(TariffDefinition.class)
+				.add(Restrictions.idEq(idname))
+				.uniqueResult();
+	}
+
+	@Transactional
+	@Override
+	public void update(TariffDefinition tariffDefinition) {
+		sessionFactory.getCurrentSession().update(tariffDefinition);
+		
+	}
 }

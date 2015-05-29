@@ -3,6 +3,7 @@ package tb.dao.impl;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -37,5 +38,20 @@ public class TariffDefinitionMapAreaDao implements ITariffDefinitionMapAreaDao {
 		sessionFactory.getCurrentSession().createQuery(delete)
 				.setString("name", name)
 				.executeUpdate();
+	}
+
+	@Transactional
+	@Override
+	public TariffDefinitionMapArea get(String name) {
+		return (TariffDefinitionMapArea) sessionFactory.getCurrentSession()
+				.createCriteria(TariffDefinitionMapArea.class)
+				.add(Restrictions.idEq(name))
+				.uniqueResult();
+	}
+
+	@Transactional
+	@Override
+	public void update(TariffDefinitionMapArea tariffDefinitionMapArea) {
+		sessionFactory.getCurrentSession().update(tariffDefinitionMapArea);		
 	}
 }

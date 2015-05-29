@@ -21,7 +21,7 @@
 				<td>${tariffdef.getRoutingServiceName()}</td>
 				<td>${tariffdef.getVehicleClass()}</td>
 				<td>${tariffdef.getMapAreasNames()}</td>
-				<td><a href="del?idname=${tariffdef.getIdName()}">delete</a></td>
+				<td><a href="edit?idname=${tariffdef.getIdName()}">edit</a> | <a href="del?idname=${tariffdef.getIdName()}">delete</a></td>
 			</tr>
 		</c:forEach>
 	</tbody>

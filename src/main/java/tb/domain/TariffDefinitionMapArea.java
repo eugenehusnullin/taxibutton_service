@@ -2,6 +2,7 @@ package tb.domain;
 
 public class TariffDefinitionMapArea {
 	private String name;
+	private String body;
 
 	public String getName() {
 		return name;
@@ -18,7 +19,4 @@ public class TariffDefinitionMapArea {
 	public void setBody(String body) {
 		this.body = body;
 	}
-
-	private String body;
-
 }

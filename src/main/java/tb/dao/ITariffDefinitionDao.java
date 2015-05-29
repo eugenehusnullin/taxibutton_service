@@ -13,4 +13,8 @@ public interface ITariffDefinitionDao {
 	List<TariffDefinition> getAll();
 
 	void delete(String idname);
+
+	TariffDefinition get(String idname);
+
+	void update(TariffDefinition tariffDefinition);
 }

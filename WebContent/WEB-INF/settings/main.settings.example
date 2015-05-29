@@ -21,7 +21,7 @@ starter.runsynch.seconds=60
 
 ; COST SERVICE
 costservice.url=http://localhost:2351/cost
-
+costservice.routingservicenames=YandexMapsService,GoogleMapsService,DirectDistanceService
 
 
 ;;;;JDBC

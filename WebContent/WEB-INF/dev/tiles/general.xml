@@ -111,6 +111,12 @@
 			value="/WEB-INF/dev/views/tariffdef/list.jsp" />
 	</definition>
 	
+	<definition name="tariffdef/edit" extends="default">
+		<put-attribute name="title" value="Edit tariff definition" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/tariffdef/edit.jsp" />
+	</definition>
+	
 	
 	
 	<definition name="tariffdefmaparea/add" extends="default">
@@ -123,5 +129,11 @@
 		<put-attribute name="title" value="List of map areas of tariff definitions" />
 		<put-attribute name="body"
 			value="/WEB-INF/dev/views/tariffdefmaparea/list.jsp" />
+	</definition>
+	
+	<definition name="tariffdefmaparea/edit" extends="default">
+		<put-attribute name="title" value="Edit map area for tariff definition" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/tariffdefmaparea/edit.jsp" />
 	</definition>
 </tiles-definitions>

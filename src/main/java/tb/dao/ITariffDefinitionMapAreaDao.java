@@ -10,4 +10,8 @@ public interface ITariffDefinitionMapAreaDao {
 	List<TariffDefinitionMapArea> getAll();
 
 	void delete(String name);
+
+	TariffDefinitionMapArea get(String name);
+
+	void update(TariffDefinitionMapArea tariffDefinitionMapArea);
 }

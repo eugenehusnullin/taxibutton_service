@@ -38,6 +38,29 @@ public class TariffDefinitionMapAreaController {
 
 		return "redirect:list";
 	}
+	
+	@RequestMapping(value = "/edit", method = RequestMethod.GET)
+	public String edit(@RequestParam("name") String name, Model model) {
+		TariffDefinitionMapArea tariffDefinitionMapArea = tariffDefinitionMapAreaDao.get(name);
+		model.addAttribute("name", name);
+		model.addAttribute("body", tariffDefinitionMapArea.getBody());
+		return "tariffdefmaparea/edit";
+	}
+
+	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+	public String edit(HttpServletRequest request) {
+		String oldName = request.getParameter("oldname");
+		String name = request.getParameter("name");
+		String body = request.getParameter("body");
+
+		TariffDefinitionMapArea tariffDefinitionMapArea = tariffDefinitionMapAreaDao.get(oldName);
+		tariffDefinitionMapArea.setName(name);
+		tariffDefinitionMapArea.setBody(body);
+
+		tariffDefinitionMapAreaDao.update(tariffDefinitionMapArea);
+
+		return "redirect:list";
+	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String listTariffDefinitionMapAreas(Model model) {
