@@ -92,9 +92,21 @@
 		<put-attribute name="body" value="/WEB-INF/dev/views/tariff/tariff.jsp" />
 	</definition>
 	
-	<definition name="maparea/create" extends="default">
-		<put-attribute name="title" value="Map areas" />
-		<put-attribute name="body" value="/WEB-INF/dev/views/maparea/create.jsp" />
+	
+	
+	<definition name="maparea/add" extends="default">
+		<put-attribute name="title" value="Add map area" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/maparea/add.jsp" />
+	</definition>
+	
+	<definition name="maparea/list" extends="default">
+		<put-attribute name="title" value="List of map areas" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/maparea/list.jsp" />
+	</definition>
+	
+	<definition name="maparea/edit" extends="default">
+		<put-attribute name="title" value="Edit map area" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/maparea/edit.jsp" />
 	</definition>
 	
 	

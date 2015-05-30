@@ -27,11 +27,6 @@ public class BrokerService {
 	private MapAreaAssist mapAreaAssist;
 
 	@Transactional
-	public void addMapArea(MapArea mapArea) {
-		mapAreaDao.add(mapArea);
-	}
-
-	@Transactional
 	public List<Broker> getAll() {
 		return brokerDao.getAll();
 	}

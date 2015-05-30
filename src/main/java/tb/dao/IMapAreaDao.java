@@ -11,4 +11,8 @@ public interface IMapAreaDao {
 	void delete(Broker broker);
 	
 	List<MapArea> getAll();
+
+	void delete(Long id);
+
+	MapArea get(Long id);
 }

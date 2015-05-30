@@ -41,6 +41,10 @@ function initialize(serverUrl) {
 	});
 }
 
+function drawMapArea(mapArea) {
+	mapArea.setMap(map);
+}
+
 function showModal(serverUrl) {
 	$('#newMapzone').modal();
 

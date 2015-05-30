@@ -22,12 +22,12 @@ public class TariffDefinitionMapAreaController {
 	private ITariffDefinitionMapAreaDao tariffDefinitionMapAreaDao;
 
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
-	public String addMapArea() {
+	public String add() {
 		return "tariffdefmaparea/add";
 	}
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public String addTariffDefinition(HttpServletRequest request) {
+	public String add(HttpServletRequest request) {
 		String name = request.getParameter("name");
 		String body = request.getParameter("body");
 		TariffDefinitionMapArea tariffDefinitionMapArea = new TariffDefinitionMapArea();
@@ -63,14 +63,14 @@ public class TariffDefinitionMapAreaController {
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String listTariffDefinitionMapAreas(Model model) {
+	public String list(Model model) {
 		List<TariffDefinitionMapArea> list = tariffDefinitionMapAreaDao.getAll();
 		model.addAttribute("tariffdefmapareas", list);
 		return "tariffdefmaparea/list";
 	}
 
 	@RequestMapping(value = "/del", method = RequestMethod.GET)
-	public String deleteTariffDefinitionMapArea(@RequestParam("name") String name) {
+	public String del(@RequestParam("name") String name) {
 		tariffDefinitionMapAreaDao.delete(name);
 
 		return "redirect:list";
