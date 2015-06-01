@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,7 @@ import tb.domain.TariffDefinitionMapArea;
 @RequestMapping("/tariffdefmaparea")
 @Controller("adminTariffDefinitionMapAreaController")
 public class TariffDefinitionMapAreaController {
+	private static final Logger logger = LoggerFactory.getLogger(TariffDefinitionMapAreaController.class);
 
 	@Autowired
 	private ITariffDefinitionMapAreaDao tariffDefinitionMapAreaDao;
@@ -38,10 +41,14 @@ public class TariffDefinitionMapAreaController {
 
 		return "redirect:list";
 	}
-	
+
 	@RequestMapping(value = "/edit", method = RequestMethod.GET)
 	public String edit(@RequestParam("name") String name, Model model) {
 		TariffDefinitionMapArea tariffDefinitionMapArea = tariffDefinitionMapAreaDao.get(name);
+		if (tariffDefinitionMapArea == null) {
+			logger.warn("TariffDefinitionMapArea not found, name=" + name);
+			return "redirect:list";
+		}
 		model.addAttribute("name", name);
 		model.addAttribute("body", tariffDefinitionMapArea.getBody());
 		return "tariffdefmaparea/edit";
