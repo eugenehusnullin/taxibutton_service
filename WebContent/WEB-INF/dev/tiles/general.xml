@@ -148,4 +148,12 @@
 		<put-attribute name="body"
 			value="/WEB-INF/dev/views/tariffdefmaparea/edit.jsp" />
 	</definition>
+	
+	
+	
+	<definition name="info/tariff" extends="default">
+		<put-attribute name="title" value="readme (tariff definition)" />
+		<put-attribute name="body"
+			value="/WEB-INF/dev/views/info/tariff.jsp" />
+	</definition>
 </tiles-definitions>
