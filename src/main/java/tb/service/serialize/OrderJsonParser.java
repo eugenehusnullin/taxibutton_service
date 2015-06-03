@@ -23,6 +23,7 @@ import tb.service.exceptions.ParseOrderException;
 import utils.DatetimeUtils;
 
 public class OrderJsonParser {
+	private static final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
 
 	private static boolean defineNotlater(Date bookingDateUtc, int notlaterMinutes) {
 		Calendar bookingCalendar = DatetimeUtils.utcToLocal(bookingDateUtc);
@@ -40,14 +41,21 @@ public class OrderJsonParser {
 		String recipientPhone = phone != null ? phone : jsonObject.optString("recipientPhone");
 
 		Date bookingDate = null;
-		try {
-			String bookingDateStr = jsonObject.getString("bookingDate");
-			SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-			bookingDate = dateFormatter.parse(bookingDateStr);
-		} catch (JSONException ex) {
-			throw new ParseOrderException("bookingDate bad. " + ex.toString());
-		} catch (ParseException ex) {
-			throw new ParseOrderException("bookingDate format bad. " + ex.toString());
+		if (jsonObject.has("bookmins"))
+		{
+			int bookMins = jsonObject.getInt("bookmins");
+			bookingDate = DatetimeUtils.localTimeToOtherTimeZone(new Date(), DatetimeUtils.TIMEZONEID_UTC);
+			bookingDate = new Date(bookingDate.getTime() + (bookMins * ONE_MINUTE_IN_MILLIS));
+		} else {
+			try {
+				String bookingDateStr = jsonObject.getString("bookingDate");
+				SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+				bookingDate = dateFormatter.parse(bookingDateStr);
+			} catch (JSONException ex) {
+				throw new ParseOrderException("bookingDate bad. " + ex.toString());
+			} catch (ParseException ex) {
+				throw new ParseOrderException("bookingDate format bad. " + ex.toString());
+			}
 		}
 
 		SortedSet<AddressPoint> addressPoints = new TreeSet<AddressPoint>();
