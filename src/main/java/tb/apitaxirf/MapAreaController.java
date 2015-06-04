@@ -39,6 +39,8 @@ public class MapAreaController {
 		try {
 			logger.info("Trying load Tariff Definition Map Areas of taxirf");
 
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
 			String raw = loadFromDb();
 			IOUtils.write(raw, response.getOutputStream(), "UTF-8");
 		} catch (IOException e) {

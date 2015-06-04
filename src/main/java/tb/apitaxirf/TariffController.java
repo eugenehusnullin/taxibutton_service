@@ -22,7 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import tb.dao.IBrokerDao;
 import tb.dao.ITariffDefinitionDao;
+import tb.domain.Broker;
 import tb.domain.TariffDefinition;
 
 @Controller("apitaxirfTariffController")
@@ -33,12 +35,26 @@ public class TariffController {
 	@Autowired
 	private ITariffDefinitionDao tariffDefinitionDao;
 
+	@Autowired
+	private IBrokerDao brokerDao;
+
 	@RequestMapping(value = "")
 	public void index(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			logger.info("Trying load Tariff Definitions of taxirf");
 
-			String raw = loadFromDb();
+			String clid = request.getParameter("clid");
+			String apikey = request.getParameter("apikey");
+
+			Broker broker = brokerDao.getByApiId(clid);
+			if (broker == null || !broker.getApiKey().equals(apikey)) {
+				logger.warn("apitaxirfTariffController bad broker credential.");
+				return;
+			}
+
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			String raw = loadFromDb(broker);
 			IOUtils.write(raw, response.getOutputStream(), "UTF-8");
 		} catch (IOException e) {
 			logger.error("apitaxirfTariffController.", e);
@@ -74,19 +90,23 @@ public class TariffController {
 		return jsonArray.toString();
 	}
 
-	private String loadFromDb() {
+	private String loadFromDb(Broker broker) {
 		JSONArray jsonArray = new JSONArray();
 		List<TariffDefinition> list = tariffDefinitionDao.getAll();
 		for (TariffDefinition tariffDefinition : list) {
-			String body = tariffDefinition.getBody();
-			JSONObject jsonTariff = null;
-			try {
-				jsonTariff = new JSONObject(body);
-			} catch (Exception e) {
-				body = body.substring(1);
-				jsonTariff = new JSONObject(body);
+			if (tariffDefinition.getMapAreas().stream()
+					.anyMatch(p -> broker.getMapAreas().stream()
+							.anyMatch(p2 -> p.getId().equals(p2.getId()))  )) {
+				String body = tariffDefinition.getBody();
+				JSONObject jsonTariff = null;
+				try {
+					jsonTariff = new JSONObject(body);
+				} catch (Exception e) {
+					body = body.substring(1);
+					jsonTariff = new JSONObject(body);
+				}
+				jsonArray.put(jsonTariff);
 			}
-			jsonArray.put(jsonTariff);
 		}
 
 		return jsonArray.toString();
