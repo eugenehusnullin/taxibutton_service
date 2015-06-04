@@ -47,7 +47,7 @@ public class TariffController {
 			String apikey = request.getParameter("apikey");
 
 			Broker broker = brokerDao.getByApiId(clid);
-			if (broker == null || !broker.getApiKey().equals(apikey)) {
+			if (broker != null && !broker.getApiKey().equals(apikey)) {
 				logger.warn("apitaxirfTariffController bad broker credential.");
 				return;
 			}
@@ -94,9 +94,19 @@ public class TariffController {
 		JSONArray jsonArray = new JSONArray();
 		List<TariffDefinition> list = tariffDefinitionDao.getAll();
 		for (TariffDefinition tariffDefinition : list) {
-			if (tariffDefinition.getMapAreas().stream()
-					.anyMatch(p -> broker.getMapAreas().stream()
-							.anyMatch(p2 -> p.getId().equals(p2.getId()))  )) {
+			boolean doit = false;
+			if (broker != null) {
+				doit = tariffDefinition.getMapAreas().stream()
+						.anyMatch(p -> broker.getMapAreas().stream()
+								.anyMatch(
+										p2 -> p.getId().equals(p2.getId())
+								)
+						);
+			} else {
+				doit = true;
+			}
+
+			if (doit) {
 				String body = tariffDefinition.getBody();
 				JSONObject jsonTariff = null;
 				try {
