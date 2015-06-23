@@ -79,7 +79,7 @@ function compilePoint(vertices) {
 function addMapZone(serverUrl, mapZone) {
 
 	$.ajax({
-		url : serverUrl + "/maparea/create",
+		url : serverUrl + "/maparea/add",
 		dataType : "html",
 		type : "POST",
 		data : mapZone,
