@@ -10,6 +10,6 @@
 			<key-property name="tariffId" length="32"></key-property>
 		</composite-id>
 		<property name="name" length="64"/>
-		<property name="tariff" length="30000"/>
+		<property name="tariff" length="2000000"/>
 	</class>
 </hibernate-mapping>

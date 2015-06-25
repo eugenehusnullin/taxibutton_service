@@ -9,6 +9,7 @@
 				<th>id</th>
 				<th>bookingDate</th>
 				<th>source</th>
+				<th>status</th>
 				<th>notlater</th>
 				<th>brokerId</th>
 				<th>phone</th>
@@ -21,6 +22,7 @@
 					<td>${order.getId()}</td>
 					<td>${order.getBookingDate()}</td>
 					<td>${order.getSourceShortAddress()}</td>
+					<td>${order.getLastStatus()}</td>
 					<td>${order.getUrgent()}</td>
 					<td>${order.getBrokerName()}</td>
 					<td>${order.getPhone()}</td>
