@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
@@ -24,12 +23,19 @@
 				<td>${broker.getApiurl()}</td>
 			</tr>
 			<tr class="actionTr">
-				<td class="actionTd" colspan="5"><a
-					href="../tariff/tariff?id=${broker.getId()}">Tariff</a>---<a
-					href="../phone/blackList?id=${broker.getId()}">Black list</a>---<a
-					href="qiwi?id=${broker.getId()}">QIWI</a>--- <a
-					href="delete?id=${broker.getId()}">Delete</a>---<a
-					href="edit?id=${broker.getId()}">Edit</a></td>
+				<td class="actionTd" colspan="5">
+					<a href="../tariff/tariff?id=${broker.getId()}">Tariff</a>
+					---
+					<a href="../phone/blackList?id=${broker.getId()}">Black list</a>
+					---
+					<a href="qiwi?id=${broker.getId()}">QIWI</a>
+					---
+					<a href="delete?id=${broker.getId()}">Delete</a>
+					---
+					<a href="edit?id=${broker.getId()}">Edit</a>
+					---
+					<a href="cars?id=${broker.getId()}">Cars</a>
+				</td>
 			</tr>
 		</c:forEach>
 	</tbody>

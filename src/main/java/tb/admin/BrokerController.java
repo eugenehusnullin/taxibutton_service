@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import tb.admin.model.MapAreaModel;
 import tb.car.CarSynch;
+import tb.car.dao.CarDao;
 import tb.dao.IMapAreaDao;
 import tb.domain.Broker;
 import tb.domain.SmsMethod;
@@ -41,21 +42,23 @@ public class BrokerController {
 	private TariffSynch tariffSynch;
 	@Autowired
 	private IMapAreaDao mapAreaDao;
-	
+	@Autowired
+	private CarDao carDao;
+
 	@RequestMapping(value = "/carsynch", method = RequestMethod.GET)
 	public String carSynch(Model model) {
 		Date d = new Date(new Date().getTime() + 3000);
 		starter.schedule(carSynch::synch, d);
-		
+
 		model.addAttribute("result", "Car synch started, wait some seconds. And you can see result in log files.");
 		return "result";
 	}
-	
+
 	@RequestMapping(value = "/tariffsynch", method = RequestMethod.GET)
 	public String tariffSynch(Model model) {
 		Date d = new Date(new Date().getTime() + 3000);
 		starter.schedule(tariffSynch::synch, d);
-		
+
 		model.addAttribute("result", "Tariff synch started, wait some seconds. And you can see result in log files.");
 		return "result";
 	}
@@ -65,6 +68,13 @@ public class BrokerController {
 		List<Broker> list = brokerService.getAll();
 		model.addAttribute("brokers", list);
 		return "broker/list";
+	}
+
+	@RequestMapping(value = "/cars", method = RequestMethod.GET)
+	public String cars(@RequestParam("id") Long brokerId, Model model) {
+		List<?> list = carDao.getCarsWithCarStates(brokerId);
+		model.addAttribute("cars", list);
+		return "broker/cars";
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
@@ -78,7 +88,7 @@ public class BrokerController {
 			mapAreaModels.add(mapAreaModel);
 		}
 		model.addAttribute("mapareas", mapAreaModels);
-		
+
 		return "broker/create";
 	}
 
@@ -96,7 +106,7 @@ public class BrokerController {
 
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
-		
+
 		Set<MapArea> mapAreasSet = new HashSet<MapArea>();
 		for (String mapAreaId : mapAreaIds) {
 			MapArea mapArea = new MapArea();
@@ -145,7 +155,7 @@ public class BrokerController {
 		model.addAttribute("mapareaUrl", broker.getMapareaUrl());
 		model.addAttribute("costUrl", broker.getCostUrl());
 		model.addAttribute("timezoneOffset", broker.getTimezoneOffset());
-		
+
 		List<MapAreaModel> mapAreaModels = new ArrayList<MapAreaModel>();
 		List<MapArea> mapAreas = mapAreaDao.getAll();
 		for (MapArea mapArea : mapAreas) {
@@ -155,7 +165,7 @@ public class BrokerController {
 			mapAreaModels.add(mapAreaModel);
 		}
 		model.addAttribute("mapareas", mapAreaModels);
-		
+
 		List<Long> mapAreasIds = new ArrayList<Long>();
 		broker.getMapAreas().stream().forEach(a -> mapAreasIds.add(a.getId()));
 		model.addAttribute("mapareasids", mapAreasIds);
@@ -176,7 +186,7 @@ public class BrokerController {
 			@RequestParam("mapareas") String[] mapAreaIds) {
 		SmsMethod smsM = SmsMethod.values()[Integer.parseInt(smsMethod)];
 		TariffType tariffType = TariffType.values()[Integer.parseInt(tariffTypeParam)];
-		
+
 		Set<MapArea> mapAreasSet = new HashSet<MapArea>();
 		for (String mapAreaId : mapAreaIds) {
 			MapArea mapArea = new MapArea();

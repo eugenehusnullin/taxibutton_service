@@ -148,6 +148,22 @@ public class CarDao {
 	}
 
 	@Transactional(value = "inmemDbTm")
+	public List<?> getCarsWithCarStates(Long brokerId) {
+		Session session = sessionFactory.getCurrentSession();
+		String q = " from CarState a, Car b"
+				+ " where a.brokerId = b.brokerId "
+				+ " and a.brokerId = :brokerId "
+				+ " and a.uuid = b.uuid "
+				+ " order by a.date desc ";
+
+		List<?> list = session.createQuery(q)
+				.setLong("brokerId", brokerId)
+				.list();
+
+		return list;
+	}
+
+	@Transactional(value = "inmemDbTm")
 	public List<CarState> getCarStatesByRequirements(List<CarState> carStates, Set<Requirement> reqs) {
 		if (reqs == null || reqs.size() == 0) {
 			return carStates;

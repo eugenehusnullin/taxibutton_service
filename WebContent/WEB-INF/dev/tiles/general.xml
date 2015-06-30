@@ -62,6 +62,11 @@
 		<put-attribute name="body" value="/WEB-INF/dev/views/broker/list.jsp" />
 	</definition>
 	
+	<definition name="broker/cars" extends="default">
+		<put-attribute name="title" value="Broker Cars" />
+		<put-attribute name="body" value="/WEB-INF/dev/views/broker/cars.jsp" />
+	</definition>
+	
 	<definition name="broker/create" extends="default">
 		<put-attribute name="title" value="Add broker" />
 		<put-attribute name="body" value="/WEB-INF/dev/views/broker/create.jsp" />
