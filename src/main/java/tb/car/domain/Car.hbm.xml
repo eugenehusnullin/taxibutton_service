@@ -28,7 +28,7 @@
 		<property name="driverLicense" length="60"></property>
 		<property name="driverPermit" length="60"></property>
 		
-		<property name="carModel" length="40"></property>
+		<property name="carModel" length="100"></property>
 		<property name="carAge"></property>
 		<property name="carColor" length="12"></property>
 		<property name="carNumber" length="12"></property>
