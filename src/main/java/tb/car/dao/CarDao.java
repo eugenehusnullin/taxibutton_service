@@ -178,7 +178,8 @@ public class CarDao {
 					.add(Restrictions.eq("uuid", carState.getUuid()))
 					.uniqueResult();
 
-			boolean b = reqsKeys.stream().allMatch(p -> car.getCarRequires().containsKey(p));
+			boolean b = reqsKeys.stream().allMatch(p -> car.getCarRequires().containsKey(p) 
+					&& !car.getCarRequires().get(p).equals("no"));
 			if (b) {
 				filteredCarStates.add(carState);
 			}
