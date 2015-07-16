@@ -1,5 +1,6 @@
 package tb.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import tb.dao.IOrderDao;
 import tb.domain.order.Feedback;
 import tb.domain.order.Order;
+import utils.DatetimeUtils;
 
 @Repository("OrderDao")
 public class OrderDao implements IOrderDao {
@@ -70,4 +72,16 @@ public class OrderDao implements IOrderDao {
 		sessionFactory.getCurrentSession().save(feedback);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Order> getExactOrdersNeedOffering(int exactMin) {
+		Date date = DatetimeUtils.localTimeToUtc(new Date());
+		date = new Date(date.getTime() + (exactMin * 60000));
+
+		return sessionFactory.getCurrentSession().createCriteria(Order.class)
+				.add(Restrictions.eq("notlater", false))
+				.add(Restrictions.eq("exactOffered", false))
+				.add(Restrictions.le("bookingDate", date))
+				.list();
+	}
 }

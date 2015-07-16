@@ -13,6 +13,7 @@
 		<property name="carUuid" length="40"></property>		
 		<property name="uuid" unique-key="order_uk2" />
 		<property name="notlater" />
+		<property name="exactOffered"/>
 		<property name="phone" length="20" />
 		<property name="bookingDate" />
 		<set name="requirements" cascade="all">

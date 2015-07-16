@@ -20,4 +20,6 @@ public interface IOrderDao {
 	Long getAllOrdersCount();
 
 	void saveFeedback(Feedback feedback);
+
+	List<Order> getExactOrdersNeedOffering(int exactMin);
 }

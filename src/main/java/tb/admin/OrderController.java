@@ -142,20 +142,20 @@ public class OrderController {
 		outputStream.writeBytes(params);
 		outputStream.flush();
 		outputStream.close();
-		
+
 		@SuppressWarnings("unused")
 		int responseCode = connection.getResponseCode();
 
 		return "redirect:list";
 	}
-	
+
 	@RequestMapping(value = "/getGeodata", method = RequestMethod.GET)
 	public String getGeodata(@RequestParam("id") Long orderId, Model model) {
 
 		model.addAttribute("orderId", orderId);
 		return "order/getGeodata";
 	}
-	
+
 	@RequestMapping(value = "/getGeodata", method = RequestMethod.POST)
 	public String getGeodata(HttpServletRequest request,
 			@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
@@ -309,7 +309,7 @@ public class OrderController {
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		long t = Calendar.getInstance().getTime().getTime() + (10 * 60000);
 		model.addAttribute("now_time",
-				df.format(DatetimeUtils.localTimeToOtherTimeZone(new Date(t), DatetimeUtils.TIMEZONEID_UTC)));
+				df.format(DatetimeUtils.localTimeToUtc(new Date(t))));
 		model.addAttribute("brokers", brokerService.getAll());
 		return "order/create";
 	}

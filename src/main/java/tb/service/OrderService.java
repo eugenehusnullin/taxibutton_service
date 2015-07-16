@@ -162,8 +162,10 @@ public class OrderService {
 		orderStatus.setStatus(OrderStatusType.Created);
 		orderStatusDao.save(orderStatus);
 
-		OrderExecHolder orderExecHolder = new OrderExecHolder(order);
-		offerOrderProcessing.addOrder(orderExecHolder);
+		if (order.getNotlater()) {
+			OrderExecHolder orderExecHolder = new OrderExecHolder(order);
+			offerOrderProcessing.addOrder(orderExecHolder);
+		}
 	}
 
 	@Transactional

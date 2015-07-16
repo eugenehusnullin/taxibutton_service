@@ -44,7 +44,7 @@ public class OrderJsonParser {
 		if (jsonObject.has("bookmins"))
 		{
 			int bookMins = jsonObject.getInt("bookmins");
-			bookingDate = DatetimeUtils.localTimeToOtherTimeZone(new Date(), DatetimeUtils.TIMEZONEID_UTC);
+			bookingDate = DatetimeUtils.localTimeToUtc(new Date());
 			bookingDate = new Date(bookingDate.getTime() + (bookMins * ONE_MINUTE_IN_MILLIS));
 		} else {
 			try {

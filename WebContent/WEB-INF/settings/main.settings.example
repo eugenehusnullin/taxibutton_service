@@ -9,6 +9,8 @@ offerorder.coordcoef=0.1
 offerorder.notlaterminutes=25
 offerorder.speed=40
 
+offerorder.exact.min=30
+
 cancelorder.threads.count=10
 
 createorder.limit=180000
