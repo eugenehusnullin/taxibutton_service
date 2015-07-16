@@ -25,8 +25,8 @@ public class ExactOrderToOffer {
 	@Autowired
 	private OfferOrderProcessing offerOrderProcessing;
 	
-	@Value("#{mainSettings['offerorder.exact.min']}")
-	private int EXACT_MIN;
+	@Value("#{mainSettings['offerorder.notlaterminutes']}")
+	private int notlaterMinutes;
 
 	@Transactional
 	@Scheduled(cron = "0 */2 * * * *")
@@ -35,13 +35,13 @@ public class ExactOrderToOffer {
 		logger.info("++ Start exact orders to offer.");
 
 		try {
-			List<Order> orders = orderDao.getExactOrdersNeedOffering(EXACT_MIN);
+			List<Order> orders = orderDao.getExactOrdersNeedOffering(notlaterMinutes);
 			for (Order order : orders) {
 				try {
 					OrderExecHolder orderExecHolder = new OrderExecHolder(order);
 					offerOrderProcessing.addOrder(orderExecHolder);
 					
-					order.setExactOffered(true);
+					order.setNotlater(true);
 					// potential problem here
 					orderDao.save(order);
 

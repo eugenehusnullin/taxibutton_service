@@ -24,7 +24,6 @@ public class Order {
 	private VehicleClass orderVehicleClass;
 	private Boolean notlater;
 	private String comments;
-	private Boolean exactOffered = false;
 
 	public Long getId() {
 		return id;
@@ -157,13 +156,5 @@ public class Order {
 
 	public void setComments(String comments) {
 		this.comments = comments;
-	}
-
-	public Boolean getExactOffered() {
-		return exactOffered;
-	}
-
-	public void setExactOffered(Boolean exactOffered) {
-		this.exactOffered = exactOffered;
 	}
 }

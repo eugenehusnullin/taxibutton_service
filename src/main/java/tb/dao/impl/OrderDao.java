@@ -80,7 +80,6 @@ public class OrderDao implements IOrderDao {
 
 		return sessionFactory.getCurrentSession().createCriteria(Order.class)
 				.add(Restrictions.eq("notlater", false))
-				.add(Restrictions.eq("exactOffered", false))
 				.add(Restrictions.le("bookingDate", date))
 				.list();
 	}
