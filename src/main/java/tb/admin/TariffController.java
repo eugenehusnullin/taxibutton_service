@@ -9,15 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import tb.service.BrokerService;
 import tb.service.TariffService;
 
 @RequestMapping("/tariff")
 @Controller
 public class TariffController {
 
-	@Autowired
-	private BrokerService brokerService;
+	// @Autowired
+	// private BrokerService brokerService;
 	@Autowired
 	private TariffService tariffService;
 

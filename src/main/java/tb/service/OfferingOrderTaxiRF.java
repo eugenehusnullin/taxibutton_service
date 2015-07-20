@@ -27,7 +27,6 @@ import tb.dao.IBrokerDao;
 import tb.dao.IOfferedOrderBrokerDao;
 import tb.dao.IOrderDao;
 import tb.dao.IOrderStatusDao;
-import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.order.OfferedOrderBroker;
 import tb.domain.order.Order;
@@ -49,8 +48,8 @@ public class OfferingOrderTaxiRF {
 	private CarDao carDao;
 	@Autowired
 	private IBrokerDao brokerDao;
-	@Autowired
-	private ITariffDao tariffDao;
+	// @Autowired
+	// private ITariffDao tariffDao;
 	@Autowired
 	private IOfferedOrderBrokerDao offeredOrderBrokerDao;
 	@Autowired

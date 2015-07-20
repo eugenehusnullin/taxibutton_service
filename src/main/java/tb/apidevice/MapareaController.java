@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import tb.dao.IMapAreaDao;
 import tb.domain.Broker;
 import tb.domain.maparea.MapArea;
 import tb.maparea.MapareaSerializer;
@@ -26,8 +25,8 @@ import utils.NetStreamUtils;
 public class MapareaController {
 	@Autowired
 	private BrokerService brokerService;
-	@Autowired
-	private IMapAreaDao mapareaDao;
+	// @Autowired
+	// private IMapAreaDao mapareaDao;
 	@Autowired
 	private MapareaSerializer mapareaSerializer;
 

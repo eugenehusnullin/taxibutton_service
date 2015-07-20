@@ -23,7 +23,6 @@ import tb.domain.TariffType;
 import tb.domain.maparea.MapArea;
 import tb.service.BrokerService;
 import tb.service.Starter;
-import tb.service.TariffService;
 import tb.tariff.TariffSynch;
 
 @RequestMapping("/broker")
@@ -32,8 +31,8 @@ public class BrokerController {
 
 	@Autowired
 	private BrokerService brokerService;
-	@Autowired
-	private TariffService tariffService;
+	// @Autowired
+	// private TariffService tariffService;
 	@Autowired
 	private Starter starter;
 	@Autowired

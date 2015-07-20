@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tb.dao.IBrokerDao;
-import tb.dao.IMapAreaDao;
 import tb.domain.Broker;
 import tb.domain.SmsMethod;
 import tb.domain.TariffType;
@@ -21,8 +20,8 @@ public class BrokerService {
 
 	@Autowired
 	private IBrokerDao brokerDao;
-	@Autowired
-	private IMapAreaDao mapAreaDao;
+	// @Autowired
+	// private IMapAreaDao mapAreaDao;
 	@Autowired
 	private MapAreaAssist mapAreaAssist;
 

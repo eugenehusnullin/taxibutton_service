@@ -28,7 +28,6 @@ import tb.domain.maparea.Point;
 import tb.domain.order.Order;
 import tb.domain.order.VehicleClass;
 import tb.service.BrokerService;
-import tb.service.OfferingOrderYandexTaxi;
 import tb.service.OrderService;
 import tb.service.exceptions.DeviceNotFoundException;
 import tb.service.exceptions.NotValidOrderStatusException;
@@ -48,8 +47,8 @@ public class OrderController {
 	private OrderService orderService;
 	@Autowired
 	private BrokerService brokerService;
-	@Autowired
-	private OfferingOrderYandexTaxi offeringOrder;
+	// @Autowired
+	// private OfferingOrderYandexTaxi offeringOrder;
 
 	// create an order from apk request (json string)
 	@RequestMapping(value = "/create", method = RequestMethod.POST)

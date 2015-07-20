@@ -36,7 +36,6 @@ import tb.dao.IOrderAcceptAlacrityDao;
 import tb.dao.IOrderCancelDao;
 import tb.dao.IOrderDao;
 import tb.dao.IOrderStatusDao;
-import tb.dao.ITariffDao;
 import tb.domain.Broker;
 import tb.domain.Device;
 import tb.domain.order.Feedback;
@@ -86,8 +85,8 @@ public class OrderService {
 	private IOrderAcceptAlacrityDao alacrityDao;
 	@Autowired
 	private IOrderAcceptAlacrityDao orderAlacrityDao;
-	@Autowired
-	private ITariffDao tariffDao;
+	// @Autowired
+	// private ITariffDao tariffDao;
 	@Autowired
 	private CarDao carDao;
 

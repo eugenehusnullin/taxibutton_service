@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 
-<table border="1" cellpadding="7">
+<table border="1">
 	<thead>
 		<tr>
 			<th>disp</th>
