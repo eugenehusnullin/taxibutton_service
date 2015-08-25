@@ -1,11 +1,8 @@
 package tb.car;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import tb.car.dao.CarDao;
 import tb.car.domain.Car;
@@ -50,8 +46,8 @@ public class CarSynch {
 				logger.info(cars.size() + " cars - pulled from broker.");
 				updateCars(cars, broker, loadDate);
 				logger.info("Cars saved to db.");
-			} catch (ParserConfigurationException | SAXException | IOException e) {
-				logger.error("Car synch error: ", e);
+			} catch (Exception e) {
+				logger.error("Broker - " + broker.getName() + "(" + broker.getApiId() + ")" + " Car synch error: ", e);
 			}
 		}
 		logger.info("End car synch.");
