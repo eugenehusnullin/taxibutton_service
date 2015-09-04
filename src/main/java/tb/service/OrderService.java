@@ -92,7 +92,7 @@ public class OrderService {
 
 	@Value("#{mainSettings['createorder.limit']}")
 	private Integer createOrderLimit = 60000;
-	
+
 	@Value("#{mainSettings['offerorder.notlaterminutes']}")
 	private int notlaterMinutes;
 
@@ -122,6 +122,31 @@ public class OrderService {
 	}
 
 	@Transactional
+	public void informEvent(JSONObject informJson) throws OrderNotFoundException, WrongData {
+		String apiId = informJson.optString("apiId");
+		String orderUuid = informJson.optString("orderId");
+		Order order = orderDao.get(orderUuid);
+		if (order == null || !order.getDevice().getApiId().equals(apiId)) {
+			throw new OrderNotFoundException(orderUuid);
+		}
+
+		OrderStatusType lastStatusType = order.getLastStatus().getStatus();
+		if (lastStatusType != OrderStatusType.Driving && lastStatusType != OrderStatusType.Waiting) {
+			throw new WrongData();
+		}
+
+		Broker broker = order.getBroker();
+		String url = broker.getApiurl() + "/1.x/inform";
+		try {
+			HttpUtils.postRawData(informJson.toString(), url, "UTF-8", "application/json");
+		} catch (Exception e) {
+			logger.error("INFORM - " + order.getUuid() + ".", e);
+		}
+
+		return;
+	}
+
+	@Transactional
 	public void getOrders(String apiId, String apiKey) throws BrokerNotFoundException {
 		Broker broker = brokerDao.getByApiId(apiId, apiKey);
 		if (broker == null) {
@@ -138,8 +163,8 @@ public class OrderService {
 			throw new DeviceNotFoundException(deviceApiid);
 		}
 
-		Order order = OrderJsonParser
-				.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao, notlaterMinutes);
+		Order order = OrderJsonParser.Json2Order(createOrderObject.getJSONObject("order"), device.getPhone(), brokerDao,
+				notlaterMinutes);
 		order.setDevice(device);
 		return order;
 	}
@@ -168,8 +193,8 @@ public class OrderService {
 	}
 
 	@Transactional
-	public void cancel(JSONObject cancelOrderJson) throws DeviceNotFoundException, OrderNotFoundException,
-			NotValidOrderStatusException {
+	public void cancel(JSONObject cancelOrderJson)
+			throws DeviceNotFoundException, OrderNotFoundException, NotValidOrderStatusException {
 
 		String apiId = cancelOrderJson.getString("apiId");
 		String orderUuid = cancelOrderJson.getString("orderId");
@@ -250,8 +275,8 @@ public class OrderService {
 	}
 
 	@Transactional
-	public JSONObject getGeodata(JSONObject getGeodataJsonObject) throws DeviceNotFoundException,
-			OrderNotFoundException, ParseException {
+	public JSONObject getGeodata(JSONObject getGeodataJsonObject)
+			throws DeviceNotFoundException, OrderNotFoundException, ParseException {
 		String apiId = getGeodataJsonObject.optString("apiId");
 		Device device = deviceDao.get(apiId);
 		if (device == null) {
@@ -277,8 +302,7 @@ public class OrderService {
 			}
 			OrderStatus firstUserGeodataStatus = order.getStatuses().stream()
 					.filter(p -> OrderStatusType.IsValidForUserGeodata(p.getStatus()))
-					.sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate()))
-					.findFirst().get();
+					.sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate())).findFirst().get();
 			geoDataList = carDao.getGeoData(order.getBroker().getId(), order.getCarUuid(),
 					date == null ? firstUserGeodataStatus.getDate() : date);
 		}
@@ -500,7 +524,7 @@ public class OrderService {
 
 		return models;
 	}
-	
+
 	@Autowired
 	private TariffDefinitionHelper tariffDefinitionHelper;
 
@@ -508,7 +532,7 @@ public class OrderService {
 	@Transactional
 	public boolean giveOrder(Long orderId, OrderAcceptAlacrity winnerAlacrity) {
 		Order order = orderDao.get(orderId);
-		
+
 		String tariffIdName = tariffDefinitionHelper.getTariffIdName(order.getSource().getLat(),
 				order.getSource().getLon(), order.getOrderVehicleClass());
 
@@ -516,7 +540,7 @@ public class OrderService {
 		Car4Request car4Request = new Car4Request();
 		car4Request.setUuid(car.getUuid());
 		car4Request.setTariff(tariffIdName);
-		
+
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(order.getBookingDate());
 		calendar.add(Calendar.HOUR_OF_DAY, winnerAlacrity.getBroker().getTimezoneOffset());

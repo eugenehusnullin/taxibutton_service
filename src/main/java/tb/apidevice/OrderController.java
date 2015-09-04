@@ -191,6 +191,30 @@ public class OrderController {
 			response.setStatus(404);
 		}
 	}
+	
+	@RequestMapping(value = "/inform", method = RequestMethod.POST)
+	public void inform(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			String str = getHttpServletRequestBuffer(request);
+			logger.trace(str);
+
+			JSONObject informJson = (JSONObject) new JSONTokener(str).nextValue();
+			orderService.informEvent(informJson);
+			response.setStatus(200);
+		} catch (UnsupportedEncodingException e) {
+			logger.error("apiDeviceOrderController.gotocar", e);
+			response.setStatus(500);
+		} catch (IOException e) {
+			logger.error("apiDeviceOrderController.gotocar", e);
+			response.setStatus(500);
+		} catch (OrderNotFoundException e) {
+			logger.error("apiDeviceOrderController.gotocar", e);
+			response.setStatus(403);
+		} catch (WrongData e) {
+			logger.error("apiDeviceOrderController.gotocar", e);
+			response.setStatus(404);
+		}
+	}
 
 	@RequestMapping(value = "/getbrokers", method = RequestMethod.POST)
 	@Transactional
