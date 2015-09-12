@@ -8,15 +8,15 @@
 	<input type="hidden" name="orderId" value="${orderId}" /> 
 	Broker api id 
 	<br />
-	<input type="text" name="apiId" />
+	<input type="text" name="apiId" value="${apiId}" />
 	<br />
 	Broker api key
 	<br />
-	<input type="text" name="apiKey" />
+	<input type="text" name="apiKey" value="${apiKey}"/>
 	<br />
 	Driver uuid
 	<br />
-	<input 	type="text" name="uuid" />
+	<input 	type="text" name="uuid" value="${uuid}"/>
 	<br />
 	<input type="submit" value="Send" />
 </form>

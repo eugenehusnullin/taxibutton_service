@@ -53,6 +53,7 @@ import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
 import tb.service.exceptions.WrongData;
 import tb.service.processing.CancelOrderProcessing;
+import tb.service.processing.ChooseWinnerProcessing;
 import tb.service.processing.OfferOrderProcessing;
 import tb.service.serialize.OrderJsonParser;
 import tb.service.serialize.YandexOrderSerializer;
@@ -95,6 +96,9 @@ public class OrderService {
 
 	@Value("#{mainSettings['offerorder.notlaterminutes']}")
 	private int notlaterMinutes;
+	
+	@Autowired
+	private ChooseWinnerProcessing chooseWinnerProcessing;
 
 	@Transactional
 	public void saveFeedback(JSONObject feedbackJson) throws OrderNotFoundException, WrongData {
@@ -355,6 +359,12 @@ public class OrderService {
 		alacrity.setUuid(uuid);
 		alacrity.setDate(new Date());
 		alacrityDao.save(alacrity);
+		
+		OrderExecHolder orderExecHolder = new OrderExecHolder(order);
+		orderExecHolder.setStartChooseWinner(new Date());
+		if (!chooseWinnerProcessing.exists(orderExecHolder)) {
+			chooseWinnerProcessing.addOrder(orderExecHolder);
+		}
 	}
 
 	@Transactional
@@ -506,6 +516,11 @@ public class OrderService {
 		}
 		return model;
 	}
+	
+	@Transactional
+	public Order getTrueOrder(Long orderId) {
+		return orderDao.get(orderId);
+	}
 
 	@Transactional
 	public List<OrderStatusModel> getStatuses(Long orderId) {
@@ -549,7 +564,15 @@ public class OrderService {
 		String url = winnerAlacrity.getBroker().getApiurl() + "/1.x/setcar";
 
 		try {
-			boolean posted = HttpUtils.postDocumentOverHttp(doc, url, logger).getResponseCode() == 200;
+			boolean posted = false;
+
+			// TODO: DELETE AFTER DEVICE TESTING COMPLETED
+			if (order.getDevice().getPhone().startsWith("+++")) {
+				posted = true;
+			} else {
+				posted = HttpUtils.postDocumentOverHttp(doc, url, logger).getResponseCode() == 200;
+			}
+
 			if (!posted) {
 				logger.info("Error giving order to broker: " + winnerAlacrity.getBroker().getId().toString());
 				return false;

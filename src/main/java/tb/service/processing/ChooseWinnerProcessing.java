@@ -127,4 +127,12 @@ public class ChooseWinnerProcessing {
 			queue.notifyAll();
 		}
 	}
+	
+	public boolean exists(OrderExecHolder orderExecHolder) {
+		synchronized (queue) {
+			boolean r = queue.contains(orderExecHolder);
+			queue.notifyAll();
+			return r;
+		}
+	}
 }

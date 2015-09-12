@@ -38,4 +38,14 @@ public class OrderExecHolder {
 	public void setStartChooseWinner(Date startChooseWinner) {
 		this.startChooseWinner = startChooseWinner;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof OrderExecHolder)) {
+			return super.equals(obj);
+		}
+		
+		OrderExecHolder other = (OrderExecHolder) obj;
+		return this.order.getId().equals(other.order.getId());
+	}
 }

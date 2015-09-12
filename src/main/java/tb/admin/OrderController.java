@@ -29,6 +29,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import tb.admin.model.AlacrityModel;
 import tb.admin.model.OrderModel;
 import tb.admin.model.OrderStatusModel;
+import tb.domain.Broker;
+import tb.domain.order.Order;
+import tb.domain.order.OrderStatusType;
 import tb.service.BrokerService;
 import tb.service.OrderService;
 import utils.DatetimeUtils;
@@ -70,6 +73,11 @@ public class OrderController {
 	@RequestMapping(value = "/alacrity", method = RequestMethod.GET)
 	public String alacrity(@RequestParam("id") Long orderId, Model model) {
 		List<AlacrityModel> listAlacrity = orderService.getAlacrities(orderId);
+		List<Broker> brokers = brokerService.getAll();
+		if (brokers.size() > 0) {
+			model.addAttribute("apiId", brokers.get(0).getApiId());
+			model.addAttribute("apiKey", brokers.get(0).getApiKey());
+		}
 
 		model.addAttribute("alacrities", listAlacrity);
 		model.addAttribute("orderId", orderId);
@@ -86,8 +94,8 @@ public class OrderController {
 
 		OrderModel orderModel = orderService.getOrder(Long.parseLong(request.getParameter("orderId")));
 
-		String params = "orderid=" + orderModel.getUuid() + "&clid=" + request.getParameter("apiId")
-				+ "&apikey=" + request.getParameter("apiKey") + "&uuid=" + request.getParameter("uuid");
+		String params = "orderid=" + orderModel.getUuid() + "&clid=" + request.getParameter("apiId") + "&apikey="
+				+ request.getParameter("apiKey") + "&uuid=" + request.getParameter("uuid");
 
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -107,13 +115,22 @@ public class OrderController {
 
 	@RequestMapping(value = "/setStatus", method = RequestMethod.GET)
 	public String setStatus(@RequestParam("id") Long orderId, Model model) {
+		Order order = orderService.getTrueOrder(orderId);
+		model.addAttribute("apiId", order.getBroker().getApiId());
+		model.addAttribute("apiKey", order.getBroker().getApiKey());
+
+		String extra = "";
+		if (order.getLastStatus().getStatus() == OrderStatusType.Taked
+				|| order.getLastStatus().getStatus() == OrderStatusType.Created) {
+			extra = order.getCarUuid();
+		}
+		model.addAttribute("extra", extra);
 		model.addAttribute("orderId", orderId);
 		return "order/setStatus";
 	}
 
 	@RequestMapping(value = "/setStatus", method = RequestMethod.POST)
-	public String setStatus(HttpServletRequest request) throws IOException,
-			URISyntaxException {
+	public String setStatus(HttpServletRequest request) throws IOException, URISyntaxException {
 
 		String clid = request.getParameter("clid");
 		String apikey = request.getParameter("apikey");
@@ -157,8 +174,8 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getGeodata", method = RequestMethod.POST)
-	public String getGeodata(HttpServletRequest request,
-			@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
+	public String getGeodata(HttpServletRequest request, @RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId, Model model) {
 
 		OrderModel orderModel = orderService.getOrder(orderId);
 		JSONObject getGeodataJson = new JSONObject();
@@ -206,8 +223,8 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getStatus", method = RequestMethod.POST)
-	public String getStatus(HttpServletRequest request,
-			@RequestParam("orderId") Long orderId, @RequestParam("apiId") String apiId, Model model) {
+	public String getStatus(HttpServletRequest request, @RequestParam("orderId") Long orderId,
+			@RequestParam("apiId") String apiId, Model model) {
 
 		OrderModel orderModel = orderService.getOrder(orderId);
 		JSONObject getStatusJson = new JSONObject();
@@ -308,8 +325,7 @@ public class OrderController {
 	public String create(Model model) {
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		long t = Calendar.getInstance().getTime().getTime() + (10 * 60000);
-		model.addAttribute("now_time",
-				df.format(DatetimeUtils.localTimeToUtc(new Date(t))));
+		model.addAttribute("now_time", df.format(DatetimeUtils.localTimeToUtc(new Date(t))));
 		model.addAttribute("brokers", brokerService.getAll());
 		return "order/create";
 	}
@@ -407,7 +423,7 @@ public class OrderController {
 			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 
 			wr.write(jsonResult.getBytes("UTF-8"));
-			//wr.writeBytes(jsonResult);
+			// wr.writeBytes(jsonResult);
 			wr.flush();
 			wr.close();
 
@@ -421,8 +437,8 @@ public class OrderController {
 				String line = null;
 
 				try {
-					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-							connection.getInputStream()));
+					BufferedReader bufferedReader = new BufferedReader(
+							new InputStreamReader(connection.getInputStream()));
 
 					while ((line = bufferedReader.readLine()) != null) {
 						stringBuffer.append(line);

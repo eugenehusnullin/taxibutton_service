@@ -9,7 +9,7 @@
 			<generator class="identity" />
 		</id>
 		<many-to-one name="device" column="deviceId" />
-		<many-to-one name="broker" column="brokerid" />
+		<many-to-one name="broker" column="brokerid" lazy="false" />
 		<property name="carUuid" length="40" />
 		<property name="uuid" unique-key="order_uk2" />
 		<property name="notlater" />
