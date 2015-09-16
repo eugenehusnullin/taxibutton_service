@@ -129,16 +129,16 @@ public class CarDao {
 	@Transactional(value = "inmemDbTm")
 	public List<CarState> getNearCarStates(double lat, double lon, double diff) {
 		Session session = sessionFactory.getCurrentSession();
-		Date date = new Date((new Date()).getTime() - 300000);
+		//Date date = new Date((new Date()).getTime() - 300000);
 		String q = " from CarState cs "
 				+ " where cs.state=0 "
-				+ " and cs.date>=:date "
+				//+ " and cs.date>=:date "
 				+ " and (abs(:lat-cs.latitude) + abs(:lon-cs.longitude)) <= :diff "
 				+ " order by abs(:lat-cs.latitude) + abs(:lon-cs.longitude) ";
 
 		@SuppressWarnings("unchecked")
 		List<CarState> list = (List<CarState>) session.createQuery(q)
-				.setTimestamp("date", date)
+				//.setTimestamp("date", date)
 				.setDouble("lat", lat)
 				.setDouble("lon", lon)
 				.setDouble("diff", diff)
