@@ -96,7 +96,7 @@ public class OrderService {
 
 	@Value("#{mainSettings['offerorder.notlaterminutes']}")
 	private int notlaterMinutes;
-	
+
 	@Autowired
 	private ChooseWinnerProcessing chooseWinnerProcessing;
 
@@ -359,7 +359,7 @@ public class OrderService {
 		alacrity.setUuid(uuid);
 		alacrity.setDate(new Date());
 		alacrityDao.save(alacrity);
-		
+
 		OrderExecHolder orderExecHolder = new OrderExecHolder(order);
 		orderExecHolder.setStartChooseWinner(new Date());
 		if (!chooseWinnerProcessing.exists(orderExecHolder)) {
@@ -516,7 +516,7 @@ public class OrderService {
 		}
 		return model;
 	}
-	
+
 	@Transactional
 	public Order getTrueOrder(Long orderId) {
 		return orderDao.get(orderId);
@@ -545,7 +545,7 @@ public class OrderService {
 
 	// assign order executer
 	@Transactional
-	public boolean giveOrder(Long orderId, OrderAcceptAlacrity winnerAlacrity) {
+	public int giveOrder(Long orderId, OrderAcceptAlacrity winnerAlacrity) {
 		Order order = orderDao.get(orderId);
 
 		String tariffIdName = tariffDefinitionHelper.getTariffIdName(order.getSource().getLat(),
@@ -563,19 +563,17 @@ public class OrderService {
 		Document doc = YandexOrderSerializer.orderToSetcarXml(order, calendar.getTime(), car4Request, order.getPhone());
 		String url = winnerAlacrity.getBroker().getApiurl() + "/1.x/setcar";
 
+		int responseCode = 0;
 		try {
-			boolean posted = false;
-
 			// TODO: DELETE AFTER DEVICE TESTING COMPLETED
 			if (order.getDevice().getPhone().startsWith("+++")) {
-				posted = true;
+				responseCode = 200;
 			} else {
-				posted = HttpUtils.postDocumentOverHttp(doc, url, logger).getResponseCode() == 200;
+				responseCode = HttpUtils.postDocumentOverHttp(doc, url, logger).getResponseCode();
 			}
 
-			if (!posted) {
+			if (responseCode != 200) {
 				logger.info("Error giving order to broker: " + winnerAlacrity.getBroker().getId().toString());
-				return false;
 			} else {
 				order.setBroker(winnerAlacrity.getBroker());
 				order.setCarUuid(winnerAlacrity.getUuid());
@@ -586,13 +584,11 @@ public class OrderService {
 				orderStatus.setOrder(order);
 				orderStatus.setStatus(OrderStatusType.Taked);
 				orderStatusDao.save(orderStatus);
-
-				return true;
 			}
 		} catch (IOException | TransformerException | TransformerFactoryConfigurationError e) {
 			logger.error(e.toString());
-			return false;
 		}
+		return responseCode;
 	}
 
 	// cancel order to prepared broker
@@ -622,12 +618,24 @@ public class OrderService {
 		}
 
 		OrderAcceptAlacrity winnerAlacrity = alacrityDao.getWinner(order);
-		boolean success = false;
+		int responseCode = 0;
 		if (winnerAlacrity != null) {
-			success = giveOrder(order.getId(), winnerAlacrity);
+			responseCode = giveOrder(order.getId(), winnerAlacrity);
 		}
 
-		if (!success) {
+		if (responseCode == 200) {
+			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
+			orderCancelHolder.setOrder(order);
+			orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
+			return orderCancelHolder;
+
+		} else {
+			if (responseCode != 0) {
+				winnerAlacrity.setFail(true);
+				winnerAlacrity.setFailHttpCode(responseCode);
+				alacrityDao.save(winnerAlacrity);
+			}
+
 			// check date supply for obsolete order
 			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = checkExpired(order, cancelOrderTimeout,
 					new Date());
@@ -636,11 +644,6 @@ public class OrderService {
 			} else {
 				return order;
 			}
-		} else {
-			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
-			orderCancelHolder.setOrder(order);
-			orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
-			return orderCancelHolder;
 		}
 	}
 

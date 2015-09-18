@@ -11,7 +11,9 @@ public class OrderAcceptAlacrity implements Serializable {
 	private Broker broker;
 	private Order order;
 	private String uuid;
-	private Date date;	
+	private Date date;
+	private Boolean fail;
+	private Integer failHttpCode;
 
 	public Broker getBroker() {
 		return broker;
@@ -43,5 +45,21 @@ public class OrderAcceptAlacrity implements Serializable {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public Boolean getFail() {
+		return fail;
+	}
+
+	public void setFail(Boolean fail) {
+		this.fail = fail;
+	}
+
+	public Integer getFailHttpCode() {
+		return failHttpCode;
+	}
+
+	public void setFailHttpCode(Integer failHttpCode) {
+		this.failHttpCode = failHttpCode;
 	}
 }

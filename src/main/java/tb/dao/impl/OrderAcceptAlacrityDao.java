@@ -46,6 +46,7 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 		OrderAcceptAlacrity winnerAlacrity = (OrderAcceptAlacrity) sessionFactory.getCurrentSession()
 				.createCriteria(OrderAcceptAlacrity.class)
 				.add(Restrictions.eq("order", order))
+				.add(Restrictions.eqOrIsNull("fail", false))
 				.addOrder(org.hibernate.criterion.Order.asc("date"))
 				.setMaxResults(1)
 				.uniqueResult();
