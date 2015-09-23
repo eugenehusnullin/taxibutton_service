@@ -88,7 +88,7 @@ public class OrderController {
 	@RequestMapping(value = "/alacrity", method = RequestMethod.POST)
 	public String alacrity(HttpServletRequest request) throws IOException, URISyntaxException {
 
-		String url = HttpUtils.getApplicationUrl(request).concat("/1.x/carack");
+		String url = HttpUtils.getApplicationUrl(request, "/admin").concat("/1.x/carack");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -147,7 +147,7 @@ public class OrderController {
 			params += "&status=" + status + "&extra=" + extra;
 		}
 
-		String url = HttpUtils.getApplicationUrl(request).concat("/1.x/requestconfirm");
+		String url = HttpUtils.getApplicationUrl(request, "/admin").concat("/1.x/requestconfirm");
 		URL obj = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 		connection.setRequestMethod("POST");
@@ -184,7 +184,7 @@ public class OrderController {
 		getGeodataJson.put("orderId", orderModel.getUuid());
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/geodata");
+			String url = HttpUtils.getApplicationUrl(request, "/admin").concat("/apidevice/order/geodata");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -233,7 +233,7 @@ public class OrderController {
 		getStatusJson.put("orderId", orderModel.getUuid());
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/status");
+			String url = HttpUtils.getApplicationUrl(request, "/admin").concat("/apidevice/order/status");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -293,7 +293,7 @@ public class OrderController {
 		int responseCode = 0;
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/cancel");
+			String url = HttpUtils.getApplicationUrl(request, "/admin").concat("/apidevice/order/cancel");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
@@ -412,7 +412,7 @@ public class OrderController {
 		String jsonResult = createOrderJson.toString();
 
 		try {
-			String url = HttpUtils.getApplicationUrl(request).concat("/apidevice/order/create");
+			String url = HttpUtils.getApplicationUrl(request, "/admin").concat("/apidevice/order/create");
 			URL obj = new URL(url);
 			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 			connection.setRequestMethod("POST");
