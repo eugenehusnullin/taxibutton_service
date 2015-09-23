@@ -614,16 +614,19 @@ public class OrderService {
 		// check right status
 		OrderStatus orderStatus = orderStatusDao.getLast(order);
 		if (OrderStatusType.EndProcessingStatus(orderStatus.getStatus())) {
+			logger.info("chooseWinner for order id=" + order.getId() + ", detect that is in EndProcessingStatus.");
 			return null;
 		}
 
 		OrderAcceptAlacrity winnerAlacrity = alacrityDao.getWinner(order);
 		int responseCode = 0;
 		if (winnerAlacrity != null) {
+			logger.info("chooseWinner for order id=" + order.getId() + ", found winner id=" + winnerAlacrity.getBroker().getId());
 			responseCode = giveOrder(order.getId(), winnerAlacrity);
 		}
 
 		if (responseCode == 200) {
+			logger.info("chooseWinner for order id=" + order.getId() + ", success gived to winner.");
 			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = new CancelOrderProcessing.OrderCancelHolder();
 			orderCancelHolder.setOrder(order);
 			orderCancelHolder.setOrderCancelType(OrderCancelType.Assigned);
@@ -631,17 +634,21 @@ public class OrderService {
 
 		} else {
 			if (responseCode != 0) {
+				logger.info("chooseWinner for order id=" + order.getId() + ", fail give to winner.");
 				winnerAlacrity.setFail(true);
 				winnerAlacrity.setFailHttpCode(responseCode);
 				alacrityDao.save(winnerAlacrity);
 			}
 
+			logger.info("chooseWinner for order id=" + order.getId() + ", check expired.");
 			// check date supply for obsolete order
 			CancelOrderProcessing.OrderCancelHolder orderCancelHolder = checkExpired(order, cancelOrderTimeout,
 					new Date());
 			if (orderCancelHolder != null) {
+				logger.info("chooseWinner for order id=" + order.getId() + ", order has expired.");
 				return orderCancelHolder;
 			} else {
+				logger.info("chooseWinner for order id=" + order.getId() + ", paused for next iteration.");
 				return order;
 			}
 		}
