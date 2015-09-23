@@ -44,7 +44,7 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 				.createCriteria(OrderAcceptAlacrity.class)
 				.add(Restrictions.eq("order", order))
 				.add(
-						Restrictions.disjunction(
+						Restrictions.or(
 								Restrictions.eq("fail", false),
 								Restrictions.isNull("fail")))
 				.addOrder(org.hibernate.criterion.Order.asc("date"))
