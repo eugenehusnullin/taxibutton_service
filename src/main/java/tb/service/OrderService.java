@@ -53,7 +53,6 @@ import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
 import tb.service.exceptions.WrongData;
 import tb.service.processing.CancelOrderProcessing;
-import tb.service.processing.ChooseWinnerProcessing;
 import tb.service.processing.OfferOrderProcessing;
 import tb.service.serialize.OrderJsonParser;
 import tb.service.serialize.YandexOrderSerializer;
@@ -97,8 +96,8 @@ public class OrderService {
 	@Value("#{mainSettings['offerorder.notlaterminutes']}")
 	private int notlaterMinutes;
 
-	@Autowired
-	private ChooseWinnerProcessing chooseWinnerProcessing;
+	// @Autowired
+	// private ChooseWinnerProcessing chooseWinnerProcessing;
 
 	@Transactional
 	public void saveFeedback(JSONObject feedbackJson) throws OrderNotFoundException, WrongData {
@@ -362,9 +361,9 @@ public class OrderService {
 
 		OrderExecHolder orderExecHolder = new OrderExecHolder(order);
 		orderExecHolder.setStartChooseWinner(new Date());
-		if (!chooseWinnerProcessing.exists(orderExecHolder)) {
-			chooseWinnerProcessing.addOrder(orderExecHolder);
-		}
+		// if (!chooseWinnerProcessing.exists(orderExecHolder)) {
+		// chooseWinnerProcessing.addOrder(orderExecHolder);
+		// }
 	}
 
 	@Transactional
@@ -621,7 +620,8 @@ public class OrderService {
 		OrderAcceptAlacrity winnerAlacrity = alacrityDao.getWinner(order);
 		int responseCode = 0;
 		if (winnerAlacrity != null) {
-			logger.info("chooseWinner for order id=" + order.getId() + ", found winner id=" + winnerAlacrity.getBroker().getId());
+			logger.info("chooseWinner for order id=" + order.getId() + ", found winner id="
+					+ winnerAlacrity.getBroker().getId());
 			responseCode = giveOrder(order.getId(), winnerAlacrity);
 		}
 

@@ -22,10 +22,8 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 	@Override
 	public OrderAcceptAlacrity get(Order order, Broker broker, String uuid) {
 		return (OrderAcceptAlacrity) sessionFactory.getCurrentSession().createCriteria(OrderAcceptAlacrity.class)
-				.add(Restrictions.eq("order", order))
-				.add(Restrictions.eq("broker", broker))
-				.add(Restrictions.eq("uuid", uuid))
-				.uniqueResult();
+				.add(Restrictions.eq("order", order)).add(Restrictions.eq("broker", broker))
+				.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 
 	@Override
@@ -42,11 +40,13 @@ public class OrderAcceptAlacrityDao implements IOrderAcceptAlacrityDao {
 
 	@Override
 	public OrderAcceptAlacrity getWinner(Order order) {
-
 		OrderAcceptAlacrity winnerAlacrity = (OrderAcceptAlacrity) sessionFactory.getCurrentSession()
 				.createCriteria(OrderAcceptAlacrity.class)
 				.add(Restrictions.eq("order", order))
-				.add(Restrictions.eqOrIsNull("fail", false))
+				.add(
+						Restrictions.disjunction(
+								Restrictions.eq("fail", false),
+								Restrictions.isNull("fail")))
 				.addOrder(org.hibernate.criterion.Order.asc("date"))
 				.setMaxResults(1)
 				.uniqueResult();
