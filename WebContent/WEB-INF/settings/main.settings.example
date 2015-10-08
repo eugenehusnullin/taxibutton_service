@@ -13,8 +13,6 @@ cancelorder.threads.count=10
 
 createorder.limit=180000
 
-device.registration.smsmethod=self
-;device.registration.smsmethod=sms48
 
 ;run synch cars and tariffs after application start in seconds
 starter.runsynch.seconds=60
@@ -61,14 +59,10 @@ hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect
 hibernate.show_sql=true
 hibernate.hbm2ddl.auto=create-drop
 
-
-
-
-
 ;;;;;;;;;;;SMS
-sms48.request=http://sms48.ru/send_sms.php?api_login=[login]&to=[reciever]&from=[sender]&msg=[msg]&check3=[md5]
-sms48.login=login
-sms48.pass=pass
-sms48.sender=knopka
+sms.url.old=http://crm.podglonass.ru/engine/ajax/crm/index.php?mod=taxiclub
+sms.url=http://crm.podglonass.ru/smser/index.php?taxiid=TAXIID&act=add
 
-smscrm.request=http://crm.podglonass.ru/engine/ajax/crm/index.php?mod=smsgateway
+
+
+

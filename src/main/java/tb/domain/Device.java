@@ -7,6 +7,7 @@ public class Device {
 	private Long id;
 	private String apiId;
 	private String phone;
+	private String taxi;
 	private Date regDate;
 
 	private String confirmKey;
@@ -67,5 +68,13 @@ public class Device {
 
 	public void setConfirmedDate(Date confirmedDate) {
 		this.confirmedDate = confirmedDate;
+	}
+
+	public String getTaxi() {
+		return taxi;
+	}
+
+	public void setTaxi(String taxi) {
+		this.taxi = taxi;
 	}
 }

@@ -47,6 +47,19 @@ public class DeviceDao implements IDeviceDao {
 	public Device getByPhone(String phone) {
 		return (Device) sessionFactory.getCurrentSession()
 				.createCriteria(Device.class)
-				.add(Restrictions.eq("phone", phone)).uniqueResult();
+				.add(Restrictions.eq("phone", phone))
+				.add(Restrictions.or(
+						Restrictions.eq("taxi", ""),
+						Restrictions.isNull("taxi")))
+				.uniqueResult();
+	}
+
+	@Override
+	public Device get(String phone, String taxi) {
+		return (Device) sessionFactory.getCurrentSession()
+				.createCriteria(Device.class)
+				.add(Restrictions.eq("phone", phone))
+				.add(Restrictions.eq("taxi", taxi))
+				.uniqueResult();
 	}
 }

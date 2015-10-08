@@ -34,12 +34,21 @@ public class DeviceService {
 			return resultJson;
 		}
 
-		Device device = deviceDao.getByPhone(phone);
+		String taxi = registerJson.optString("taxi");
+
+		Device device = null;
+		if (taxi.isEmpty()) {
+			device = deviceDao.getByPhone(phone);
+		} else {
+			device = deviceDao.get(phone, taxi);
+		}
+
 		if (device == null) {
 			String newDeviceUuid = UUID.randomUUID().toString();
 			device = new Device();
 			device.setApiId(newDeviceUuid);
 			device.setPhone(phone);
+			device.setTaxi(taxi);
 			device.setRegDate(new Date());
 		}
 
@@ -49,8 +58,8 @@ public class DeviceService {
 		device.setConfirmKey(Integer.toString(keyInt));
 		deviceDao.save(device);
 
-		smsService.sendMessage(phone, "Код: " + Integer.toString(keyInt));
-		resultJson.put("result", "WAITSMS");
+		boolean smsResult = smsService.send(taxi, phone, "Код: " + Integer.toString(keyInt));
+		resultJson.put("result", smsResult ? "WAITSMS" : "ERROR");
 		return resultJson;
 	}
 
@@ -67,7 +76,15 @@ public class DeviceService {
 			return resultJson;
 		}
 
-		Device device = deviceDao.getByPhone(phone);
+		String taxi = confirmJson.optString("taxi");
+
+		Device device = null;
+		if (taxi.isEmpty()) {
+			device = deviceDao.getByPhone(phone);
+		} else {
+			device = deviceDao.get(phone, taxi);
+		}
+
 		if (device == null) {
 			resultJson.put("result", "ERROR");
 			resultJson.put("description", "phone not found");
