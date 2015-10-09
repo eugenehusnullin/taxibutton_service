@@ -45,6 +45,9 @@ public class SmsService {
 				logger.error(response);
 				return false;
 			} else {
+				logger.debug(smsUrl.replace("TAXIID", taxi));
+				logger.debug(body);
+				logger.debug(response);
 				return true;
 			}
 		} catch (Exception e) {
