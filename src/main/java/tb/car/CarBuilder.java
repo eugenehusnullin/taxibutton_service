@@ -12,7 +12,7 @@ import org.w3c.dom.NodeList;
 
 import tb.car.domain.Car;
 import tb.domain.Broker;
-import utils.XmlUtils;
+import tb.utils.XmlUtils;
 
 @Service
 public class CarBuilder {

@@ -1,11 +1,12 @@
 package tb.apidevice;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hsqldb.lib.DataOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import tb.service.TariffService;
 import tb.service.exceptions.DeviceNotFoundException;
-import utils.NetStreamUtils;
 
 @RequestMapping("/tariff")
 @Controller("apiDeviceTariffController")
@@ -32,8 +32,8 @@ public class TariffController {
 	public void getAll(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			StringBuffer stringBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
-			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			JSONObject requestJson = (JSONObject) new JSONTokener(IOUtils.toString(request.getInputStream(), "UTF-8"))
+					.nextValue();
 
 			try {
 				JSONArray responseJson = tariffService.getByBroker(requestJson);

@@ -35,7 +35,6 @@ import tb.service.exceptions.OrderNotFoundException;
 import tb.service.exceptions.ParseOrderException;
 import tb.service.exceptions.WrongData;
 import tb.tariffdefinition.CostRequest;
-import utils.NetStreamUtils;
 
 @RequestMapping("/order")
 @Controller("apiDeviceOrderController")
@@ -221,8 +220,7 @@ public class OrderController {
 	public void getBrokers(HttpServletRequest request, HttpServletResponse response) {
 		try {
 
-			StringBuffer stringBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
-			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			JSONObject requestJson = (JSONObject) new JSONTokener(IOUtils.toString(request.getInputStream(), "UTF-8")).nextValue();
 
 			String lat = requestJson.optString("lat");
 			String lon = requestJson.optString("lon");

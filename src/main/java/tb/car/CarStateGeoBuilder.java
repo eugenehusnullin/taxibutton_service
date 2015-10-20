@@ -11,7 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import tb.car.domain.CarState;
-import utils.XmlUtils;
+import tb.utils.XmlUtils;
 
 @Service
 public class CarStateGeoBuilder {

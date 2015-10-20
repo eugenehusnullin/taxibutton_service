@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import tb.domain.order.Order;
 import tb.domain.order.OrderCancelType;
 import tb.service.OrderService;
-import utils.ThreadFactorySecuenceNaming;
 
 @Service
 public class CancelOrderProcessing {
@@ -102,8 +101,7 @@ public class CancelOrderProcessing {
 
 	@PostConstruct
 	public void startProcessing() {
-		executor = Executors.newFixedThreadPool(threadsCount, new ThreadFactorySecuenceNaming(
-				"CancelOrderProcessing EXECUTOR #"));
+		executor = Executors.newFixedThreadPool(threadsCount);
 
 		Runnable processRunnable = new ReceiverOrderCancelRunnable();
 		mainThread = new Thread(processRunnable);

@@ -20,7 +20,7 @@ import tb.domain.TariffDefinition;
 import tb.domain.maparea.Point;
 import tb.domain.order.VehicleClass;
 import tb.service.serialize.YandexOrderSerializer;
-import utils.HttpUtils;
+import tb.utils.HttpUtils;
 
 @Service
 public class CostRequest {

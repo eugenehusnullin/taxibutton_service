@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import tb.service.OfferingOrderTaxiRF;
 import tb.service.OrderExecHolder;
 import tb.service.OrderService;
-import utils.ThreadFactorySecuenceNaming;
 
 @Service()
 public class OfferOrderProcessing {
@@ -78,8 +77,8 @@ public class OfferOrderProcessing {
 						orderExecHolder.setStartChooseWinner(new Date());
 						chooseWinnerProcessing.addOrder(orderExecHolder);
 					} else {
-						CancelOrderProcessing.OrderCancelHolder orderCancelHolder =
-								orderService.checkExpired(orderExecHolder.getOrder(), cancelOrderTimeout, new Date());
+						CancelOrderProcessing.OrderCancelHolder orderCancelHolder = orderService
+								.checkExpired(orderExecHolder.getOrder(), cancelOrderTimeout, new Date());
 						if (orderCancelHolder != null) {
 							cancelOrderProcessing.addOrderCancel(orderCancelHolder);
 						} else {
@@ -120,8 +119,7 @@ public class OfferOrderProcessing {
 
 	@PostConstruct
 	public void startProcessing() {
-		executor = Executors.newFixedThreadPool(threadsCount, new ThreadFactorySecuenceNaming(
-				"OfferOrderProcessing EXECUTOR #"));
+		executor = Executors.newFixedThreadPool(threadsCount);
 
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);

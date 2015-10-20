@@ -35,7 +35,7 @@ import tb.domain.order.Order;
 import tb.domain.order.OrderStatus;
 import tb.domain.order.OrderStatusType;
 import tb.service.serialize.YandexOrderSerializer;
-import utils.HttpUtils;
+import tb.utils.HttpUtils;
 
 @Service
 public class OfferingOrderYandexTaxi {

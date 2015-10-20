@@ -18,7 +18,6 @@ import tb.domain.Broker;
 import tb.domain.maparea.MapArea;
 import tb.maparea.MapareaSerializer;
 import tb.service.BrokerService;
-import utils.NetStreamUtils;
 
 @RequestMapping("/maparea")
 @Controller("apiDeviceMapareaController")
@@ -34,8 +33,7 @@ public class MapareaController {
 	@Transactional
 	public void getMapareas(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			StringBuffer stringBuffer = NetStreamUtils.getHttpServletRequestBuffer(request);
-			JSONObject requestJson = (JSONObject) new JSONTokener(stringBuffer.toString()).nextValue();
+			JSONObject requestJson = (JSONObject) new JSONTokener(IOUtils.toString(request.getInputStream(), "UTF-8")).nextValue();
 
 			String uuid = requestJson.optString("uuid");
 			if (uuid != null) {

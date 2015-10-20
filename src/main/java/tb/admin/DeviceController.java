@@ -8,6 +8,7 @@ import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import tb.service.DeviceService;
-import utils.HttpUtils;
-import utils.NetStreamUtils;
+import tb.utils.HttpUtils;
 
 @RequestMapping("/device")
 @Controller
@@ -69,8 +69,8 @@ public class DeviceController {
 				System.out.println("Error creating an ");
 			}
 
-			JSONObject responseJson = (JSONObject) new JSONTokener(NetStreamUtils.getStringFromInputStream(connection
-					.getInputStream())).nextValue();
+			JSONObject responseJson = (JSONObject) new JSONTokener(
+					IOUtils.toString(connection.getInputStream(), "UTF-8")).nextValue();
 
 			model.addAttribute("result", responseJson);
 

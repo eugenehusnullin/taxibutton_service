@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 
 import tb.domain.Broker;
 import tb.domain.Tariff;
-import utils.XmlUtils;
+import tb.utils.XmlUtils;
 
 @Service
 public class TariffBuilder {

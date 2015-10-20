@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import tb.domain.order.Order;
 import tb.service.OrderExecHolder;
 import tb.service.OrderService;
-import utils.ThreadFactorySecuenceNaming;
 
 @Service
 public class ChooseWinnerProcessing {
@@ -101,8 +100,7 @@ public class ChooseWinnerProcessing {
 
 	@PostConstruct
 	public void startProcessing() {
-		executor = Executors.newFixedThreadPool(threadsCount, new ThreadFactorySecuenceNaming(
-				"ChooseWinnerProcessing EXECUTOR #"));
+		executor = Executors.newFixedThreadPool(threadsCount);
 
 		Runnable processRunnable = new RecieverOrderRunnable();
 		mainThread = new Thread(processRunnable);
@@ -127,7 +125,7 @@ public class ChooseWinnerProcessing {
 			queue.notifyAll();
 		}
 	}
-	
+
 	public boolean exists(OrderExecHolder orderExecHolder) {
 		synchronized (queue) {
 			boolean r = queue.contains(orderExecHolder);

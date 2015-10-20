@@ -57,8 +57,8 @@ import tb.service.processing.OfferOrderProcessing;
 import tb.service.serialize.OrderJsonParser;
 import tb.service.serialize.YandexOrderSerializer;
 import tb.tariffdefinition.TariffDefinitionHelper;
-import utils.DatetimeUtils;
-import utils.HttpUtils;
+import tb.utils.DatetimeUtils;
+import tb.utils.HttpUtils;
 
 @Service
 public class OrderService {

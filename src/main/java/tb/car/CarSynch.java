@@ -17,8 +17,8 @@ import tb.car.dao.CarDao;
 import tb.car.domain.Car;
 import tb.dao.IBrokerDao;
 import tb.domain.Broker;
-import utils.HttpUtils;
-import utils.XmlUtils;
+import tb.utils.HttpUtils;
+import tb.utils.XmlUtils;
 
 @Service
 @EnableScheduling
