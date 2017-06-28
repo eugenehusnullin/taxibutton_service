@@ -14,3 +14,4 @@ WebContent/WEB-INF/settings/sms48.settings
 src/main/resources/log4j2.xml
 src/main/resources/tb/apitaxirf/*
 WebContent/resources/css/root.css
+/.gradle/
